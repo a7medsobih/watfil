@@ -1,4 +1,4 @@
-next-template/
+watfil-website/
 ├── app/
 │   ├── [locale]/
 │   │   ├── layout.js

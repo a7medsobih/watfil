@@ -1,3 +1,4 @@
 export default function ComparePage() {
-  return <h1>Compare</h1>;
+
+  return <h1>t()</h1>;
 }
