@@ -1,0 +1,91 @@
+next-template/
+├── app/
+│   ├── [locale]/
+│   │   ├── layout.js
+│   │   ├── error.js
+│   │   ├── (public)/
+│   │   │   ├── layout.js
+│   │   │   ├── loading.js
+│   │   │   ├── not-found.js
+│   │   │   ├── page.js                     # Home
+│   │   │   ├── products/
+│   │   │   │   ├── page.js
+│   │   │   │   ├── loading.js
+│   │   │   │   └── [slug]/
+│   │   │   │       ├── page.js
+│   │   │   │       └── loading.js
+│   │   │   ├── companies/
+│   │   │   │   ├── page.js
+│   │   │   │   ├── loading.js
+│   │   │   │   └── [slug]/
+│   │   │   │       ├── page.js
+│   │   │   │       └── loading.js
+│   │   │   ├── categories/
+│   │   │   │   ├── page.js
+│   │   │   │   └── [slug]/
+│   │   │   │       └── page.js
+│   │   │   ├── search/
+│   │   │   │   └── page.js
+│   │   │   ├── wishlist/
+│   │   │   │   └── page.js
+│   │   │   ├── compare/
+│   │   │   │   └── page.js
+│   │   │   ├── blog/
+│   │   │   │   ├── page.js
+│   │   │   │   └── [slug]/
+│   │   │   │       └── page.js
+│   │   │   └── about/
+│   │   │       └── page.js
+│   │   └── (auth)/
+│   │       ├── layout.js
+│   │       ├── login/
+│   │       ├── register/
+│   │       ├── forgot-password/
+│   │       └── reset-password/
+│   ├── api/
+│   │   └── health/
+│   ├── sitemap.js
+│   ├── robots.js
+│   └── manifest.js
+├── features/
+│   ├── home/
+│   ├── products/
+│   ├── companies/
+│   ├── blog/
+│   ├── categories/
+│   ├── search/
+│   ├── wishlist/
+│   ├── compare/
+│   ├── auth/
+│   └── reviews/
+├── components/
+│   ├── ui/
+│   ├── layout/
+│   ├── common/
+│   ├── skeletons/
+│   ├── seo/
+│   ├── animations/
+│   └── LanguageSwitcher.jsx
+├── lib/
+│   ├── api/
+│   │   ├── client.js
+│   │   ├── fetcher.js
+│   │   └── endpoints.js
+│   ├── seo/
+│   ├── cache/
+│   ├── utils/
+│   ├── constants/
+│   └── validations/
+├── hooks/
+├── i18n/
+├── messages/
+├── styles/
+├── assets/
+├── public/
+├── proxy.ts                    # Next.js 16 (replaces middleware.js)
+├── next.config.mjs
+├── jsconfig.json
+├── eslint.config.mjs
+├── components.json
+├── package.json
+└── README.md
