@@ -5,91 +5,142 @@
     "AboutPage": {
         "title": "مرحبا بالعالم فى الابوت "
     },
-    "brand.name": "وتفل",
-    "brand.tagline": "مياه نقية. تقنية موثوقة.",
-    "nav.home": "الرئيسية",
-    "nav.products": "المنتجات",
-    "nav.companies": "الشركات",
-    "nav.blog": "المدونة",
-    "nav.about": "من نحن",
-    "nav.contact": "تواصل معنا",
-    "nav.wishlist": "المفضلة",
-    "nav.compare": "المقارنة",
-    "nav.search": "بحث",
-    "nav.login": "تسجيل الدخول",
-    "nav.register": "إنشاء حساب",
-    "cta.explore": "استكشف المنتجات",
-    "cta.browse": "تصفح الكتالوج",
-    "cta.viewAll": "عرض الكل",
-    "cta.readMore": "اقرأ المزيد",
-    "cta.contact": "تواصل مع الشركة",
-    "cta.getQuote": "اطلب عرض سعر",
-    "cta.addToCompare": "أضف للمقارنة",
-    "cta.wishlist": "حفظ",
-    "hero.eyebrow": "أكثر من ٤٨٠ مورد معتمد يثقون بنا",
-    "hero.title": "مياه أنقى،\nاختيار أذكى.",
-    "hero.subtitle": "اكتشف أفضل فلاتر وأجهزة تنقية المياه والشركات الموردة في جميع المحافظات — في مكان واحد.",
-    "hero.searchPlaceholder": "ابحث عن فلاتر، ماركات، فئات…",
-    "home.categories.title": "تصفح حسب الفئة",
-    "home.categories.subtitle": "من فلاتر المنزل إلى أنظمة التنقية الصناعية.",
-    "home.featured.title": "المنتجات المميزة",
-    "home.featured.subtitle": "فلاتر مختارة بعناية يثق بها مجتمعنا.",
-    "home.companies.title": "أفضل الشركات",
-    "home.companies.subtitle": "موردون معتمدون وفنيو تركيب وخدمة.",
-    "home.why.title": "لماذا وتفل",
-    "home.why.subtitle": "كل ما تحتاجه لاختيار تقنية المياه بثقة.",
-    "home.stats.products": "منتج",
-    "home.stats.companies": "شركة",
-    "home.stats.reviews": "تقييم موثق",
-    "home.stats.governorates": "محافظة",
-    "home.reviews.title": "ماذا يقول عملاؤنا",
-    "home.newsletter.title": "ابقَ على تواصل",
-    "home.newsletter.subtitle": "احصل على أحدث المنتجات ودلائل الشراء والعروض الحصرية.",
-    "home.newsletter.button": "اشترك",
-    "products.title": "كل المنتجات",
-    "products.filters": "الفلاتر",
-    "products.sort": "ترتيب",
-    "products.sort.new": "الأحدث",
-    "products.sort.popular": "الأكثر شهرة",
-    "products.sort.rating": "الأعلى تقييماً",
-    "products.category": "الفئة",
-    "products.brand": "الماركة",
-    "products.governorate": "المحافظة",
-    "products.price": "السعر",
-    "products.rating": "التقييم",
-    "products.availability": "التوفر",
-    "products.results": "نتيجة",
-    "product.specs": "المواصفات",
-    "product.features": "المميزات",
-    "product.reviews": "التقييمات",
-    "product.faq": "أسئلة شائعة",
-    "product.companies": "الشركات الموردة",
-    "product.related": "منتجات مشابهة",
-    "product.filterByGov": "تصفية حسب المحافظة",
-    "company.about": "عن الشركة",
-    "company.branches": "الفروع",
-    "company.products": "المنتجات",
-    "company.gallery": "المعرض",
-    "company.contact": "تواصل",
-    "blog.latest": "أحدث المقالات",
-    "blog.readTime": "دقيقة قراءة",
-    "auth.login.title": "أهلاً بعودتك",
-    "auth.login.subtitle": "سجل دخولك إلى حساب وتفل",
-    "auth.register.title": "أنشئ حسابك",
-    "auth.register.subtitle": "انضم لآلاف العملاء والمهنيين",
-    "auth.email": "البريد الإلكتروني",
-    "auth.password": "كلمة المرور",
-    "auth.name": "الاسم الكامل",
-    "auth.forgot": "نسيت كلمة المرور؟",
-    "auth.or": "أو تابع باستخدام",
-    "auth.haveAccount": "لديك حساب بالفعل؟",
-    "auth.noAccount": "جديد في وتفل؟",
-    "wishlist.title": "مفضلتك",
-    "wishlist.empty": "لا يوجد شيء محفوظ",
-    "compare.title": "مقارنة المنتجات",
-    "footer.tagline": "المنصة الموثوقة لتقنيات المياه النظيفة.",
-    "footer.explore": "استكشف",
-    "footer.company": "الشركة",
-    "footer.support": "الدعم",
-    "footer.rights": "جميع الحقوق محفوظة."
+    "brand": {
+        "name": "وتفل",
+        "tagline": "مياه نقية. تقنية موثوقة."
+    },
+    "nav": {
+        "home": "الرئيسية",
+        "products": "المنتجات",
+        "companies": "الشركات",
+        "blog": "المدونة",
+        "about": "من نحن",
+        "contact": "تواصل معنا",
+        "wishlist": "المفضلة",
+        "compare": "المقارنة",
+        "search": "بحث",
+        "login": "تسجيل الدخول",
+        "register": "إنشاء حساب",
+        "menu": "القائمة",
+        "primary": "القائمة الرئيسية",
+        "language": "اللغة",
+        "theme": "المظهر",
+        "themeLight": "فاتح",
+        "themeDark": "داكن"
+    },
+    "cta": {
+        "explore": "استكشف المنتجات",
+        "browse": "تصفح الكتالوج",
+        "viewAll": "عرض الكل",
+        "readMore": "اقرأ المزيد",
+        "contact": "تواصل مع الشركة",
+        "getQuote": "اطلب عرض سعر",
+        "addToCompare": "أضف للمقارنة",
+        "wishlist": "حفظ"
+    },
+    "hero": {
+        "eyebrow": "أكثر من ٤٨٠ مورد معتمد يثقون بنا",
+        "title": "مياه أنقى،\nاختيار أذكى.",
+        "subtitle": "اكتشف أفضل فلاتر وأجهزة تنقية المياه والشركات الموردة في جميع المحافظات — في مكان واحد.",
+        "searchPlaceholder": "ابحث عن فلاتر، ماركات، فئات…"
+    },
+    "home": {
+        "categories": {
+            "title": "تصفح حسب الفئة",
+            "subtitle": "من فلاتر المنزل إلى أنظمة التنقية الصناعية."
+        },
+        "featured": {
+            "title": "المنتجات المميزة",
+            "subtitle": "فلاتر مختارة بعناية يثق بها مجتمعنا."
+        },
+        "companies": {
+            "title": "أفضل الشركات",
+            "subtitle": "موردون معتمدون وفنيو تركيب وخدمة."
+        },
+        "why": {
+            "title": "لماذا وتفل",
+            "subtitle": "كل ما تحتاجه لاختيار تقنية المياه بثقة."
+        },
+        "stats": {
+            "products": "منتج",
+            "companies": "شركة",
+            "reviews": "تقييم موثق",
+            "governorates": "محافظة"
+        },
+        "reviews": {
+            "title": "ماذا يقول عملاؤنا"
+        },
+        "newsletter": {
+            "title": "ابقَ على تواصل",
+            "subtitle": "احصل على أحدث المنتجات ودلائل الشراء والعروض الحصرية.",
+            "button": "اشترك"
+        }
+    },
+    "products": {
+        "title": "كل المنتجات",
+        "filters": "الفلاتر",
+        "sort": {
+            "new": "الأحدث",
+            "popular": "الأكثر شهرة",
+            "rating": "الأعلى تقييماً"
+        },
+        "category": "الفئة",
+        "brand": "الماركة",
+        "governorate": "المحافظة",
+        "price": "السعر",
+        "rating": "التقييم",
+        "availability": "التوفر",
+        "results": "نتيجة"
+    },
+    "product": {
+        "specs": "المواصفات",
+        "features": "المميزات",
+        "reviews": "التقييمات",
+        "faq": "أسئلة شائعة",
+        "companies": "الشركات الموردة",
+        "related": "منتجات مشابهة",
+        "filterByGov": "تصفية حسب المحافظة"
+    },
+    "company": {
+        "about": "عن الشركة",
+        "branches": "الفروع",
+        "products": "المنتجات",
+        "gallery": "المعرض",
+        "contact": "تواصل"
+    },
+    "blog": {
+        "latest": "أحدث المقالات",
+        "readTime": "دقيقة قراءة"
+    },
+    "auth": {
+        "login": {
+            "title": "أهلاً بعودتك",
+            "subtitle": "سجل دخولك إلى حساب وتفل"
+        },
+        "register": {
+            "title": "أنشئ حسابك",
+            "subtitle": "انضم لآلاف العملاء والمهنيين"
+        },
+        "email": "البريد الإلكتروني",
+        "password": "كلمة المرور",
+        "name": "الاسم الكامل",
+        "forgot": "نسيت كلمة المرور؟",
+        "or": "أو تابع باستخدام",
+        "haveAccount": "لديك حساب بالفعل؟",
+        "noAccount": "جديد في وتفل؟"
+    },
+    "wishlist": {
+        "title": "مفضلتك",
+        "empty": "لا يوجد شيء محفوظ"
+    },
+    "compare": {
+        "title": "مقارنة المنتجات"
+    },
+    "footer": {
+        "tagline": "المنصة الموثوقة لتقنيات المياه النظيفة.",
+        "explore": "استكشف",
+        "company": "الشركة",
+        "support": "الدعم",
+        "rights": "جميع الحقوق محفوظة."
+    }
 }

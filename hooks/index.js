@@ -1,1 +1,1 @@
-// Shared app hooks
+export { useThemeToggle } from "./useThemeToggle";

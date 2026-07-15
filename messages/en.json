@@ -5,91 +5,142 @@
     "AboutPage": {
         "title": "Hello world!"
     },
-    "brand.name": "Watfil",
-    "brand.tagline": "Pure Water. Trusted Technology.",
-    "nav.home": "Home",
-    "nav.products": "Products",
-    "nav.companies": "Companies",
-    "nav.blog": "Blog",
-    "nav.about": "About",
-    "nav.contact": "Contact",
-    "nav.wishlist": "Wishlist",
-    "nav.compare": "Compare",
-    "nav.search": "Search",
-    "nav.login": "Sign in",
-    "nav.register": "Create account",
-    "cta.explore": "Explore products",
-    "cta.browse": "Browse catalog",
-    "cta.viewAll": "View all",
-    "cta.readMore": "Read more",
-    "cta.contact": "Contact company",
-    "cta.getQuote": "Request quote",
-    "cta.addToCompare": "Add to compare",
-    "cta.wishlist": "Save",
-    "hero.eyebrow": "Trusted by 480+ certified suppliers",
-    "hero.title": "Cleaner water,\nsmarter choices.",
-    "hero.subtitle": "Discover premium water filters, purifiers, and the companies that deliver them across every governorate — all in one place.",
-    "hero.searchPlaceholder": "Search filters, brands, categories…",
-    "home.categories.title": "Explore by category",
-    "home.categories.subtitle": "From household filters to industrial purification systems.",
-    "home.featured.title": "Featured products",
-    "home.featured.subtitle": "Hand-picked filters trusted by our community.",
-    "home.companies.title": "Top companies",
-    "home.companies.subtitle": "Certified suppliers, installers and service providers.",
-    "home.why.title": "Why Watfil",
-    "home.why.subtitle": "Everything you need to choose water technology with confidence.",
-    "home.stats.products": "Products",
-    "home.stats.companies": "Companies",
-    "home.stats.reviews": "Verified reviews",
-    "home.stats.governorates": "Governorates",
-    "home.reviews.title": "What customers say",
-    "home.newsletter.title": "Stay in the flow",
-    "home.newsletter.subtitle": "Get product releases, buying guides and exclusive offers.",
-    "home.newsletter.button": "Subscribe",
-    "products.title": "All products",
-    "products.filters": "Filters",
-    "products.sort": "Sort",
-    "products.sort.new": "Newest",
-    "products.sort.popular": "Popular",
-    "products.sort.rating": "Top rated",
-    "products.category": "Category",
-    "products.brand": "Brand",
-    "products.governorate": "Governorate",
-    "products.price": "Price",
-    "products.rating": "Rating",
-    "products.availability": "Availability",
-    "products.results": "results",
-    "product.specs": "Specifications",
-    "product.features": "Features",
-    "product.reviews": "Reviews",
-    "product.faq": "FAQ",
-    "product.companies": "Companies selling this",
-    "product.related": "Related products",
-    "product.filterByGov": "Filter by governorate",
-    "company.about": "About company",
-    "company.branches": "Branches",
-    "company.products": "Products",
-    "company.gallery": "Gallery",
-    "company.contact": "Contact",
-    "blog.latest": "Latest articles",
-    "blog.readTime": "min read",
-    "auth.login.title": "Welcome back",
-    "auth.login.subtitle": "Sign in to your Watfil account",
-    "auth.register.title": "Create your account",
-    "auth.register.subtitle": "Join thousands of homeowners and pros",
-    "auth.email": "Email",
-    "auth.password": "Password",
-    "auth.name": "Full name",
-    "auth.forgot": "Forgot password?",
-    "auth.or": "or continue with",
-    "auth.haveAccount": "Already have an account?",
-    "auth.noAccount": "New to Watfil?",
-    "wishlist.title": "Your wishlist",
-    "wishlist.empty": "Nothing saved yet",
-    "compare.title": "Compare products",
-    "footer.tagline": "The trusted marketplace for clean water technology.",
-    "footer.explore": "Explore",
-    "footer.company": "Company",
-    "footer.support": "Support",
-    "footer.rights": "All rights reserved."
+    "brand": {
+        "name": "Watfil",
+        "tagline": "Pure Water. Trusted Technology."
+    },
+    "nav": {
+        "home": "Home",
+        "products": "Products",
+        "companies": "Companies",
+        "blog": "Blog",
+        "about": "About",
+        "contact": "Contact",
+        "wishlist": "Wishlist",
+        "compare": "Compare",
+        "search": "Search",
+        "login": "Sign in",
+        "register": "Create account",
+        "menu": "Menu",
+        "primary": "Primary",
+        "language": "Language",
+        "theme": "Theme",
+        "themeLight": "Light",
+        "themeDark": "Dark"
+    },
+    "cta": {
+        "explore": "Explore products",
+        "browse": "Browse catalog",
+        "viewAll": "View all",
+        "readMore": "Read more",
+        "contact": "Contact company",
+        "getQuote": "Request quote",
+        "addToCompare": "Add to compare",
+        "wishlist": "Save"
+    },
+    "hero": {
+        "eyebrow": "Trusted by 480+ certified suppliers",
+        "title": "Cleaner water,\nsmarter choices.",
+        "subtitle": "Discover premium water filters, purifiers, and the companies that deliver them across every governorate — all in one place.",
+        "searchPlaceholder": "Search filters, brands, categories…"
+    },
+    "home": {
+        "categories": {
+            "title": "Explore by category",
+            "subtitle": "From household filters to industrial purification systems."
+        },
+        "featured": {
+            "title": "Featured products",
+            "subtitle": "Hand-picked filters trusted by our community."
+        },
+        "companies": {
+            "title": "Top companies",
+            "subtitle": "Certified suppliers, installers and service providers."
+        },
+        "why": {
+            "title": "Why Watfil",
+            "subtitle": "Everything you need to choose water technology with confidence."
+        },
+        "stats": {
+            "products": "Products",
+            "companies": "Companies",
+            "reviews": "Verified reviews",
+            "governorates": "Governorates"
+        },
+        "reviews": {
+            "title": "What customers say"
+        },
+        "newsletter": {
+            "title": "Stay in the flow",
+            "subtitle": "Get product releases, buying guides and exclusive offers.",
+            "button": "Subscribe"
+        }
+    },
+    "products": {
+        "title": "All products",
+        "filters": "Filters",
+        "sort": {
+            "new": "Newest",
+            "popular": "Popular",
+            "rating": "Top rated"
+        },
+        "category": "Category",
+        "brand": "Brand",
+        "governorate": "Governorate",
+        "price": "Price",
+        "rating": "Rating",
+        "availability": "Availability",
+        "results": "results"
+    },
+    "product": {
+        "specs": "Specifications",
+        "features": "Features",
+        "reviews": "Reviews",
+        "faq": "FAQ",
+        "companies": "Companies selling this",
+        "related": "Related products",
+        "filterByGov": "Filter by governorate"
+    },
+    "company": {
+        "about": "About company",
+        "branches": "Branches",
+        "products": "Products",
+        "gallery": "Gallery",
+        "contact": "Contact"
+    },
+    "blog": {
+        "latest": "Latest articles",
+        "readTime": "min read"
+    },
+    "auth": {
+        "login": {
+            "title": "Welcome back",
+            "subtitle": "Sign in to your Watfil account"
+        },
+        "register": {
+            "title": "Create your account",
+            "subtitle": "Join thousands of homeowners and pros"
+        },
+        "email": "Email",
+        "password": "Password",
+        "name": "Full name",
+        "forgot": "Forgot password?",
+        "or": "or continue with",
+        "haveAccount": "Already have an account?",
+        "noAccount": "New to Watfil?"
+    },
+    "wishlist": {
+        "title": "Your wishlist",
+        "empty": "Nothing saved yet"
+    },
+    "compare": {
+        "title": "Compare products"
+    },
+    "footer": {
+        "tagline": "The trusted marketplace for clean water technology.",
+        "explore": "Explore",
+        "company": "Company",
+        "support": "Support",
+        "rights": "All rights reserved."
+    }
 }
