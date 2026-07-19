@@ -1,10 +1,10 @@
 watfil-website/
 ├── app/
 │   ├── [locale]/
-│   │   ├── layout.js
+│   │   ├── layout.js                       # Inter + Cairo fonts, lang/dir
 │   │   ├── error.js
 │   │   ├── (public)/
-│   │   │   ├── layout.js
+│   │   │   ├── layout.js                   # Navbar + Footer
 │   │   │   ├── loading.js
 │   │   │   ├── not-found.js
 │   │   │   ├── page.js                     # Home
@@ -39,53 +39,167 @@ watfil-website/
 │   │   └── (auth)/
 │   │       ├── layout.js
 │   │       ├── login/
+│   │       │   └── page.js
 │   │       ├── register/
+│   │       │   └── page.js
 │   │       ├── forgot-password/
+│   │       │   └── page.js
 │   │       └── reset-password/
+│   │           └── page.js
 │   ├── api/
 │   │   └── health/
+│   │       └── route.js
+│   ├── providers.jsx
 │   ├── sitemap.js
 │   ├── robots.js
 │   └── manifest.js
 ├── features/
 │   ├── home/
+│   │   ├── components/
+│   │   │   └── HomePage.jsx
+│   │   ├── api/
+│   │   ├── hooks/
+│   │   ├── services/
+│   │   ├── types.js
+│   │   └── index.js
 │   ├── products/
+│   │   ├── components/
+│   │   │   ├── ProductsPage.jsx
+│   │   │   └── ProductDetailsPage.jsx
+│   │   ├── api/
+│   │   ├── hooks/
+│   │   ├── schemas/
+│   │   ├── services/
+│   │   ├── types.js
+│   │   └── index.js
 │   ├── companies/
+│   │   ├── components/
+│   │   │   ├── CompaniesPage.jsx
+│   │   │   └── CompanyDetailsPage.jsx
+│   │   ├── api/
+│   │   ├── hooks/
+│   │   ├── schemas/
+│   │   ├── services/
+│   │   ├── types.js
+│   │   └── index.js
 │   ├── blog/
+│   │   ├── components/
+│   │   │   ├── BlogPage.jsx
+│   │   │   └── BlogPostPage.jsx
+│   │   ├── api/
+│   │   ├── hooks/
+│   │   ├── services/
+│   │   └── index.js
 │   ├── categories/
+│   │   ├── components/
+│   │   │   ├── CategoriesPage.jsx
+│   │   │   └── CategoryDetailsPage.jsx
+│   │   ├── api/
+│   │   └── index.js
 │   ├── search/
+│   │   ├── components/
+│   │   │   └── SearchPage.jsx
+│   │   └── index.js
 │   ├── wishlist/
+│   │   ├── components/
+│   │   │   └── WishlistPage.jsx
+│   │   └── index.js
 │   ├── compare/
+│   │   ├── components/
+│   │   │   └── ComparePage.jsx
+│   │   └── index.js
 │   ├── auth/
+│   │   ├── components/
+│   │   │   ├── LoginPage.jsx
+│   │   │   ├── RegisterPage.jsx
+│   │   │   ├── ForgotPasswordPage.jsx
+│   │   │   └── ResetPasswordPage.jsx
+│   │   └── index.js
 │   └── reviews/
+│       ├── components/
+│       └── index.js
 ├── components/
 │   ├── ui/
+│   │   ├── badge.jsx
+│   │   ├── button.jsx
+│   │   ├── sheet.jsx
+│   │   ├── Slider.jsx
+│   │   └── Spinner.jsx
 │   ├── layout/
+│   │   ├── Footer.jsx
+│   │   └── navbar/
+│   │       ├── index.js
+│   │       ├── nav-items.js
+│   │       ├── Navbar.jsx
+│   │       ├── NavbarBrand.jsx
+│   │       ├── NavbarLinks.jsx
+│   │       ├── NavbarActions.jsx
+│   │       ├── NavbarAuth.jsx
+│   │       ├── MobileMenu.jsx
+│   │       └── MobileDrawer.jsx
 │   ├── common/
+│   │   ├── Card.jsx
+│   │   └── NavLink.jsx
 │   ├── skeletons/
+│   │   ├── index.js
+│   │   └── PageSkeleton.jsx
 │   ├── seo/
+│   │   ├── index.js
+│   │   └── JsonLd.jsx
 │   ├── animations/
-│   └── LanguageSwitcher.jsx
+│   │   └── Reveal.jsx
+│   ├── providers/
+│   │   └── ThemeProvider.jsx
+│   ├── LanguageSwitcher.jsx
+│   └── ThemeToggle.jsx
 ├── lib/
 │   ├── api/
 │   │   ├── client.js
 │   │   ├── fetcher.js
 │   │   └── endpoints.js
 │   ├── seo/
+│   │   ├── metadata.js
+│   │   ├── openGraph.js
+│   │   └── schema.js
 │   ├── cache/
-│   ├── utils/
+│   │   └── index.js
 │   ├── constants/
-│   └── validations/
+│   │   └── constantData.js
+│   ├── validations/
+│   │   └── index.js
+│   ├── utils/
+│   │   └── helperFun.js
+│   └── utils.js                        # cn() helper
+├── stores/
+│   ├── index.js
+│   ├── cart-store.js
+│   ├── compare-store.js
+│   ├── wishlist-store.js
+│   └── ui-store.js
 ├── hooks/
+│   ├── index.js
+│   └── useThemeToggle.js
 ├── i18n/
+│   ├── navigation.js
+│   ├── request.js
+│   └── routing.js
 ├── messages/
+│   ├── ar.json
+│   └── en.json
 ├── styles/
+│   └── globals.css
 ├── assets/
+│   └── watfil-logo.png
 ├── public/
-├── proxy.ts                    # Next.js 16 (replaces middleware.js)
+│   └── favicon.ico
+├── docs/
+│   └── folder-structure.txt
+├── proxy.ts                            # Next.js 16 (replaces middleware.js)
 ├── next.config.mjs
+├── postcss.config.mjs
 ├── jsconfig.json
 ├── eslint.config.mjs
 ├── components.json
 ├── package.json
+├── .env.example
 └── README.md

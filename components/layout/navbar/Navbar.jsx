@@ -9,7 +9,7 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full">
       <div className="glass-strong border-b border-border/60">
-        <div className="container-page flex h-16 items-center gap-4 md:h-20">
+        <div className="container flex h-16 items-center gap-4 md:h-18">
           <NavbarBrand />
           <NavbarLinks />
           <div className="flex-1" />

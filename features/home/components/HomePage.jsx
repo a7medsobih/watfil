@@ -1,11 +1,13 @@
-import { useTranslations } from "next-intl";
+import CategoriesSection from "./CategoriesSection";
+import HeroSection from "./HeroSection";
+import ProductsSection from "./ProductsSection";
 
 export default function HomePage() {
-  const t = useTranslations("HomePage");
-
   return (
     <>
-      <h1>{t("title")}</h1>
+      <HeroSection />
+      <CategoriesSection />
+      <ProductsSection />
     </>
   );
 }
