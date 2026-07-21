@@ -16,7 +16,7 @@ export default function SectionHeader({
                 "mb-10",
                 align === "center"
                     ? "flex flex-col items-center gap-3 text-center"
-                    : "flex flex-wrap items-end justify-between gap-6",
+                    : "flex  items-end justify-between gap-6",
                 className,
             )}
         >
@@ -27,12 +27,12 @@ export default function SectionHeader({
                     </span>
                 )}
 
-                <h2 className="text-3xl font-bold leading-tight tracking-tight md:text-4xl">
+                <h2 className="text-2xl md:text-3xl font-bold leading-tight tracking-tight ">
                     {title}
                 </h2>
 
                 {subtitle && (
-                    <p className="mt-3 text-base leading-relaxed text-muted-foreground">
+                    <p className="mt-3 text-sm md:text-base leading-relaxed text-muted-foreground">
                         {subtitle}
                     </p>
                 )}

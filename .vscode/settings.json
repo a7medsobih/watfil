@@ -1,13 +1,14 @@
 {
-    "i18n-ally.localesPaths": [
-        "i18n",
-        "messages"
-    ],
-    "workbench.colorCustomizations": {
-      "activityBar.background": "#3F2635",
-      "titleBar.activeBackground": "#58354A",
-      "titleBar.activeForeground": "#FCFAFB",
-      "titleBar.inactiveBackground": "#3F2635",
-      "titleBar.inactiveForeground": "#FCFAFB"
-    }
+  "i18n-ally.localesPaths": [
+    "i18n",
+    "messages"
+  ],
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#3F2635",
+    "titleBar.activeBackground": "#58354A",
+    "titleBar.activeForeground": "#FCFAFB",
+    "titleBar.inactiveBackground": "#3F2635",
+    "titleBar.inactiveForeground": "#FCFAFB"
+  },
+  "i18n-ally.keystyle": "nested"
 }

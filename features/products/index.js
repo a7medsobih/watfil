@@ -1,2 +1,4 @@
-export { default as ProductsPage } from "./components/ProductsPage";
-export { default as ProductDetailsPage } from "./components/ProductDetailsPage";
+
+export { getProducts, getFeaturedProducts, getProduct } from "./api";
+export { mapProduct, mapProducts, mapProductsMeta } from "./services";
+export { resolveProductsParams } from "./utils/resolve-products-params";

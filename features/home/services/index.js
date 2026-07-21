@@ -1,1 +1,1 @@
-// Home feature services
+export { mapStatistics } from "./statistics.mapper";

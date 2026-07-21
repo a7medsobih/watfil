@@ -11,7 +11,7 @@ export default async function NavbarAuth() {
       <Button variant="ghost" size="sm" asChild>
         <Link href="/login">{t("nav.login")}</Link>
       </Button>
-      <Button variant="hero" size="sm" asChild>
+      <Button variant="hero" size="sm" className="" asChild>
         <Link href="/register">{t("nav.register")}</Link>
       </Button>
     </div>

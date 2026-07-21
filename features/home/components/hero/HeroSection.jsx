@@ -1,4 +1,3 @@
-// features/home/components/HeroSection.jsx
 "use client";
 
 import { Search, ShieldCheck, Sparkles, Truck } from "lucide-react";

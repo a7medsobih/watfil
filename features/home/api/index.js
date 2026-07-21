@@ -1,1 +1,1 @@
-// Home feature API calls
+export { getStatistics } from "./get-statistics";

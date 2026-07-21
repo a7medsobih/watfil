@@ -1,1 +1,3 @@
-// Products feature API calls
+export { getProducts } from "./get-products";
+export { getFeaturedProducts } from "./get-featured-products";
+export { getProduct } from "./get-product";

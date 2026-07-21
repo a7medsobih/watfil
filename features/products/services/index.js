@@ -1,1 +1,5 @@
-// Products feature services
+export {
+  mapProduct,
+  mapProducts,
+  mapProductsMeta,
+} from "./product.mapper";

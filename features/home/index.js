@@ -1,4 +1,8 @@
-export { default as HomePage } from "./components/HomePage";
-// export { default as AboutPage } from "./components/AboutPage";
-export { default as HeroSection } from "./components/HeroSection";
-export { default as CategoriesSection } from "./components/CategoriesSection";
+export { HeroSection } from "./components/hero";
+export { CategoriesSection } from "./components/categories";
+export { ProductsSection } from "./components/products";
+export { StatsSection, StatsCard } from "./components/stats";
+export { WhySection, WhyCard } from "./components/why";
+
+export { getStatistics } from "./api";
+export { mapStatistics } from "./services";

@@ -1,4 +1,3 @@
-// features/home/components/HeroFloatingBadge.jsx
 "use client";
 
 import { motion } from "motion/react";
