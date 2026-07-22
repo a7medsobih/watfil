@@ -8,12 +8,12 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
-import { useCompareStore, useWishlistStore } from "@/stores";
+import { useCompareStore, useWishlistCountStore } from "@/stores";
 
 export default function NavbarActions() {
   const t = useTranslations();
-  const wishlistCount = useWishlistStore((state) => state.items.length);
   const compareCount = useCompareStore((state) => state.items.length);
+  const wishlistCount = useWishlistCountStore((state) => state.count);
 
   return (
     <div className="hidden items-center gap-1 md:flex">

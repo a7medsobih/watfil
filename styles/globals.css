@@ -300,6 +300,15 @@
   border: 1px solid color-mix(in oklab, var(--color-border) 90%, transparent);
 }
 
+@utility scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @utility gradient-hero {
   background: var(--gradient-hero);
 }

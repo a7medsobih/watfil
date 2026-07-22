@@ -61,6 +61,9 @@
             "title": "Why Watfil",
             "subtitle": "Everything you need to choose water technology with confidence."
         },
+        "blog": {
+            "subtitle": "Tips, guides and insights on water filtration."
+        },
         "stats": {
             "products": "Products",
             "companies": "Companies",
@@ -78,6 +81,9 @@
     },
     "products": {
         "title": "All products",
+        "subtitle": "Browse filters, systems and water technology from trusted suppliers.",
+        "count": "{count} products",
+        "searchPlaceholder": "Search by name, description, or SKU…",
         "filters": "Filters",
         "sort": {
             "new": "Newest",
@@ -90,7 +96,12 @@
         "price": "Price",
         "rating": "Rating",
         "availability": "Availability",
-        "results": "results"
+        "results": "results",
+        "all": "All",
+        "allGovernorates": "All governorates",
+        "resetFilters": "Reset filters",
+        "emptyTitle": "No products found",
+        "empty": "Try adjusting your search or filters."
     },
     "product": {
         "specs": "Specifications",
@@ -108,30 +119,111 @@
         "gallery": "Gallery",
         "contact": "Contact"
     },
+    "companies": {
+        "title": "Companies",
+        "subtitle": "Certified suppliers, installers and service providers you can trust.",
+        "count": "{count} companies",
+        "searchPlaceholder": "Search filters, brands, categories…",
+        "governoratesLabel": "Governorates",
+        "emptyTitle": "No companies here yet",
+        "empty": "No companies found in this governorate. Try another one from the tabs above."
+    },
+    "pagination": {
+        "previous": "Previous",
+        "next": "Next"
+    },
     "blog": {
+        "title": "Blog",
+        "subtitle": "Expert advice and practical guides for cleaner water.",
         "latest": "Latest articles",
         "readTime": "min read"
     },
     "auth": {
+        "welcome": {
+            "title": "Welcome to Watfil",
+            "subtitle": "Enter your phone number to sign in or create an account"
+        },
         "login": {
             "title": "Welcome back",
-            "subtitle": "Sign in to your Watfil account"
+            "subtitle": "Enter your password to continue"
         },
         "register": {
             "title": "Create your account",
-            "subtitle": "Join thousands of homeowners and pros"
+            "subtitle": "A few details and you’re in",
+            "phoneHint": "Enter your phone number to get started"
         },
+        "otp": {
+            "title": "Verify your number",
+            "subtitle": "Enter the 6-digit code sent to {phone}",
+            "code": "Verification code",
+            "resend": "Resend code",
+            "resendIn": "Resend in {seconds}s",
+            "debug": "Debug code: {code}"
+        },
+        "phone": "Phone number",
+        "phonePlaceholder": "01xxxxxxxxx",
+        "phoneHint": "We’ll check if you already have an account",
         "email": "Email",
         "password": "Password",
+        "confirmPassword": "Confirm password",
         "name": "Full name",
+        "governorate": "Governorate",
+        "governoratePlaceholder": "Select governorate",
+        "referralCode": "Referral code",
+        "optional": "optional",
         "forgot": "Forgot password?",
         "or": "or continue with",
         "haveAccount": "Already have an account?",
-        "noAccount": "New to Watfil?"
+        "noAccount": "New to Watfil?",
+        "actions": {
+            "continue": "Continue",
+            "checking": "Checking…",
+            "signIn": "Sign in",
+            "signingIn": "Signing in…",
+            "sendOtp": "Send verification code",
+            "sendingOtp": "Sending…",
+            "confirmOtp": "Confirm",
+            "verifying": "Verifying…",
+            "changePhone": "Change number",
+            "back": "Back",
+            "logout": "Log out",
+            "loading": "Loading…"
+        },
+        "toast": {
+            "success": "You’re signed in",
+            "logout": "Signed out successfully"
+        },
+        "errors": {
+            "generic": "Something went wrong. Please try again.",
+            "invalidPhone": "Enter a valid Egyptian mobile number",
+            "passwordRequired": "Password is required",
+            "invalidCredentials": "Incorrect password",
+            "suspended": "Your account has been suspended",
+            "nameRequired": "Name is required",
+            "passwordMin": "Password must be at least 8 characters",
+            "passwordMismatch": "Passwords do not match",
+            "governorateRequired": "Please select a governorate",
+            "otpInvalid": "Invalid or expired verification code"
+        }
     },
     "wishlist": {
         "title": "Your wishlist",
-        "empty": "Nothing saved yet"
+        "subtitle": "Products you liked — saved in one place.",
+        "empty": "Nothing saved yet. Browse products and tap the heart to save them.",
+        "emptyTitle": "No favorites yet",
+        "like": "Add to wishlist",
+        "unlike": "Remove from wishlist",
+        "loading": "Loading wishlist…",
+        "loginRequiredTitle": "Sign in to view your wishlist",
+        "loginRequiredDescription": "Your liked products are saved to your account.",
+        "loadError": "Could not load wishlist",
+        "loadErrorDescription": "Something went wrong. Please try again.",
+        "retry": "Try again",
+        "toast": {
+            "liked": "Product added to favorites.",
+            "unliked": "Product removed from favorites.",
+            "error": "Something went wrong, please try again."
+        }
     },
     "compare": {
         "title": "Compare products"

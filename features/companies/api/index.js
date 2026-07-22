@@ -1,1 +1,2 @@
-// Companies feature API calls
+export { getCompanies } from "./get-companies";
+export { getGovernorates } from "./get-governorates";

@@ -1,1 +1,1 @@
-// Products feature hooks
+export { useProductsQuery } from "./use-products-query";

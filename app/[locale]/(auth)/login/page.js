@@ -1,5 +1,8 @@
-import { LoginPage } from "@/features/auth";
+import { getLocale } from "next-intl/server";
 
-export default function Page() {
-  return <LoginPage />;
+import { redirect } from "@/i18n/navigation";
+
+export default async function LoginPage() {
+  const locale = await getLocale();
+  redirect({ href: "/?auth=login", locale });
 }

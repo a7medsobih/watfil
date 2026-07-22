@@ -1,2 +1,7 @@
-export { default as CompaniesPage } from "./components/CompaniesPage";
-export { default as CompanyDetailsPage } from "./components/CompanyDetailsPage";
+export { getCompanies, getGovernorates } from "./api";
+export {
+  mapCompany,
+  mapCompanies,
+  mapCompaniesMeta,
+  mapGovernorates,
+} from "./services";

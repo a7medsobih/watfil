@@ -1,6 +1,12 @@
 "use client";
 
+import { Suspense } from "react";
+
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { Toaster } from "@/components/ui/sonner";
+import AuthBootstrap from "@/features/auth/components/AuthBootstrap";
+import AuthDialog from "@/features/auth/components/AuthDialog";
+import AuthQueryOpener from "@/features/auth/components/AuthQueryOpener";
 
 export function Providers({ children }) {
   return (
@@ -11,6 +17,12 @@ export function Providers({ children }) {
       disableTransitionOnChange
     >
       {children}
+      <AuthBootstrap />
+      <AuthDialog />
+      <Suspense fallback={null}>
+        <AuthQueryOpener />
+      </Suspense>
+      <Toaster richColors position="top-center" closeButton />
     </ThemeProvider>
   );
 }

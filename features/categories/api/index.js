@@ -1,1 +1,1 @@
-// Categories feature API calls
+export { getCategories } from "./get-categories";

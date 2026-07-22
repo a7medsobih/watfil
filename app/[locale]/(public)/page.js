@@ -1,4 +1,5 @@
 import {
+  BlogSection,
   CategoriesSection,
   HeroSection,
   ProductsSection,
@@ -16,6 +17,7 @@ export default function Page() {
       {/* <StatsSection /> */}
       <CompaniesSection />
       <WhySection />
+      <BlogSection />
     </>
   );
 }

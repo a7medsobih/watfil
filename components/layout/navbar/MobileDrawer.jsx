@@ -1,10 +1,13 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
+import { toast } from "sonner";
+import { LogOutIcon } from "lucide-react";
 
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import NavLink from "@/components/common/NavLink";
 import ThemeToggle from "@/components/ThemeToggle";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -12,9 +15,28 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { Link } from "@/i18n/navigation";
+import { useAuthDialogStore } from "@/stores/auth-dialog-store";
+import { useAuthStore } from "@/stores/auth-store";
 import { useUiStore } from "@/stores";
 import { getVisibleNavItems } from "./nav-items";
+
+function getDisplayName(user) {
+  if (!user) return "";
+  return (
+    user.full_name ||
+    user.name ||
+    user.profile?.full_name ||
+    user.phone ||
+    ""
+  );
+}
+
+function getInitials(name) {
+  const parts = String(name).trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+}
 
 export default function MobileDrawer() {
   const t = useTranslations();
@@ -22,8 +44,27 @@ export default function MobileDrawer() {
   const isOpen = useUiStore((state) => state.isMobileMenuOpen);
   const setMobileMenuOpen = useUiStore((state) => state.setMobileMenuOpen);
   const closeMobileMenu = useUiStore((state) => state.closeMobileMenu);
+  const openAuthDialog = useAuthDialogStore((state) => state.openAuthDialog);
+  const isHydrated = useAuthStore((state) => state.isHydrated);
+  const token = useAuthStore((state) => state.token);
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
   const items = getVisibleNavItems();
   const side = locale === "ar" ? "left" : "right";
+  const isAuthenticated = Boolean(isHydrated && token && user);
+  const displayName = getDisplayName(user);
+  const avatarUrl = user?.avatar || user?.profile?.avatar || null;
+
+  const openAuth = (intent) => {
+    closeMobileMenu();
+    openAuthDialog(intent);
+  };
+
+  const handleLogout = async () => {
+    closeMobileMenu();
+    await logout();
+    toast.success(t("auth.toast.logout"));
+  };
 
   return (
     <Sheet open={isOpen} onOpenChange={setMobileMenuOpen}>
@@ -58,17 +99,55 @@ export default function MobileDrawer() {
           <ThemeToggle variant="labeled" />
         </div>
 
-        <div className="mt-2 flex gap-2 px-2">
-          <Button variant="outline" size="sm" asChild className="flex-1">
-            <Link href="/login" onClick={closeMobileMenu}>
-              {t("nav.login")}
-            </Link>
-          </Button>
-          <Button variant="hero" size="sm" asChild className="flex-1">
-            <Link href="/register" onClick={closeMobileMenu}>
-              {t("nav.register")}
-            </Link>
-          </Button>
+        <div className="mt-2 flex flex-col gap-2 px-2">
+          {isAuthenticated ? (
+            <>
+              <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card/80 p-3">
+                <Avatar>
+                  {avatarUrl ? (
+                    <AvatarImage src={avatarUrl} alt={displayName} />
+                  ) : null}
+                  <AvatarFallback>{getInitials(displayName)}</AvatarFallback>
+                </Avatar>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium">{displayName}</p>
+                  {user?.phone ? (
+                    <p dir="ltr" className="truncate text-xs text-muted-foreground">
+                      {user.phone}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLogout}
+                className="w-full gap-1.5"
+              >
+                <LogOutIcon className="size-3.5" />
+                {t("auth.actions.logout")}
+              </Button>
+            </>
+          ) : (
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1"
+                onClick={() => openAuth("login")}
+              >
+                {t("nav.login")}
+              </Button>
+              <Button
+                variant="hero"
+                size="sm"
+                className="flex-1"
+                onClick={() => openAuth("register")}
+              >
+                {t("nav.register")}
+              </Button>
+            </div>
+          )}
         </div>
       </SheetContent>
     </Sheet>

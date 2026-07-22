@@ -1,5 +1,8 @@
-import { RegisterPage } from "@/features/auth";
+import { getLocale } from "next-intl/server";
 
-export default function Page() {
-  return <RegisterPage />;
+import { redirect } from "@/i18n/navigation";
+
+export default async function RegisterPage() {
+  const locale = await getLocale();
+  redirect({ href: "/?auth=register", locale });
 }
