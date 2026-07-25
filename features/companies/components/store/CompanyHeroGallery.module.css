@@ -1,0 +1,19 @@
+.companyHeroSwiper :global(.swiper-pagination) {
+  /* Sit above the overlapping company info card */
+  bottom: 5.5rem !important;
+  z-index: 5;
+}
+
+.companyHeroSwiper :global(.swiper-pagination-bullet) {
+  width: 0.5rem;
+  height: 0.5rem;
+  background: var(--card);
+  opacity: 0.55;
+}
+
+.companyHeroSwiper :global(.swiper-pagination-bullet-active) {
+  width: 1.5rem;
+  border-radius: 999px;
+  background: var(--primary);
+  opacity: 1;
+}

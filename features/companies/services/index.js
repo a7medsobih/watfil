@@ -1,5 +1,6 @@
 export {
   mapCompany,
+  mapCompanyDetail,
   mapCompanies,
   mapCompaniesMeta,
   mapGovernorates,

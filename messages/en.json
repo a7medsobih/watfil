@@ -104,20 +104,120 @@
         "empty": "Try adjusting your search or filters."
     },
     "product": {
-        "specs": "Specifications",
-        "features": "Features",
-        "reviews": "Reviews",
-        "faq": "FAQ",
+        "tabsLabel": "Product details",
+        "tabs": {
+            "overview": "Overview",
+            "installments": "Installments",
+            "perks": "Perks",
+            "info": "Product information"
+        },
+        "sku": "SKU",
+        "startingFrom": "Starting from",
+        "availableFrom": "Available from",
+        "soldBy": "Sold by",
+        "companiesCount": "{count} companies",
+        "reviewsCount": "reviews",
+        "likes": "likes",
+        "views": "views",
+        "compare": "Compare",
+        "stagesCount": "{count} stages",
+        "badges": {
+            "sale": "Sale",
+            "installment": "Installment",
+            "perks": "Perks included"
+        },
+        "availability": {
+            "available": "Available",
+            "unavailable": "Unavailable"
+        },
+        "stock": {
+            "in_stock": "In stock",
+            "out_of_stock": "Out of stock",
+            "limited": "Limited stock"
+        },
+        "overview": {
+            "description": "Description",
+            "pricing": "Pricing",
+            "supplier": "Supplier",
+            "category": "Category",
+            "status": "Availability",
+            "stock": "Stock status"
+        },
+        "installments": {
+            "months": "Months",
+            "monthsValue": "{count} months",
+            "downPayment": "Down payment",
+            "amount": "Monthly installment",
+            "empty": "No installment plans available for this product."
+        },
+        "perks": {
+            "empty": "No perks listed for this offer."
+        },
+        "info": {
+            "stages": "Number of stages",
+            "type": "Product type",
+            "availability": "Availability",
+            "stock": "Stock status",
+            "addedAt": "Added on"
+        },
         "companies": "Companies selling this",
+        "companiesSubtitle": "Choose a governorate to see local sellers, prices, and installment options.",
+        "companiesEmptyTitle": "No companies in this governorate",
+        "companiesEmpty": "Try another governorate to find sellers for this product.",
         "related": "Related products",
-        "filterByGov": "Filter by governorate"
+        "filterByGov": "Filter by governorate",
+        "verified": "Verified",
+        "price": "Price"
     },
     "company": {
         "about": "About company",
         "branches": "Branches",
         "products": "Products",
         "gallery": "Gallery",
-        "contact": "Contact"
+        "contact": "Contact",
+        "reviews": "reviews",
+        "likes": "likes",
+        "views": "views",
+        "productsCount": "products",
+        "myRating": "Your rating: {rating}",
+        "like": "Like company",
+        "unlike": "Unlike company",
+        "tabsLabel": "Company sections",
+        "tabs": {
+            "store": "Store",
+            "about": "About",
+            "services": "Services",
+            "coverage": "Coverage",
+            "team": "Team",
+            "ratings": "Ratings"
+        },
+        "emptyProductsTitle": "No products yet",
+        "emptyProducts": "This company has not listed any products.",
+        "ratings": {
+            "addTitle": "Rate this company",
+            "editTitle": "Update your rating",
+            "summary": "{count} customer ratings",
+            "commentPlaceholder": "Optional comment (max 1000 characters)",
+            "submit": "Submit rating",
+            "update": "Update rating",
+            "delete": "Delete my rating",
+            "loginRequired": "Sign in to rate this company.",
+            "signIn": "Sign in",
+            "validation": "Please choose a rating from 1 to 5 stars.",
+            "anonymous": "Customer",
+            "emptyTitle": "No ratings yet",
+            "empty": "Be the first to rate this company.",
+            "toast": {
+                "saved": "Your rating was saved.",
+                "deleted": "Your rating was removed.",
+                "error": "Something went wrong, please try again."
+            }
+        },
+        "toast": {
+            "liked": "Company added to your likes.",
+            "unliked": "Company removed from your likes.",
+            "error": "Something went wrong, please try again."
+        }
     },
     "companies": {
         "title": "Companies",

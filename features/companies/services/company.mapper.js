@@ -1,3 +1,7 @@
+import { mapProduct } from "@/features/products/services/product.mapper";
+import { LIKE_SOURCE } from "@/features/wishlist/types";
+import { buildCompanySlug } from "@/features/companies/utils/company-slug";
+
 const COMPANY_LOGO_PLACEHOLDER = "/images/company-placeholder.svg";
 const COVERAGE_BADGE_LIMIT = 3;
 
@@ -27,7 +31,7 @@ function mapGovernorate(governorate, locale = "ar") {
 }
 
 /**
- * Unique coverage governorates for badge display.
+ * Unique coverage governorates for badge display (list cards).
  */
 function mapCoverage(coverage = [], locale = "ar") {
   const seen = new Set();
@@ -57,6 +61,137 @@ function mapCoverage(coverage = [], locale = "ar") {
 }
 
 /**
+ * Full coverage chips for the company store (governorates + cities).
+ */
+function mapCoverageAreas(coverage = [], locale = "ar") {
+  const seen = new Set();
+  const items = [];
+
+  for (const entry of coverage ?? []) {
+    const city = entry?.city;
+    const governorate = entry?.governorate;
+
+    if (city?.id) {
+      const name = mapLocalizedName(city, locale);
+      const key = `city:${city.id}:${name}`.toLowerCase();
+      if (name && !seen.has(key)) {
+        seen.add(key);
+        items.push({
+          id: `city-${city.id}`,
+          name,
+          type: "city",
+          governorateId: governorate?.id ?? city.governorate_id ?? null,
+        });
+      }
+    }
+
+    if (governorate?.id) {
+      const name = mapLocalizedName(governorate, locale);
+      const key = `gov:${governorate.id}:${name}`.toLowerCase();
+      if (name && !seen.has(key)) {
+        seen.add(key);
+        items.push({
+          id: `gov-${governorate.id}`,
+          name,
+          type: "governorate",
+          governorateId: governorate.id,
+        });
+      }
+    }
+  }
+
+  return items;
+}
+
+function mapGallery(gallery = []) {
+  return [...(gallery ?? [])]
+    .filter((item) => item?.url)
+    .sort((a, b) => Number(a.sort_order ?? 0) - Number(b.sort_order ?? 0))
+    .map((item) => ({
+      id: item.id,
+      url: item.url,
+      sortOrder: Number(item.sort_order ?? 0),
+    }));
+}
+
+function mapServices(services = []) {
+  return [...(services ?? [])]
+    .filter((item) => item?.title)
+    .sort((a, b) => Number(a.sort_order ?? 0) - Number(b.sort_order ?? 0))
+    .map((item) => ({
+      id: item.id,
+      title: item.title ?? "",
+      description: item.description ?? "",
+      icon: item.icon ?? null,
+      sortOrder: Number(item.sort_order ?? 0),
+    }));
+}
+
+function mapTeam(team = []) {
+  return [...(team ?? [])]
+    .filter((member) => member?.name)
+    .sort((a, b) => Number(a.sort_order ?? 0) - Number(b.sort_order ?? 0))
+    .map((member) => ({
+      id: member.id ?? member.name,
+      name: member.name ?? "",
+      role: member.role ?? member.job_title ?? "",
+      photo: member.photo ?? member.image ?? null,
+      sortOrder: Number(member.sort_order ?? 0),
+    }));
+}
+
+function mapRatings(ratings = []) {
+  return [...(ratings ?? [])]
+    .filter((item) => item?.id != null || item?.rating != null)
+    .map((item) => ({
+      id: item.id,
+      rating: Number(item.rating ?? 0),
+      comment:
+        typeof item.comment === "string" && item.comment.trim()
+          ? item.comment.trim()
+          : null,
+      customer: item.customer
+        ? {
+            id: item.customer.id,
+            fullName: item.customer.full_name ?? null,
+          }
+        : null,
+      createdAt: item.created_at ?? null,
+      updatedAt: item.updated_at ?? null,
+    }));
+}
+
+/**
+ * Maps company-store products and attaches like source/company context.
+ */
+function mapCompanyProducts(products = [], companyId) {
+  return (products ?? [])
+    .map((product) => {
+      const mapped = mapProduct(product);
+      if (!mapped) return null;
+
+      const source =
+        product.source === LIKE_SOURCE.CATALOG
+          ? LIKE_SOURCE.CATALOG
+          : product.source === LIKE_SOURCE.COMPANY
+            ? LIKE_SOURCE.COMPANY
+            : mapped.source === LIKE_SOURCE.CATALOG
+              ? LIKE_SOURCE.CATALOG
+              : LIKE_SOURCE.COMPANY;
+
+      const isCompanyProduct = source === LIKE_SOURCE.COMPANY;
+
+      return {
+        ...mapped,
+        source,
+        likeSource: source,
+        companyId: isCompanyProduct ? (companyId ?? mapped.companyId) : null,
+      };
+    })
+    .filter(Boolean);
+}
+
+/**
  * Converts a backend company into the stable Company Model used by the UI.
  * @param {object} company
  * @param {string} [locale]
@@ -67,11 +202,14 @@ export function mapCompany(company, locale = "ar") {
   const coverage = mapCoverage(company.coverage ?? [], locale);
 
   const hasLogo = Boolean(company.logo);
+  const name = company.name ?? "";
 
   return {
     id: company.id,
-    slug: String(company.slug ?? company.id),
-    name: company.name ?? "",
+    slug: company.slug
+      ? String(company.slug)
+      : buildCompanySlug(name, company.id),
+    name,
     logo: hasLogo ? company.logo : COMPANY_LOGO_PLACEHOLDER,
     hasLogo,
     rating: toNumberOrNull(company.average_rating),
@@ -80,6 +218,38 @@ export function mapCompany(company, locale = "ar") {
     governorate: mapGovernorate(company.governorate, locale),
     coverage,
     verified: Boolean(company.is_verified ?? company.verified),
+  };
+}
+
+/**
+ * Full company store model (detail endpoint).
+ * @param {object} company
+ * @param {string} [locale]
+ */
+export function mapCompanyDetail(company, locale = "ar") {
+  const base = mapCompany(company, locale);
+  if (!base) return null;
+
+  const about =
+    typeof company.about === "string" && company.about.trim()
+      ? company.about.trim()
+      : null;
+
+  return {
+    ...base,
+    about,
+    viewsCount: Number(company.views_count ?? 0),
+    productsCount: Number(
+      company.products_count ?? company.products?.length ?? 0,
+    ),
+    isLiked: Boolean(company.is_liked),
+    myRating: toNumberOrNull(company.my_rating),
+    gallery: mapGallery(company.gallery),
+    services: mapServices(company.services),
+    team: mapTeam(company.team),
+    ratings: mapRatings(company.ratings),
+    coverageAreas: mapCoverageAreas(company.coverage ?? [], locale),
+    products: mapCompanyProducts(company.products ?? [], company.id),
   };
 }
 

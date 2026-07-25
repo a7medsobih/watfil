@@ -104,20 +104,120 @@
         "empty": "جرّب تعديل البحث أو الفلاتر."
     },
     "product": {
-        "specs": "المواصفات",
-        "features": "المميزات",
-        "reviews": "التقييمات",
-        "faq": "أسئلة شائعة",
+        "tabsLabel": "تفاصيل المنتج",
+        "tabs": {
+            "overview": "نظرة عامة",
+            "installments": "التقسيط",
+            "perks": "المزايا",
+            "info": "معلومات المنتج"
+        },
+        "sku": "رمز المنتج",
+        "startingFrom": "يبدأ من",
+        "availableFrom": "متوفر لدى",
+        "soldBy": "يُباع لدى",
+        "companiesCount": "{count} شركات",
+        "reviewsCount": "تقييم",
+        "likes": "إعجاب",
+        "views": "مشاهدة",
+        "compare": "مقارنة",
+        "stagesCount": "{count} مراحل",
+        "badges": {
+            "sale": "خصم",
+            "installment": "تقسيط",
+            "perks": "مزايا إضافية"
+        },
+        "availability": {
+            "available": "متوفر",
+            "unavailable": "غير متوفر"
+        },
+        "stock": {
+            "in_stock": "متوفر بالمخزون",
+            "out_of_stock": "غير متوفر بالمخزون",
+            "limited": "كمية محدودة"
+        },
+        "overview": {
+            "description": "الوصف",
+            "pricing": "السعر",
+            "supplier": "المورد",
+            "category": "الفئة",
+            "status": "التوفر",
+            "stock": "حالة المخزون"
+        },
+        "installments": {
+            "months": "الأشهر",
+            "monthsValue": "{count} شهر",
+            "downPayment": "المقدم",
+            "amount": "القسط الشهري",
+            "empty": "لا توجد خطط تقسيط لهذا المنتج."
+        },
+        "perks": {
+            "empty": "لا توجد مزايا لهذا العرض."
+        },
+        "info": {
+            "stages": "عدد المراحل",
+            "type": "نوع المنتج",
+            "availability": "التوفر",
+            "stock": "حالة المخزون",
+            "addedAt": "تاريخ الإضافة"
+        },
         "companies": "الشركات الموردة",
+        "companiesSubtitle": "اختر المحافظة لعرض الشركات والأسعار وخيارات التقسيط.",
+        "companiesEmptyTitle": "لا توجد شركات في هذه المحافظة",
+        "companiesEmpty": "جرّب محافظة أخرى للعثور على بائعين لهذا المنتج.",
         "related": "منتجات مشابهة",
-        "filterByGov": "تصفية حسب المحافظة"
+        "filterByGov": "تصفية حسب المحافظة",
+        "verified": "موثّقة",
+        "price": "السعر"
     },
     "company": {
         "about": "عن الشركة",
         "branches": "الفروع",
         "products": "المنتجات",
         "gallery": "المعرض",
-        "contact": "تواصل"
+        "contact": "تواصل",
+        "reviews": "تقييم",
+        "likes": "إعجاب",
+        "views": "مشاهدة",
+        "productsCount": "منتج",
+        "myRating": "تقييمك: {rating}",
+        "like": "أعجب بالشركة",
+        "unlike": "إزالة الإعجاب",
+        "tabsLabel": "أقسام الشركة",
+        "tabs": {
+            "store": "المتجر",
+            "about": "عن الشركة",
+            "services": "الخدمات",
+            "coverage": "التغطية",
+            "team": "الفريق",
+            "ratings": "التقييمات"
+        },
+        "emptyProductsTitle": "لا توجد منتجات بعد",
+        "emptyProducts": "لم تُضف هذه الشركة أي منتجات حتى الآن.",
+        "ratings": {
+            "addTitle": "قيّم هذه الشركة",
+            "editTitle": "عدّل تقييمك",
+            "summary": "{count} تقييم من العملاء",
+            "commentPlaceholder": "تعليق اختياري (بحد أقصى 1000 حرف)",
+            "submit": "إرسال التقييم",
+            "update": "تحديث التقييم",
+            "delete": "حذف تقييمي",
+            "loginRequired": "سجّل الدخول لتقييم هذه الشركة.",
+            "signIn": "تسجيل الدخول",
+            "validation": "اختر تقييمًا من 1 إلى 5 نجوم.",
+            "anonymous": "عميل",
+            "emptyTitle": "لا توجد تقييمات بعد",
+            "empty": "كن أول من يقيّم هذه الشركة.",
+            "toast": {
+                "saved": "تم حفظ تقييمك.",
+                "deleted": "تم حذف تقييمك.",
+                "error": "حدث خطأ، حاول مرة أخرى."
+            }
+        },
+        "toast": {
+            "liked": "تمت إضافة الشركة إلى إعجاباتك.",
+            "unliked": "تمت إزالة الشركة من إعجاباتك.",
+            "error": "حدث خطأ، حاول مرة أخرى."
+        }
     },
     "companies": {
         "title": "الشركات",

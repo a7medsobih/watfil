@@ -33,6 +33,14 @@ function getEdges(el) {
 /**
  * Governorate tabs with simple horizontal scroll + arrow controls.
  * Selection uses searchParams via Link (no client fetch).
+ *
+ * @param {object} props
+ * @param {object[]} [props.governorates]
+ * @param {string|number} [props.selectedId]
+ * @param {string} [props.className]
+ * @param {{ previous?: string, next?: string }} [props.labels]
+ * @param {string} [props.ariaLabel]
+ * @param {(governorateId: string|number) => string} [props.hrefBuilder]
  */
 export default function GovernorateTabs({
   governorates = [],
@@ -40,6 +48,7 @@ export default function GovernorateTabs({
   className,
   labels = {},
   ariaLabel = "Governorates",
+  hrefBuilder,
 }) {
   const scrollerRef = useRef(null);
   const dragRef = useRef(null);
@@ -201,11 +210,14 @@ export default function GovernorateTabs({
         >
           {governorates.map((governorate) => {
             const isActive = String(governorate.id) === String(selectedId);
+            const href = hrefBuilder
+              ? hrefBuilder(governorate.id)
+              : buildCompaniesHref({ governorate: governorate.id });
 
             return (
               <Link
                 key={governorate.id}
-                href={buildCompaniesHref({ governorate: governorate.id })}
+                href={href}
                 role="tab"
                 aria-selected={isActive}
                 draggable={false}

@@ -1,14 +1,43 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { GitCompare, Heart, Star } from "lucide-react";
+import { Eye, GitCompare, Heart, Star } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import ProductLikeButton from "@/features/wishlist/components/ProductLikeButton";
 import { LIKE_SOURCE } from "@/features/wishlist/types";
+import { resolveLucideIcon } from "@/features/companies/utils/resolve-lucide-icon";
 import { cn } from "@/lib/utils";
+
+function PerkIcons({ perks = [], locale = "en" }) {
+  const visible = perks.slice(0, 4);
+  if (!visible.length) return null;
+
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-1.5">
+      {visible.map((perk) => {
+        const Icon = resolveLucideIcon(perk.icon);
+        return (
+          <span
+            key={perk.id ?? `${perk.title}-${perk.icon}`}
+            title={perk.title}
+            className="inline-flex size-7 items-center justify-center rounded-full bg-primary/10 text-primary"
+          >
+            <Icon className="size-3.5" aria-hidden />
+            <span className="sr-only">{perk.title}</span>
+          </span>
+        );
+      })}
+      {perks.length > visible.length && (
+        <span className="text-xs text-muted-foreground">
+          +{perks.length - visible.length}
+        </span>
+      )}
+    </div>
+  );
+}
 
 export default function ProductCard({
   product,
@@ -23,13 +52,21 @@ export default function ProductCard({
 
   const likeSource =
     product.likeSource ??
+    product.source ??
     (product.companyId != null ? LIKE_SOURCE.COMPANY : LIKE_SOURCE.CATALOG);
 
   const [likesCount, setLikesCount] = useState(product.likesCount ?? 0);
 
   useEffect(() => {
     setLikesCount(product.likesCount ?? 0);
-  }, [product.id, product.likesCount]);
+  }, [product.id, product.likesCount, product.source]);
+
+  const isCatalog = (product.source ?? likeSource) === LIKE_SOURCE.CATALOG;
+  const isCompanyProduct =
+    (product.source ?? likeSource) === LIKE_SOURCE.COMPANY;
+  const isOutOfStock =
+    product.isAvailable === false || product.stockStatus === "out_of_stock";
+  const perks = product.hasPerks ? (product.perks ?? []) : [];
 
   return (
     <article
@@ -57,6 +94,27 @@ export default function ProductCard({
           {product.isOnSale && (
             <Badge variant="destructive" className="rounded-full">
               {locale === "ar" ? "خصم" : "Sale"}
+            </Badge>
+          )}
+          {isCatalog && (
+            <Badge
+              variant="secondary"
+              className="rounded-full bg-card/90 text-foreground backdrop-blur-sm"
+            >
+              {locale === "ar" ? "كتالوج" : "Catalog"}
+            </Badge>
+          )}
+          {isCompanyProduct && (
+            <Badge
+              variant="secondary"
+              className="rounded-full bg-primary/15 text-primary backdrop-blur-sm"
+            >
+              {locale === "ar" ? "منتج الشركة" : "Company"}
+            </Badge>
+          )}
+          {isOutOfStock && (
+            <Badge variant="outline" className="rounded-full bg-card/90">
+              {locale === "ar" ? "غير متوفر" : "Out of stock"}
             </Badge>
           )}
         </div>
@@ -112,14 +170,32 @@ export default function ProductCard({
           </p>
         )}
 
-        <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs">
-          <div className="flex items-center gap-1.5">
-            <Star className="h-3.5 w-3.5 text-warning" />
-            <span className="font-semibold">
-              {product.rating != null ? product.rating.toFixed(1) : "--"}
+        {product.supplier?.name && (
+          <div className="mt-3 flex items-center gap-2">
+            {product.supplier.logo ? (
+              <img
+                src={product.supplier.logo}
+                alt=""
+                loading="lazy"
+                className="size-6 rounded-full object-cover ring-1 ring-border/60"
+              />
+            ) : null}
+            <span className="line-clamp-1 text-xs text-muted-foreground">
+              {product.supplier.name}
             </span>
-            <span className="text-muted-foreground">({product.reviews})</span>
           </div>
+        )}
+
+        <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs">
+          {(product.rating != null || product.reviews > 0) && (
+            <div className="flex items-center gap-1.5">
+              <Star className="h-3.5 w-3.5 text-warning" />
+              <span className="font-semibold">
+                {product.rating != null ? product.rating.toFixed(1) : "--"}
+              </span>
+              <span className="text-muted-foreground">({product.reviews})</span>
+            </div>
+          )}
 
           <div className="flex items-center gap-1 text-muted-foreground">
             <Heart className="h-3.5 w-3.5" aria-hidden />
@@ -127,7 +203,18 @@ export default function ProductCard({
               {likesCount}
             </span>
           </div>
+
+          {product.viewsCount != null && (
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <Eye className="h-3.5 w-3.5" aria-hidden />
+              <span className="font-semibold tabular-nums text-foreground">
+                {product.viewsCount}
+              </span>
+            </div>
+          )}
         </div>
+
+        {perks.length > 0 && <PerkIcons perks={perks} locale={locale} />}
 
         {product.offeringCompaniesCount > 0 && (
           <p className="mt-2 text-xs text-muted-foreground">
