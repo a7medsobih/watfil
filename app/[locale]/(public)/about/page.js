@@ -1,5 +1,9 @@
-import { AboutPage } from "@/features/home";
+// src/app/[locale]/(public)/about/page.js
 
-export default function Page() {
-  return <AboutPage />;
+const page = () => {
+  return (
+    <div>About Page</div>
+  )
 }
+
+export default page
