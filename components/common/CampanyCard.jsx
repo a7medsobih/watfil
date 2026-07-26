@@ -1,10 +1,16 @@
-import { Heart, MapPin, Star } from "lucide-react";
+"use client";
 
+import { Heart, MapPin, Star } from "lucide-react";
+import { useTranslations } from "next-intl";
+
+import MediaImage from "@/components/common/MediaImage";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 export default function CampanyCard({ company, className }) {
+  const t = useTranslations("company");
+
   if (!company) return null;
 
   const coverageItems = company.coverage?.items ?? [];
@@ -26,11 +32,11 @@ export default function CampanyCard({ company, className }) {
             hasLogo ? "bg-muted" : "gradient-water",
           )}
         >
-          <img
-            src={company.logo}
+          <MediaImage
+            src={hasLogo ? company.logo : null}
             alt={company.name}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            kind="company"
+            className="transition-transform duration-500 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
         </div>
@@ -61,7 +67,9 @@ export default function CampanyCard({ company, className }) {
             {coverageTotal > 0 && (
               <div className="flex items-center gap-1 text-muted-foreground">
                 <MapPin className="h-4 w-4 shrink-0" />
-                <span>{coverageTotal}</span>
+                <span>
+                  {t("tabs.branches")} · {coverageTotal}
+                </span>
               </div>
             )}
           </div>

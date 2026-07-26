@@ -14,10 +14,14 @@ const DEBOUNCE_MS = 400;
 export default function ProductsSearch({ placeholder, className }) {
   const { params, update } = useProductsQuery();
   const [value, setValue] = useState(params.search ?? "");
+  const [syncedSearch, setSyncedSearch] = useState(params.search ?? "");
 
-  useEffect(() => {
-    setValue(params.search ?? "");
-  }, [params.search]);
+  // Keep the input in sync when the URL changes (back/forward, reset, links).
+  const urlSearch = params.search ?? "";
+  if (urlSearch !== syncedSearch) {
+    setSyncedSearch(urlSearch);
+    setValue(urlSearch);
+  }
 
   useEffect(() => {
     const next = value.trim();

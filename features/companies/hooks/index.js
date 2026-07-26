@@ -1,1 +1,1 @@
-// Companies feature hooks
+export { useCompaniesQuery } from "./use-companies-query";

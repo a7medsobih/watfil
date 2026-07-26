@@ -1,0 +1,288 @@
+{
+  "info": {
+    "name": "Watafl — Company Join Requests (انضم إلينا)",
+    "_postman_id": "watafl-company-join-requests",
+    "description": "# Watafl — انضم إلينا (Company Join Requests)\n\nفورم عام يدعو الشركات للانضمام، والأدمن يعرض الطلبات ثم ينشئ الحساب يدويًا.\n\n**Base:** `{{base_url}}` = `http://localhost:8000/api`\n\n---\n\n## ترتيب الاختبار\n\n1. **0 — Lookups** → خد `governorate_id`\n2. **1 — Public** → أرسل طلب انضمام → يحفظ `join_request_id`\n3. **2 — Auth Admin** → احفظ `admin_token`\n4. **3 — Admin Inbox** → list / show\n5. **4 — Create Company** → `POST /super-admin/companies` بنفس بيانات الطلب\n6. **5 — Mark Processed** → علّم الطلب `processed`\n\n> لا يوجد approve تلقائي — إنشاء الشركة يدوي دائمًا.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000/api", "type": "string" },
+    { "key": "admin_email", "value": "admin@watafl.com", "type": "string" },
+    { "key": "admin_password", "value": "Admin@1234", "type": "string" },
+    { "key": "admin_token", "value": "", "type": "string" },
+    { "key": "governorate_id", "value": "1", "type": "string" },
+    { "key": "join_request_id", "value": "", "type": "string" },
+    { "key": "company_name", "value": "شركة النور للفلاتر", "type": "string" },
+    { "key": "tax_number", "value": "TAX-JOIN-001", "type": "string" },
+    { "key": "contact_name", "value": "أحمد محمد", "type": "string" },
+    { "key": "phone", "value": "01000000001", "type": "string" },
+    { "key": "email", "value": "join@example.com", "type": "string" },
+    { "key": "company_password", "value": "Company@1234", "type": "string" },
+    { "key": "company_id", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "0 — Lookups",
+      "description": "المحافظات مطلوبة في الفورم.",
+      "item": [
+        {
+          "name": "GET Public Governorates",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Governorates 200', function () { pm.response.to.have.status(200); });",
+                  "var res = pm.response.json();",
+                  "var list = res.data || res;",
+                  "if (Array.isArray(list) && list.length && list[0].id) {",
+                  "  pm.collectionVariables.set('governorate_id', String(list[0].id));",
+                  "  console.log('governorate_id =', list[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/public/governorates",
+              "host": ["{{base_url}}"],
+              "path": ["public", "governorates"]
+            },
+            "description": "## GET /public/governorates\n\nاحفظ أول `id` في `governorate_id`."
+          }
+        }
+      ]
+    },
+    {
+      "name": "1 — Public · Submit Join Request",
+      "description": "بدون Auth — صفحة انضم إلينا.",
+      "item": [
+        {
+          "name": "POST Submit Company Join Request",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Created 201', function () { pm.response.to.have.status(201); });",
+                  "var res = pm.response.json();",
+                  "if (res.data && res.data.id) {",
+                  "  pm.collectionVariables.set('join_request_id', String(res.data.id));",
+                  "  console.log('join_request_id =', res.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"company_name\": \"{{company_name}}\",\n  \"tax_number\": \"{{tax_number}}\",\n  \"governorate_id\": {{governorate_id}},\n  \"contact_name\": \"{{contact_name}}\",\n  \"phone\": \"{{phone}}\",\n  \"email\": \"{{email}}\",\n  \"notes\": \"نرغب في الانضمام لمنصة واتفل\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/public/company-join-requests",
+              "host": ["{{base_url}}"],
+              "path": ["public", "company-join-requests"]
+            },
+            "description": "## POST /public/company-join-requests\n\n**Auth:** لا\n\n### Body\n| Field | Required |\n|-------|----------|\n| company_name | نعم |\n| tax_number | نعم |\n| governorate_id | نعم |\n| contact_name | نعم |\n| phone | نعم |\n| email | نعم |\n| notes | لا |\n\n### Response 201\n```json\n{\n  \"message\": \"تم استلام طلب الانضمام بنجاح...\",\n  \"data\": {\n    \"id\": 1,\n    \"company_name\": \"...\",\n    \"tax_number\": \"TAX-JOIN-001\",\n    \"status\": \"pending\",\n    \"governorate\": { \"id\": 1, \"name_ar\": \"...\" }\n  }\n}\n```\n\n**422:** رقم ضريبي موجود في الشركات، أو طلب pending بنفس tax/phone."
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 — Auth · Super Admin",
+      "item": [
+        {
+          "name": "Login Super Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Admin login 200', function () { pm.response.to.have.status(200); });",
+                  "var res = pm.response.json();",
+                  "var token = res.token || (res.data && res.data.token) || res.access_token;",
+                  "if (token) { pm.collectionVariables.set('admin_token', token); console.log('admin_token saved'); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{admin_email}}\",\n  \"password\": \"{{admin_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/super-admin/login",
+              "host": ["{{base_url}}"],
+              "path": ["super-admin", "login"]
+            },
+            "description": "يحفظ `admin_token`."
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 — Admin · Inbox",
+      "description": "عرض طلبات الانضمام فقط.",
+      "item": [
+        {
+          "name": "GET List Join Requests (pending)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('List 200', function () { pm.response.to.have.status(200); });",
+                  "var res = pm.response.json();",
+                  "if (res.data && res.data.length && res.data[0].id) {",
+                  "  pm.collectionVariables.set('join_request_id', String(res.data[0].id));",
+                  "  console.log('join_request_id =', res.data[0].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/super-admin/company-join-requests?status=pending&q=&page=1&per_page=15",
+              "host": ["{{base_url}}"],
+              "path": ["super-admin", "company-join-requests"],
+              "query": [
+                { "key": "status", "value": "pending", "description": "pending | processed" },
+                { "key": "q", "value": "", "description": "بحث: اسم / رقم ضريبي / هاتف / إيميل" },
+                { "key": "page", "value": "1" },
+                { "key": "per_page", "value": "15" }
+              ]
+            },
+            "description": "## GET /super-admin/company-join-requests\n\n**Auth:** Bearer admin\n\n**Query:** `status`, `q`, `page`, `per_page`"
+          }
+        },
+        {
+          "name": "GET Show Join Request",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/super-admin/company-join-requests/{{join_request_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["super-admin", "company-join-requests", "{{join_request_id}}"]
+            },
+            "description": "## GET /super-admin/company-join-requests/{id}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4 — Admin · Create Company (يدوي)",
+      "description": "بعد مراجعة الطلب — أنشئ الحساب بنفس الاسم والرقم الضريبي والمحافظة.",
+      "item": [
+        {
+          "name": "POST Create Company from Join Request",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Company created', function () { pm.response.to.have.status(201); });",
+                  "var res = pm.response.json();",
+                  "if (res.data && res.data.id) {",
+                  "  pm.collectionVariables.set('company_id', String(res.data.id));",
+                  "  console.log('company_id =', res.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{company_name}}\",\n  \"tax_number\": \"{{tax_number}}\",\n  \"password\": \"{{company_password}}\",\n  \"governorate_id\": {{governorate_id}},\n  \"is_active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/super-admin/companies",
+              "host": ["{{base_url}}"],
+              "path": ["super-admin", "companies"]
+            },
+            "description": "## POST /super-admin/companies\n\nاستخدم بيانات الطلب (`company_name` → `name`, نفس `tax_number` و `governorate_id`) + كلمة مرور يختارها الأدمن.\n\nللـ logo استخدم multipart من الكولكشن الرئيسي."
+          }
+        }
+      ]
+    },
+    {
+      "name": "5 — Admin · Mark Processed",
+      "item": [
+        {
+          "name": "PATCH Mark Join Request Processed",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Marked processed', function () { pm.response.to.have.status(200); });",
+                  "var res = pm.response.json();",
+                  "pm.test('status processed', function () {",
+                  "  pm.expect(res.data && res.data.status).to.eql('processed');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"admin_notes\": \"تم إنشاء الحساب يدويًا\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/super-admin/company-join-requests/{{join_request_id}}/mark-processed",
+              "host": ["{{base_url}}"],
+              "path": ["super-admin", "company-join-requests", "{{join_request_id}}", "mark-processed"]
+            },
+            "description": "## PATCH /super-admin/company-join-requests/{id}/mark-processed\n\n**Body (اختياري):** `{ \"admin_notes\": \"...\" }`\n\n**422:** لو الطلب مش pending (اتعالَج قبل كده)."
+          }
+        }
+      ]
+    }
+  ]
+}

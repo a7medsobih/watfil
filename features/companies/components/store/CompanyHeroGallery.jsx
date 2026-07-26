@@ -30,21 +30,24 @@ export default function CompanyHeroGallery({
   const nextClass = `company-hero-next-${uid}`;
   const prevRef = useRef(null);
   const nextRef = useRef(null);
-  const [swiperInstance, setSwiperInstance] = useState(null);
+  const swiperRef = useRef(null);
+  const [swiperReady, setSwiperReady] = useState(false);
 
   const slides = (images ?? []).filter((item) => item?.url);
   const multi = slides.length > 1;
 
   useEffect(() => {
-    if (!swiperInstance || !multi) return;
+    const swiper = swiperRef.current;
+
+    if (!swiperReady || !swiper || !multi) return;
     if (!prevRef.current || !nextRef.current) return;
 
-    swiperInstance.params.navigation.prevEl = prevRef.current;
-    swiperInstance.params.navigation.nextEl = nextRef.current;
-    swiperInstance.navigation.destroy();
-    swiperInstance.navigation.init();
-    swiperInstance.navigation.update();
-  }, [swiperInstance, multi, dir]);
+    swiper.params.navigation.prevEl = prevRef.current;
+    swiper.params.navigation.nextEl = nextRef.current;
+    swiper.navigation.destroy();
+    swiper.navigation.init();
+    swiper.navigation.update();
+  }, [swiperReady, multi, dir]);
 
   if (!slides.length) return null;
 
@@ -105,7 +108,10 @@ export default function CompanyHeroGallery({
               }
             : false
         }
-        onSwiper={setSwiperInstance}
+        onSwiper={(swiper) => {
+          swiperRef.current = swiper;
+          setSwiperReady(true);
+        }}
         className={cn(styles.companyHeroSwiper, "w-full")}
       >
         {slides.map((image, index) => (

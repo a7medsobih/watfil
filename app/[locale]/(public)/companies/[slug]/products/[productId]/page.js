@@ -10,7 +10,7 @@ import {
   buildCompanyProductHref,
   resolveCompanyProductSource,
 } from "@/features/companies/utils/resolve-company-product-params";
-import ProductDetailsPage from "@/features/products/components/details/ProductDetailsPage";
+import CompanyOfferDetailsPage from "@/features/products/components/details/CompanyOfferDetailsPage";
 import { buildMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata({ params, searchParams }) {
@@ -87,11 +87,10 @@ export default async function CompanyProductDetailsRoute({
           hasLogo: company.hasLogo,
         }}
       />
-      <ProductDetailsPage
+      <CompanyOfferDetailsPage
         product={product}
-        locale={locale}
         company={company}
-        showOfferingCompanies={false}
+        locale={locale}
         breadcrumbs={[
           { label: t("nav.home"), href: "/" },
           { label: t("nav.companies"), href: "/companies" },

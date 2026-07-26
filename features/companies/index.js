@@ -1,8 +1,11 @@
 export {
   getCompanies,
   getCompany,
+  getCompanyProducts,
   getCompanyProductDetails,
   getGovernorates,
+  getTopRatedCompanies,
+  createCompanyJoinRequest,
   likeCompany,
   unlikeCompany,
   rateCompany,
@@ -13,9 +16,13 @@ export {
   mapCompanyDetail,
   mapCompanies,
   mapCompaniesMeta,
+  mapCompanyProducts,
   mapGovernorates,
+  sortGovernoratesByRating,
 } from "./services";
 export { CompanyStorePage } from "./components/store";
+export { default as JoinCompanyCTA } from "./components/JoinCompanyCTA";
+export { default as JoinUsPage } from "./components/join/JoinUsPage";
 export {
   CompanyBrandProvider,
   CompanyBrandSetter,

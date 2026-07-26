@@ -7,6 +7,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { COMPARE_UI_ENABLED } from "@/features/compare";
 import { Link } from "@/i18n/navigation";
 import { useCompareStore, useWishlistCountStore } from "@/stores";
 
@@ -23,16 +24,23 @@ export default function NavbarActions() {
         </Link>
       </Button>
 
-      <Button variant="ghost" size="icon" asChild aria-label={t("nav.compare")}>
-        <Link href="/compare" className="relative">
-          <GitCompare className="h-4.5 w-4.5" />
-          {compareCount > 0 ? (
-            <Badge className="absolute -end-1 -top-1 h-4 min-w-4 px-1 text-[10px]">
-              {compareCount}
-            </Badge>
-          ) : null}
-        </Link>
-      </Button>
+      {COMPARE_UI_ENABLED ? (
+        <Button
+          variant="ghost"
+          size="icon"
+          asChild
+          aria-label={t("nav.compare")}
+        >
+          <Link href="/compare" className="relative">
+            <GitCompare className="h-4.5 w-4.5" />
+            {compareCount > 0 ? (
+              <Badge className="absolute -end-1 -top-1 h-4 min-w-4 px-1 text-[10px]">
+                {compareCount}
+              </Badge>
+            ) : null}
+          </Link>
+        </Button>
+      ) : null}
 
       <Button variant="ghost" size="icon" asChild aria-label={t("nav.wishlist")}>
         <Link href="/wishlist" className="relative">

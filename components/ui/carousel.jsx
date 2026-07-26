@@ -109,13 +109,13 @@ function Carousel({
   );
 }
 
-function CarouselContent({ className, ...props }) {
+function CarouselContent({ className, viewportClassName, ...props }) {
   const { carouselRef, orientation } = useCarousel();
 
   return (
     <div
       ref={carouselRef}
-      className="overflow-hidden"
+      className={cn("overflow-hidden", viewportClassName)}
       data-slot="carousel-content"
     >
       <div
@@ -172,7 +172,7 @@ function CarouselPrevious({
       onClick={scrollPrev}
       {...props}
     >
-      <ArrowLeft className="cn-rtl-flip" />
+      <ArrowLeft className="rtl:rotate-180" />
       <span className="sr-only">Previous slide</span>
     </Button>
   );
@@ -202,7 +202,7 @@ function CarouselNext({
       onClick={scrollNext}
       {...props}
     >
-      <ArrowRight className="cn-rtl-flip" />
+      <ArrowRight className="rtl:rotate-180" />
       <span className="sr-only">Next slide</span>
     </Button>
   );

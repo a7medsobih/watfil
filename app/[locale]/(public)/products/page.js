@@ -6,6 +6,8 @@ import AppPagination from "@/components/common/AppPagination";
 import EmptyState from "@/components/common/EmptyState";
 import PageHeader from "@/components/common/PageHeader";
 import ProductCard from "@/components/common/ProductCard";
+import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import { getCategories } from "@/features/categories/api";
 import { getGovernorates } from "@/features/companies/api";
 import ProductsFilters from "@/features/products/components/ProductsFilters";
@@ -25,26 +27,32 @@ export default async function Page({ searchParams }) {
   const [categories, governorates, { products, meta }] = await Promise.all([
     getCategories(),
     getGovernorates({ locale }),
-    getProducts(params),
+    getProducts({
+      ...params,
+      min_price: null,
+      max_price: null,
+    }),
   ]);
+
+  const hasActiveFilters = Boolean(
+    params.search || params.category_id || params.governorate_id,
+  );
 
   const filterLabels = {
     filters: t("products.filters"),
     category: t("products.category"),
-    price: t("products.price"),
     governorate: t("products.governorate"),
-    all: t("products.all"),
+    governorateHint: t("products.governorateHint"),
     allGovernorates: t("products.allGovernorates"),
+    all: t("products.all"),
     reset: t("products.resetFilters"),
   };
-
-  const currency = locale === "ar" ? "ج.م" : "EGP";
 
   return (
     <>
       <PageHeader
         title={t("products.title")}
-        subtitle={t("products.count", { count: meta.total })}
+        subtitle={t("products.subtitle")}
         breadcrumbs={[
           { label: t("nav.home"), href: "/" },
           { label: t("nav.products") },
@@ -66,7 +74,6 @@ export default async function Page({ searchParams }) {
               categories={categories}
               governorates={governorates}
               labels={filterLabels}
-              currency={currency}
             />
           </Suspense>
         </div>
@@ -78,7 +85,6 @@ export default async function Page({ searchParams }) {
                 categories={categories}
                 governorates={governorates}
                 labels={filterLabels}
-                currency={currency}
               />
             </Suspense>
           </div>
@@ -92,6 +98,7 @@ export default async function Page({ searchParams }) {
                       key={product.id}
                       product={product}
                       locale={locale}
+                      variant="catalog"
                     />
                   ))}
                 </div>
@@ -107,8 +114,11 @@ export default async function Page({ searchParams }) {
                   }}
                   hrefBuilder={(page) =>
                     buildProductsHref({
-                      ...params,
+                      search: params.search,
+                      category_id: params.category_id,
+                      governorate_id: params.governorate_id,
                       page,
+                      per_page: params.per_page,
                     })
                   }
                 />
@@ -118,6 +128,13 @@ export default async function Page({ searchParams }) {
                 icon={<Package className="size-7 sm:size-8" aria-hidden />}
                 title={t("products.emptyTitle")}
                 description={t("products.empty")}
+                action={
+                  hasActiveFilters ? (
+                    <Button variant="outline" asChild>
+                      <Link href="/products">{t("products.resetFilters")}</Link>
+                    </Button>
+                  ) : null
+                }
               />
             )}
           </div>

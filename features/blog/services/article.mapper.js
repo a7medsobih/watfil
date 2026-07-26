@@ -1,4 +1,6 @@
-const ARTICLE_IMAGE_PLACEHOLDER = "/images/blog-placeholder.webp";
+import { IMAGE_PLACEHOLDERS } from "@/lib/media/placeholders";
+
+const ARTICLE_IMAGE_PLACEHOLDER = IMAGE_PLACEHOLDERS.article;
 const EXCERPT_MAX_LENGTH = 140;
 
 function stripHtml(html = "") {

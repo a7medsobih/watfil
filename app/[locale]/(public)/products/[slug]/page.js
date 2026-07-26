@@ -118,16 +118,21 @@ export default async function ProductDetailRoute({ params, searchParams }) {
       governorates={governorates}
       selectedGovernorateId={selectedGovernorateId}
       companiesLabels={{
-        title: t("product.companies"),
-        subtitle: t("product.companiesSubtitle"),
+        title: t("product.chooseCompanyTitle"),
+        subtitle: t("product.chooseCompanySubtitle"),
         filterByGov: t("product.filterByGov"),
         emptyTitle: t("product.companiesEmptyTitle"),
         empty: t("product.companiesEmpty"),
-        previous: t("pagination.previous"),
-        next: t("pagination.next"),
         verified: t("product.verified"),
         installment: t("product.badges.installment"),
         price: t("product.price"),
+        buyNow: t("product.buyNow"),
+        browseCompany: t("product.browseCompany"),
+        buyFromCompany: t("product.buyFromCompany"),
+        warranty: t("product.warranty"),
+        installation: t("product.installation"),
+        offers: t("product.offers"),
+        serviceLocations: t("product.serviceLocations"),
       }}
     />
   );

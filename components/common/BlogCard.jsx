@@ -1,5 +1,6 @@
 import { ArrowRight, Eye } from "lucide-react";
 
+import MediaImage from "@/components/common/MediaImage";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "@/i18n/navigation";
 import { formatDate } from "@/lib/utils/format-date";
@@ -20,11 +21,11 @@ export default function BlogCard({
         >
             <Link href={`/blog/${article.slug}`} className="flex h-full flex-col">
                 <div className="relative aspect-[16/8] overflow-hidden bg-muted">
-                    <img
+                    <MediaImage
                         src={article.featuredImage}
                         alt={article.imageAlt || article.title}
-                        loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        kind="article"
+                        className="transition-transform duration-500 group-hover:scale-105"
                     />
 
                     {article.category && (

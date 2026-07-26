@@ -1,6 +1,10 @@
 export { getCompanies } from "./get-companies";
+export { getFeaturedCompanies } from "./get-featured-companies";
+export { getTopRatedCompanies } from "./get-top-rated-companies";
 export { getCompany } from "./get-company";
+export { getCompanyProducts } from "./get-company-products";
 export { getCompanyProductDetails } from "./get-company-product-details";
 export { getGovernorates } from "./get-governorates";
+export { createCompanyJoinRequest } from "./create-company-join-request";
 export { likeCompany, unlikeCompany } from "./like-company";
 export { rateCompany, deleteCompanyRating } from "./rate-company";

@@ -1,8 +1,9 @@
 import { mapProduct } from "@/features/products/services/product.mapper";
 import { LIKE_SOURCE } from "@/features/wishlist/types";
 import { buildCompanySlug } from "@/features/companies/utils/company-slug";
+import { IMAGE_PLACEHOLDERS } from "@/lib/media/placeholders";
 
-const COMPANY_LOGO_PLACEHOLDER = "/images/company-placeholder.svg";
+const COMPANY_LOGO_PLACEHOLDER = IMAGE_PLACEHOLDERS.company;
 const COVERAGE_BADGE_LIMIT = 3;
 
 function toNumberOrNull(value) {
@@ -27,6 +28,17 @@ function mapGovernorate(governorate, locale = "ar") {
     name: mapLocalizedName(governorate, locale),
     nameAr: governorate.name_ar ?? "",
     nameEn: governorate.name_en ?? "",
+    rating: toNumberOrNull(
+      governorate.average_rating ??
+        governorate.avg_rating ??
+        governorate.rating,
+    ),
+    companiesCount: Number(
+      governorate.companies_count ??
+        governorate.companiesCount ??
+        governorate.count ??
+        0,
+    ),
   };
 }
 
@@ -163,11 +175,15 @@ function mapRatings(ratings = []) {
 
 /**
  * Maps company-store products and attaches like source/company context.
+ *
+ * @param {object[]} [products]
+ * @param {string|number} [companyId]
+ * @param {string} [locale]
  */
-function mapCompanyProducts(products = [], companyId) {
+export function mapCompanyProducts(products = [], companyId, locale = "ar") {
   return (products ?? [])
     .map((product) => {
-      const mapped = mapProduct(product);
+      const mapped = mapProduct(product, locale);
       if (!mapped) return null;
 
       const source =
@@ -249,7 +265,7 @@ export function mapCompanyDetail(company, locale = "ar") {
     team: mapTeam(company.team),
     ratings: mapRatings(company.ratings),
     coverageAreas: mapCoverageAreas(company.coverage ?? [], locale),
-    products: mapCompanyProducts(company.products ?? [], company.id),
+    products: mapCompanyProducts(company.products ?? [], company.id, locale),
   };
 }
 
@@ -267,8 +283,38 @@ export function mapCompaniesMeta(meta) {
 }
 
 /**
+ * Sort governorates: highest company rating → companies count → alphabetical.
+ * When rating/count data is absent, falls back to alphabetical only.
+ *
+ * @param {object[]} governorates
+ * @param {string} [locale]
+ */
+export function sortGovernoratesByRating(governorates = [], locale = "ar") {
+  const collator = new Intl.Collator(locale === "ar" ? "ar" : "en", {
+    sensitivity: "base",
+  });
+
+  return [...governorates].sort((a, b) => {
+    const ratingA = a?.rating != null ? Number(a.rating) : null;
+    const ratingB = b?.rating != null ? Number(b.rating) : null;
+
+    if (ratingA != null || ratingB != null) {
+      const diff = (ratingB ?? -1) - (ratingA ?? -1);
+      if (diff !== 0) return diff;
+    }
+
+    const countA = Number(a?.companiesCount ?? 0);
+    const countB = Number(b?.companiesCount ?? 0);
+    if (countA !== countB) return countB - countA;
+
+    return collator.compare(String(a?.name ?? ""), String(b?.name ?? ""));
+  });
+}
+
+/**
  * Maps + dedupes public governorates by English name (stable unique tabs).
  * Prefers the lowest id when duplicates exist.
+ * Sorted by rating → company count → alphabetical when data is available.
  */
 export function mapGovernorates(governorates = [], locale = "ar") {
   const byName = new Map();
@@ -278,16 +324,12 @@ export function mapGovernorates(governorates = [], locale = "ar") {
 
     const key = String(item.name_en ?? item.name_ar ?? item.id).toLowerCase();
     const existing = byName.get(key);
+    const mapped = mapGovernorate(item, locale);
 
     if (!existing || Number(item.id) < Number(existing.id)) {
-      byName.set(key, {
-        id: item.id,
-        name: mapLocalizedName(item, locale),
-        nameAr: item.name_ar ?? "",
-        nameEn: item.name_en ?? "",
-      });
+      byName.set(key, mapped);
     }
   }
 
-  return Array.from(byName.values()).sort((a, b) => Number(a.id) - Number(b.id));
+  return sortGovernoratesByRating(Array.from(byName.values()), locale);
 }

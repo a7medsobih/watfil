@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600" fill="none" role="img" aria-label="Article placeholder">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="600" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E8F6FA"/>
+      <stop offset="0.55" stop-color="#D7F0F5"/>
+      <stop offset="1" stop-color="#C5E4F0"/>
+    </linearGradient>
+    <linearGradient id="wave" x1="0" y1="0" x2="1200" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2BB8C8" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#1E7FA8" stop-opacity="0.28"/>
+    </linearGradient>
+    <linearGradient id="icon" x1="470" y1="180" x2="730" y2="430" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2BB8C8"/>
+      <stop offset="1" stop-color="#1B6F9A"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="600" fill="url(#bg)"/>
+  <path d="M0 430C180 400 330 470 510 450C690 430 810 370 990 390C1080 400 1140 420 1200 430V600H0V430Z" fill="url(#wave)"/>
+  <path d="M0 490C210 470 360 520 540 505C720 490 840 440 1020 455C1110 463 1155 480 1200 490V600H0V490Z" fill="#1E7FA8" fill-opacity="0.12"/>
+  <rect x="450" y="160" width="300" height="240" rx="40" fill="url(#icon)" fill-opacity="0.12"/>
+  <rect x="492" y="196" width="216" height="168" rx="22" stroke="url(#icon)" stroke-width="14"/>
+  <path d="M528 244H672" stroke="url(#icon)" stroke-width="14" stroke-linecap="round"/>
+  <path d="M528 288H672" stroke="url(#icon)" stroke-width="14" stroke-linecap="round"/>
+  <path d="M528 332H612" stroke="url(#icon)" stroke-width="14" stroke-linecap="round"/>
+  <circle cx="170" cy="150" r="44" fill="#2BB8C8" fill-opacity="0.12"/>
+  <circle cx="1030" cy="170" r="58" fill="#1E7FA8" fill-opacity="0.1"/>
+</svg>

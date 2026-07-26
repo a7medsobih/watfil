@@ -1,17 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Eye, GitCompare, Heart, Star } from "lucide-react";
+import { useTranslations } from "next-intl";
 
+import MediaImage from "@/components/common/MediaImage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
+import { COMPARE_UI_ENABLED } from "@/features/compare";
+import { buildCompanyProductHref } from "@/features/companies/utils/resolve-company-product-params";
+import { resolveLucideIcon } from "@/features/companies/utils/resolve-lucide-icon";
 import ProductLikeButton from "@/features/wishlist/components/ProductLikeButton";
 import { LIKE_SOURCE } from "@/features/wishlist/types";
-import { resolveLucideIcon } from "@/features/companies/utils/resolve-lucide-icon";
 import { cn } from "@/lib/utils";
 
-function PerkIcons({ perks = [], locale = "en" }) {
+function PerkIcons({ perks = [] }) {
   const visible = perks.slice(0, 4);
   if (!visible.length) return null;
 
@@ -39,34 +43,64 @@ function PerkIcons({ perks = [], locale = "en" }) {
   );
 }
 
+/**
+ * Product card.
+ * - variant="catalog": Watfil discovery card (no purchase data)
+ * - variant="company": company-store / offer card (may show price & perks)
+ */
 export default function ProductCard({
   product,
   locale = "en",
   className = "",
   onLikeChange,
+  variant,
+  companySlug = null,
+  href: hrefOverride = null,
 }) {
-  const showSalePrice =
-    product.isOnSale &&
-    product.originalPrice != null &&
-    product.originalPrice > product.cashPrice;
-
+  const t = useTranslations("product");
   const likeSource =
     product.likeSource ??
     product.source ??
     (product.companyId != null ? LIKE_SOURCE.COMPANY : LIKE_SOURCE.CATALOG);
 
+  const resolvedVariant =
+    variant ??
+    (likeSource === LIKE_SOURCE.COMPANY || companySlug
+      ? "company"
+      : "catalog");
+  const isCatalogVariant = resolvedVariant === "catalog";
+
   const [likesCount, setLikesCount] = useState(product.likesCount ?? 0);
-
-  useEffect(() => {
+  const [likesSyncKey, setLikesSyncKey] = useState(
+    `${product.id}-${product.source}-${product.likesCount ?? 0}`,
+  );
+  const nextLikesSyncKey = `${product.id}-${product.source}-${product.likesCount ?? 0}`;
+  if (nextLikesSyncKey !== likesSyncKey) {
+    setLikesSyncKey(nextLikesSyncKey);
     setLikesCount(product.likesCount ?? 0);
-  }, [product.id, product.likesCount, product.source]);
+  }
 
-  const isCatalog = (product.source ?? likeSource) === LIKE_SOURCE.CATALOG;
+  const isCatalogSource =
+    (product.source ?? likeSource) === LIKE_SOURCE.CATALOG;
   const isCompanyProduct =
     (product.source ?? likeSource) === LIKE_SOURCE.COMPANY;
   const isOutOfStock =
     product.isAvailable === false || product.stockStatus === "out_of_stock";
   const perks = product.hasPerks ? (product.perks ?? []) : [];
+
+  const showSalePrice =
+    !isCatalogVariant &&
+    product.isOnSale &&
+    product.originalPrice != null &&
+    product.originalPrice > product.cashPrice;
+
+  const href =
+    hrefOverride ??
+    ((companySlug || product.companySlug) && product.id
+      ? buildCompanyProductHref(companySlug || product.companySlug, product.id, {
+          source: product.source ?? likeSource ?? "catalog",
+        })
+      : `/products/${product.slug}`);
 
   return (
     <article
@@ -76,45 +110,43 @@ export default function ProductCard({
       )}
     >
       <div className="relative aspect-square overflow-hidden bg-muted">
-        <img
+        <MediaImage
           src={product.image}
           alt={product.name}
-          loading="lazy"
+          kind="product"
           width={900}
           height={900}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="transition-transform duration-500 group-hover:scale-105"
         />
 
         <div className="absolute start-3 top-3 z-[2] flex flex-col gap-2">
-          {product.hasInstallment && (
-            <Badge className="rounded-full">
-              {locale === "ar" ? "تقسيط" : "Installment"}
-            </Badge>
+          {!isCatalogVariant && product.hasInstallment && (
+            <Badge className="rounded-full">{t("badges.installment")}</Badge>
           )}
-          {product.isOnSale && (
+          {!isCatalogVariant && product.isOnSale && (
             <Badge variant="destructive" className="rounded-full">
-              {locale === "ar" ? "خصم" : "Sale"}
+              {t("badges.sale")}
             </Badge>
           )}
-          {isCatalog && (
+          {!isCatalogVariant && isCatalogSource && (
             <Badge
               variant="secondary"
               className="rounded-full bg-card/90 text-foreground backdrop-blur-sm"
             >
-              {locale === "ar" ? "كتالوج" : "Catalog"}
+              {t("badges.watfilProduct")}
             </Badge>
           )}
-          {isCompanyProduct && (
+          {!isCatalogVariant && isCompanyProduct && (
             <Badge
               variant="secondary"
               className="rounded-full bg-primary/15 text-primary backdrop-blur-sm"
             >
-              {locale === "ar" ? "منتج الشركة" : "Company"}
+              {t("badges.companyProduct")}
             </Badge>
           )}
           {isOutOfStock && (
             <Badge variant="outline" className="rounded-full bg-card/90">
-              {locale === "ar" ? "غير متوفر" : "Out of stock"}
+              {t("availability.unavailable")}
             </Badge>
           )}
         </div>
@@ -132,24 +164,26 @@ export default function ProductCard({
             }}
           />
 
-          <Button
-            variant="outline"
-            size="icon-sm"
-            aria-label="Compare"
-            aria-pressed={product.isInCompare}
-            className={cn(
-              "border-border/60 bg-card/75 shadow-sm backdrop-blur-sm hover:border-primary/30 hover:bg-card",
-              product.isInCompare
-                ? "border-primary/40 text-primary"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-          >
-            <GitCompare className="h-4 w-4" />
-          </Button>
+          {COMPARE_UI_ENABLED ? (
+            <Button
+              variant="outline"
+              size="icon-sm"
+              aria-label={t("compare")}
+              aria-pressed={product.isInCompare}
+              className={cn(
+                "border-border/60 bg-card/75 shadow-sm backdrop-blur-sm hover:border-primary/30 hover:bg-card",
+                product.isInCompare
+                  ? "border-primary/40 text-primary"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+            >
+              <GitCompare className="h-4 w-4" />
+            </Button>
+          ) : null}
         </div>
       </div>
 
@@ -164,26 +198,10 @@ export default function ProductCard({
           {product.name}
         </h3>
 
-        {product.description && (
+        {!isCatalogVariant && product.description && (
           <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
             {product.description}
           </p>
-        )}
-
-        {product.supplier?.name && (
-          <div className="mt-3 flex items-center gap-2">
-            {product.supplier.logo ? (
-              <img
-                src={product.supplier.logo}
-                alt=""
-                loading="lazy"
-                className="size-6 rounded-full object-cover ring-1 ring-border/60"
-              />
-            ) : null}
-            <span className="line-clamp-1 text-xs text-muted-foreground">
-              {product.supplier.name}
-            </span>
-          </div>
         )}
 
         <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs">
@@ -214,41 +232,44 @@ export default function ProductCard({
           )}
         </div>
 
-        {perks.length > 0 && <PerkIcons perks={perks} locale={locale} />}
+        {!isCatalogVariant && perks.length > 0 && (
+          <PerkIcons perks={perks} />
+        )}
 
-        {product.offeringCompaniesCount > 0 && (
+        {isCatalogVariant && product.offeringCompaniesCount > 0 && (
           <p className="mt-2 text-xs text-muted-foreground">
-            {locale === "ar"
-              ? `${product.offeringCompaniesCount}  من شركات`
-              : `${product.offeringCompaniesCount} offering companies`}
+            {t("companiesCount", { count: product.offeringCompaniesCount })}
           </p>
         )}
 
         <div className="mt-auto pt-5">
-          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 border-t border-border/60 pt-4">
-            <span className="text-xs text-muted-foreground">
-              {locale === "ar" ? "السعر" : "Price"}
-            </span>
-
-            <span className="text-xl font-bold text-primary">
-              {product.cashPrice.toLocaleString()}
-            </span>
-
-            <span className="text-sm text-muted-foreground">
-              {locale === "ar" ? "ج.م" : "EGP"}
-            </span>
-
-            {showSalePrice && (
-              <span className="text-sm text-muted-foreground line-through">
-                {product.originalPrice.toLocaleString()}
+          {isCatalogVariant ? (
+            <div className="border-t border-border/60 pt-4">
+              <span className="inline-flex text-sm font-semibold text-primary">
+                {t("viewDetails")}
               </span>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 border-t border-border/60 pt-4">
+              <span className="text-xs text-muted-foreground">{t("price")}</span>
+              <span className="text-xl font-bold text-primary">
+                {product.cashPrice.toLocaleString()}
+              </span>
+              <span className="text-sm text-muted-foreground">
+                {locale === "ar" ? "ج.م" : "EGP"}
+              </span>
+              {showSalePrice && (
+                <span className="text-sm text-muted-foreground line-through">
+                  {product.originalPrice.toLocaleString()}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
       <Link
-        href={`/products/${product.slug}`}
+        href={href}
         className="absolute inset-0 z-[1]"
         aria-label={product.name}
       />

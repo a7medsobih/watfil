@@ -19,7 +19,6 @@ export default function ProductsFiltersSheet({
   categories,
   governorates,
   labels,
-  currency,
 }) {
   return (
     <Sheet>
@@ -43,7 +42,6 @@ export default function ProductsFiltersSheet({
             categories={categories}
             governorates={governorates}
             labels={labels}
-            currency={currency}
             showHeader={false}
             className="border-0 p-0 shadow-none lg:static"
           />

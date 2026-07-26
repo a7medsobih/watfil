@@ -4,7 +4,7 @@ import ProductHero from "@/features/products/components/details/ProductHero";
 import ProductOfferingCompanies from "@/features/products/components/details/ProductOfferingCompanies";
 
 /**
- * Composes the public product detail page (catalog or company offer).
+ * Composes the public catalog product detail page.
  */
 export default function ProductDetailsPage({
   product,
@@ -19,6 +19,8 @@ export default function ProductDetailsPage({
 }) {
   if (!product) return null;
 
+  const mode = company || !showOfferingCompanies ? "company" : "catalog";
+
   return (
     <div className="container pb-16 pt-4 md:pt-8">
       {breadcrumbs.length > 0 && (
@@ -32,8 +34,9 @@ export default function ProductDetailsPage({
         locale={locale}
         company={company}
         showOfferingCompanies={showOfferingCompanies}
+        mode={mode}
       />
-      <ProductDetailsTabs product={product} locale={locale} />
+      <ProductDetailsTabs product={product} locale={locale} mode={mode} />
 
       {showOfferingCompanies && (
         <ProductOfferingCompanies

@@ -20,7 +20,7 @@ export default function WhySection() {
   const locale = useLocale();
 
   return (
-    <section className="container py-16">
+    <section className="container py-10">
       <SectionHeader
         align="center"
         eyebrow={locale === "ar" ? "لماذا نحن" : "Why us"}

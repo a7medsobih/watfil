@@ -16,6 +16,7 @@
         "blog": "Blog",
         "about": "About",
         "contact": "Contact",
+        "joinUs": "Join us",
         "wishlist": "Wishlist",
         "compare": "Compare",
         "search": "Search",
@@ -39,9 +40,9 @@
         "wishlist": "Save"
     },
     "hero": {
-        "eyebrow": "Trusted by 480+ certified suppliers",
+        "eyebrow": "Trusted by 480+ certified companies",
         "title": "Cleaner water,\nsmarter choices.",
-        "subtitle": "Discover premium water filters, purifiers, and the companies that deliver them across every governorate — all in one place.",
+        "subtitle": "Discover premium water filters, purifiers, and certified companies across every governorate — all in one place.",
         "searchPlaceholder": "Search filters, brands, categories…"
     },
     "home": {
@@ -55,7 +56,10 @@
         },
         "companies": {
             "title": "Top companies",
-            "subtitle": "Certified suppliers, installers and service providers."
+            "subtitle": "Certified companies for install and service.",
+            "governorate": "Governorate",
+            "allGovernorates": "All governorates",
+            "empty": "No rated companies for this governorate yet."
         },
         "why": {
             "title": "Why Watfil",
@@ -81,7 +85,7 @@
     },
     "products": {
         "title": "All products",
-        "subtitle": "Browse filters, systems and water technology from trusted suppliers.",
+        "subtitle": "Browse Watfil products, then choose a certified company near you to buy.",
         "count": "{count} products",
         "searchPlaceholder": "Search by name, description, or SKU…",
         "filters": "Filters",
@@ -99,6 +103,7 @@
         "results": "results",
         "all": "All",
         "allGovernorates": "All governorates",
+        "governorateHint": "Shows products available from companies serving this governorate.",
         "resetFilters": "Reset filters",
         "emptyTitle": "No products found",
         "empty": "Try adjusting your search or filters."
@@ -107,8 +112,11 @@
         "tabsLabel": "Product details",
         "tabs": {
             "overview": "Overview",
+            "description": "Description",
+            "specifications": "Specifications",
             "installments": "Installments",
             "perks": "Perks",
+            "reviews": "Reviews",
             "info": "Product information"
         },
         "sku": "SKU",
@@ -120,11 +128,27 @@
         "likes": "likes",
         "views": "views",
         "compare": "Compare",
+        "viewDetails": "Details",
+        "buyFromCompany": "Buy from this company",
+        "buyNow": "Buy now",
+        "browseCompany": "Browse company",
+        "orderNow": "Order now",
+        "purchaseFromCompany": "You buy from the certified company — not directly from Watfil.",
+        "chooseCompanyTitle": "Discover companies in your governorate",
+        "chooseCompanySubtitle": "Compare benefits and offers, then pick the best fit near you.",
+        "moreBenefits": "+{count} more",
+        "serviceLocations": "Service locations",
+        "branchesCount": "{count} service locations",
+        "warranty": "Warranty",
+        "installation": "Installation",
+        "offers": "Offers",
         "stagesCount": "{count} stages",
         "badges": {
             "sale": "Sale",
             "installment": "Installment",
-            "perks": "Perks included"
+            "perks": "Perks included",
+            "watfilProduct": "Watfil product",
+            "companyProduct": "Company product"
         },
         "availability": {
             "available": "Available",
@@ -138,7 +162,7 @@
         "overview": {
             "description": "Description",
             "pricing": "Pricing",
-            "supplier": "Supplier",
+            "supplier": "Company",
             "category": "Category",
             "status": "Availability",
             "stock": "Stock status"
@@ -148,10 +172,19 @@
             "monthsValue": "{count} months",
             "downPayment": "Down payment",
             "amount": "Monthly installment",
-            "empty": "No installment plans available for this product."
+            "empty": "No installment plans available for this offer."
         },
         "perks": {
             "empty": "No perks listed for this offer."
+        },
+        "reviews": {
+            "title": "Customer reviews",
+            "summary": "{count} reviews",
+            "emptyTitle": "No reviews yet",
+            "empty": "Detailed reviews appear on company pages after purchases.",
+            "sortNewest": "Newest",
+            "sortHighest": "Highest rated",
+            "anonymous": "Customer"
         },
         "info": {
             "stages": "Number of stages",
@@ -160,18 +193,24 @@
             "stock": "Stock status",
             "addedAt": "Added on"
         },
-        "companies": "Companies selling this",
-        "companiesSubtitle": "Choose a governorate to see local sellers, prices, and installment options.",
+        "purchase": {
+            "title": "Purchase information",
+            "subtitle": "Complete your order with the certified company.",
+            "goToCompany": "Go to company page"
+        },
+        "companies": "Discover companies in your governorate",
+        "companiesSubtitle": "Compare benefits and offers, then pick the best fit near you.",
         "companiesEmptyTitle": "No companies in this governorate",
-        "companiesEmpty": "Try another governorate to find sellers for this product.",
+        "companiesEmpty": "Try another governorate to find companies for this product.",
         "related": "Related products",
-        "filterByGov": "Filter by governorate",
+        "filterByGov": "Choose governorate",
         "verified": "Verified",
         "price": "Price"
     },
     "company": {
         "about": "About company",
         "branches": "Branches",
+        "serviceLocations": "Service locations",
         "products": "Products",
         "gallery": "Gallery",
         "contact": "Contact",
@@ -184,12 +223,20 @@
         "unlike": "Unlike company",
         "tabsLabel": "Company sections",
         "tabs": {
-            "store": "Store",
+            "store": "Products",
             "about": "About",
             "services": "Services",
-            "coverage": "Coverage",
+            "coverage": "Service locations",
+            "branches": "Service locations",
             "team": "Team",
-            "ratings": "Ratings"
+            "ratings": "Ratings",
+            "contact": "Contact"
+        },
+        "contactPanel": {
+            "title": "Contact the company",
+            "description": "Visit the company page or save it to favorites, then contact them to complete your purchase.",
+            "viewStore": "View products",
+            "noDirectContact": "Contact details appear when provided by the company."
         },
         "emptyProductsTitle": "No products yet",
         "emptyProducts": "This company has not listed any products.",
@@ -197,6 +244,9 @@
             "addTitle": "Rate this company",
             "editTitle": "Update your rating",
             "summary": "{count} customer ratings",
+            "customerReviews": "Customer reviews",
+            "sortNewest": "Newest",
+            "sortHighest": "Highest rated",
             "commentPlaceholder": "Optional comment (max 1000 characters)",
             "submit": "Submit rating",
             "update": "Update rating",
@@ -221,12 +271,18 @@
     },
     "companies": {
         "title": "Companies",
-        "subtitle": "Certified suppliers, installers and service providers you can trust.",
+        "subtitle": "Certified companies for install and service you can trust.",
         "count": "{count} companies",
         "searchPlaceholder": "Search filters, brands, categories…",
-        "governoratesLabel": "Governorates",
+        "governoratesLabel": "Governorate",
+        "allGovernorates": "All governorates",
         "emptyTitle": "No companies here yet",
-        "empty": "No companies found in this governorate. Try another one from the tabs above."
+        "empty": "No matching companies. Try another governorate or adjust your search."
+    },
+    "errors": {
+        "title": "We couldn't load this page",
+        "description": "Something went wrong while reaching the server. Check your connection and try again.",
+        "retry": "Try again"
     },
     "pagination": {
         "previous": "Previous",
@@ -308,14 +364,20 @@
     },
     "wishlist": {
         "title": "Your wishlist",
-        "subtitle": "Products you liked — saved in one place.",
-        "empty": "Nothing saved yet. Browse products and tap the heart to save them.",
-        "emptyTitle": "No favorites yet",
+        "subtitle": "Your favorite products and companies in one place.",
+        "tabs": {
+            "products": "Products",
+            "companies": "Companies"
+        },
+        "empty": "Nothing saved yet. Browse products or companies and tap the heart to save them.",
+        "emptyTitle": "No favorite products yet",
+        "emptyCompaniesTitle": "No favorite companies yet",
+        "emptyCompanies": "Like companies while browsing to see them here.",
         "like": "Add to wishlist",
         "unlike": "Remove from wishlist",
         "loading": "Loading wishlist…",
         "loginRequiredTitle": "Sign in to view your wishlist",
-        "loginRequiredDescription": "Your liked products are saved to your account.",
+        "loginRequiredDescription": "Favorites for products and companies are saved to your account.",
         "loadError": "Could not load wishlist",
         "loadErrorDescription": "Something went wrong. Please try again.",
         "retry": "Try again",
@@ -327,6 +389,64 @@
     },
     "compare": {
         "title": "Compare products"
+    },
+    "joinUs": {
+        "title": "Join Watfil",
+        "subtitle": "Submit a join request for your company. Our team will review it and get in touch — no account is created until approval.",
+        "metaTitle": "Join Watfil — Partner with us",
+        "metaDescription": "Apply to join the Watfil network. Showcase your water filtration products to customers across Egypt.",
+        "fields": {
+            "companyName": "Company name",
+            "taxNumber": "Tax number",
+            "governorate": "Governorate",
+            "governoratePlaceholder": "Select governorate",
+            "contactName": "Contact name",
+            "phone": "Phone",
+            "email": "Email",
+            "notes": "Notes",
+            "optional": "optional"
+        },
+        "actions": {
+            "submit": "Submit request",
+            "submitting": "Submitting…",
+            "backHome": "Back to home",
+            "browseCompanies": "Browse companies",
+            "joinNow": "Join now"
+        },
+        "success": {
+            "title": "Join request received",
+            "description": "The Watfil team will review your request and contact you soon."
+        },
+        "errors": {
+            "generic": "Something went wrong. Please try again."
+        },
+        "cta": {
+            "home": {
+                "title": "Grow your business with Watfil",
+                "description": "Join our network and put your products in front of thousands of customers looking for trusted water solutions."
+            },
+            "companies": {
+                "title": "Is your company missing from the Watfil network?",
+                "description": "Join now and start showcasing your products to thousands of customers."
+            }
+        },
+        "faq": {
+            "title": "Frequently asked questions",
+            "items": [
+                {
+                    "question": "Does submitting a request create an account?",
+                    "answer": "No. You only send a join request. After review, the Watfil team creates the company account manually."
+                },
+                {
+                    "question": "How long does the review take?",
+                    "answer": "Our team reviews requests as soon as possible and will contact you using the details you provided."
+                },
+                {
+                    "question": "What happens after approval?",
+                    "answer": "Once approved, your company account is created and you can start listing products on Watfil."
+                }
+            ]
+        }
     },
     "footer": {
         "tagline": "The trusted marketplace for clean water technology.",

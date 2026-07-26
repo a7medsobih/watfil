@@ -2,18 +2,25 @@ import { ArrowRight } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import BlogCard from "@/components/common/BlogCard";
+import SectionCarousel from "@/components/common/SectionCarousel";
 import SectionHeader from "@/components/common/SectionHeader";
 import { Button } from "@/components/ui/button";
 import { getFeaturedArticles } from "@/features/blog/api";
 import { Link } from "@/i18n/navigation";
 
+const HOME_ARTICLES_LIMIT = 6;
+
 export default async function BlogSection() {
   const t = await getTranslations();
   const locale = await getLocale();
-  const { articles } = await getFeaturedArticles();
+  const { articles } = await getFeaturedArticles({
+    limit: HOME_ARTICLES_LIMIT,
+  });
+
+  if (!articles.length) return null;
 
   return (
-    <section className="container py-16">
+    <section className="container py-10">
       <SectionHeader
         eyebrow={locale === "ar" ? "من المدونة" : "From the blog"}
         title={t("blog.latest")}
@@ -28,7 +35,11 @@ export default async function BlogSection() {
         }
       />
 
-      <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      <SectionCarousel
+        ariaLabel={t("blog.latest")}
+        gridClassName="md:grid-cols-2 lg:grid-cols-3"
+        itemClassName="basis-[88%] sm:basis-[60%]"
+      >
         {articles.map((article) => (
           <BlogCard
             key={article.id}
@@ -37,7 +48,7 @@ export default async function BlogSection() {
             readMoreLabel={t("cta.readMore")}
           />
         ))}
-      </div>
+      </SectionCarousel>
     </section>
   );
 }

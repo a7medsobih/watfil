@@ -3,5 +3,7 @@ export {
   mapCompanyDetail,
   mapCompanies,
   mapCompaniesMeta,
+  mapCompanyProducts,
   mapGovernorates,
+  sortGovernoratesByRating,
 } from "./company.mapper";

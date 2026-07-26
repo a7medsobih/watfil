@@ -40,8 +40,9 @@ function getPageItems(currentPage, lastPage) {
   return items;
 }
 
-function PageLink({
+function PageControl({
   href,
+  onSelect,
   isActive,
   className,
   children,
@@ -57,11 +58,24 @@ function PageLink({
     className,
   );
 
-  if (disabled || !href) {
+  if (disabled || (!href && !onSelect)) {
     return (
       <span aria-disabled className={classes} tabIndex={-1}>
         {children}
       </span>
+    );
+  }
+
+  if (onSelect) {
+    return (
+      <button
+        type="button"
+        onClick={onSelect}
+        aria-current={isActive ? "page" : undefined}
+        className={classes}
+      >
+        {children}
+      </button>
     );
   }
 
@@ -77,7 +91,9 @@ function PageLink({
 }
 
 /**
- * Generic list pagination for server-rendered pages (companies, products, …).
+ * Generic list pagination.
+ * Pass `hrefBuilder` for server-rendered lists (companies, products, …) or
+ * `onPageChange` for client lists paginated in place (company store).
  * Renders only when results span more than one page.
  *
  * @param {object} props
@@ -85,7 +101,8 @@ function PageLink({
  * @param {number} props.lastPage
  * @param {number} [props.total]
  * @param {number} [props.perPage]
- * @param {(page: number) => string} props.hrefBuilder
+ * @param {(page: number) => string} [props.hrefBuilder]
+ * @param {(page: number) => void} [props.onPageChange]
  * @param {string} [props.className]
  * @param {{ previous?: string, next?: string }} [props.labels]
  */
@@ -95,6 +112,7 @@ export default function AppPagination({
   total,
   perPage,
   hrefBuilder,
+  onPageChange,
   className,
   labels = {},
 }) {
@@ -111,12 +129,17 @@ export default function AppPagination({
 
   const items = getPageItems(page, pages);
 
+  const controlProps = (targetPage) =>
+    onPageChange
+      ? { onSelect: () => onPageChange(targetPage) }
+      : { href: hrefBuilder?.(targetPage) };
+
   return (
     <Pagination className={cn("mt-10", className)}>
       <PaginationContent>
         <PaginationItem>
-          <PageLink
-            href={page > 1 ? hrefBuilder(page - 1) : undefined}
+          <PageControl
+            {...(page > 1 ? controlProps(page - 1) : {})}
             disabled={page <= 1}
             size="default"
             className="gap-1 px-2.5 sm:pe-4"
@@ -125,7 +148,7 @@ export default function AppPagination({
             <span className="hidden sm:inline">
               {labels.previous ?? "Previous"}
             </span>
-          </PageLink>
+          </PageControl>
         </PaginationItem>
 
         {items.map((item, index) =>
@@ -140,23 +163,23 @@ export default function AppPagination({
             </PaginationItem>
           ) : (
             <PaginationItem key={item}>
-              <PageLink href={hrefBuilder(item)} isActive={item === page}>
+              <PageControl {...controlProps(item)} isActive={item === page}>
                 {item}
-              </PageLink>
+              </PageControl>
             </PaginationItem>
           ),
         )}
 
         <PaginationItem>
-          <PageLink
-            href={page < pages ? hrefBuilder(page + 1) : undefined}
+          <PageControl
+            {...(page < pages ? controlProps(page + 1) : {})}
             disabled={page >= pages}
             size="default"
             className="gap-1 px-2.5 sm:ps-4"
           >
             <span className="hidden sm:inline">{labels.next ?? "Next"}</span>
             <ChevronRightIcon className="size-4 rtl:rotate-180" />
-          </PageLink>
+          </PageControl>
         </PaginationItem>
       </PaginationContent>
     </Pagination>

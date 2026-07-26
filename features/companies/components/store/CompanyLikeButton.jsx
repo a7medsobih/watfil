@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useRequireAuth } from "@/features/auth";
 import { likeCompany, unlikeCompany } from "@/features/companies/api";
 import { useAuthStore, useIsAuthenticated } from "@/stores/auth-store";
+import { useLikedCompaniesStore } from "@/stores/liked-companies-store";
 import { cn } from "@/lib/utils";
 
 /**
@@ -16,6 +17,7 @@ import { cn } from "@/lib/utils";
  */
 export default function CompanyLikeButton({
   companyId,
+  company = null,
   initialLiked = false,
   initialLikesCount = 0,
   onChange,
@@ -26,6 +28,7 @@ export default function CompanyLikeButton({
   const isAuthenticated = useIsAuthenticated();
   const token = useAuthStore((state) => state.token);
   const { openLogin } = useRequireAuth("login");
+  const setLikedCompany = useLikedCompaniesStore((state) => state.setLiked);
 
   const [liked, setLiked] = useState(Boolean(initialLiked));
   const [likesCount, setLikesCount] = useState(Number(initialLikesCount) || 0);
@@ -35,6 +38,26 @@ export default function CompanyLikeButton({
     setLiked(Boolean(initialLiked));
     setLikesCount(Number(initialLikesCount) || 0);
   }, [initialLiked, initialLikesCount, companyId]);
+
+  useEffect(() => {
+    if (!companyId || !initialLiked || !company) return;
+    setLikedCompany(
+      {
+        id: company.id ?? companyId,
+        slug: company.slug,
+        name: company.name,
+        logo: company.logo,
+        hasLogo: company.hasLogo,
+        rating: company.rating,
+        reviews: company.reviews,
+        likes: company.likes ?? initialLikesCount,
+        governorate: company.governorate,
+        coverage: company.coverage,
+        verified: company.verified,
+      },
+      true,
+    );
+  }, [company, companyId, initialLiked, initialLikesCount, setLikedCompany]);
 
   const toggleLike = async () => {
     if (!companyId || loading) return;
@@ -52,6 +75,26 @@ export default function CompanyLikeButton({
     setLiked(nextLiked);
     setLikesCount(nextCount);
     onChange?.({ liked: nextLiked, likesCount: nextCount });
+
+    if (company || companyId) {
+      setLikedCompany(
+        {
+          id: company?.id ?? companyId,
+          slug: company?.slug ?? null,
+          name: company?.name ?? "",
+          logo: company?.logo ?? null,
+          hasLogo: Boolean(company?.hasLogo),
+          rating: company?.rating ?? null,
+          reviews: company?.reviews ?? 0,
+          likes: nextCount,
+          governorate: company?.governorate ?? null,
+          coverage: company?.coverage ?? null,
+          verified: Boolean(company?.verified),
+        },
+        nextLiked,
+      );
+    }
+
     setLoading(true);
 
     try {
@@ -66,6 +109,24 @@ export default function CompanyLikeButton({
       setLiked(previousLiked);
       setLikesCount(previousCount);
       onChange?.({ liked: previousLiked, likesCount: previousCount });
+      if (company || companyId) {
+        setLikedCompany(
+          {
+            id: company?.id ?? companyId,
+            slug: company?.slug ?? null,
+            name: company?.name ?? "",
+            logo: company?.logo ?? null,
+            hasLogo: Boolean(company?.hasLogo),
+            rating: company?.rating ?? null,
+            reviews: company?.reviews ?? 0,
+            likes: previousCount,
+            governorate: company?.governorate ?? null,
+            coverage: company?.coverage ?? null,
+            verified: Boolean(company?.verified),
+          },
+          previousLiked,
+        );
+      }
       toast.error(t("toast.error"));
     } finally {
       setLoading(false);

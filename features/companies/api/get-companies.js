@@ -8,15 +8,18 @@ import {
 
 /**
  * Builds API query params for companies list.
- * Ready for future: search, page, per_page, filters.
+ * governorate_id is optional — omit for all governorates when backend allows.
  * @param {object} params
  */
 function buildQueryParams(params = {}) {
   const query = {
-    governorate_id: params.governorate_id,
     page: params.page ?? 1,
     per_page: params.per_page ?? 15,
   };
+
+  if (params.governorate_id != null && params.governorate_id !== "") {
+    query.governorate_id = params.governorate_id;
+  }
 
   if (params.search != null && params.search !== "") {
     query.search = params.search;
@@ -26,19 +29,15 @@ function buildQueryParams(params = {}) {
 }
 
 /**
- * Fetches paginated public companies for a governorate.
- * Requires governorate_id — listing all companies is not supported by the API.
+ * Fetches paginated public companies.
+ * governorate_id is optional (all governorates when omitted).
  *
  * @param {object} params
- * @param {string|number} params.governorate_id
+ * @param {string|number} [params.governorate_id]
  * @param {string} [params.locale]
  * @returns {Promise<{ companies: object[], meta: object }>}
  */
 export async function getCompanies(params = {}) {
-  if (params.governorate_id == null || params.governorate_id === "") {
-    throw new Error("getCompanies requires governorate_id");
-  }
-
   const response = await fetcher(endpoints.companies.list, {
     params: buildQueryParams(params),
     next: {

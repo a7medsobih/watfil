@@ -1,19 +1,26 @@
 import { ArrowRight } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 
+import ProductCard from "@/components/common/ProductCard";
+import SectionCarousel from "@/components/common/SectionCarousel";
 import SectionHeader from "@/components/common/SectionHeader";
 import { Button } from "@/components/ui/button";
 import { getFeaturedProducts } from "@/features/products/api";
 import { Link } from "@/i18n/navigation";
-import ProductCard from "@/components/common/ProductCard";
+
+const HOME_PRODUCTS_LIMIT = 8;
 
 export default async function ProductsSection() {
   const t = await getTranslations();
   const locale = await getLocale();
-  const { products } = await getFeaturedProducts();
+  const { products } = await getFeaturedProducts({
+    limit: HOME_PRODUCTS_LIMIT,
+  });
+
+  if (!products.length) return null;
 
   return (
-    <section className="container py-16">
+    <section className="container py-10">
       <SectionHeader
         eyebrow={locale === "ar" ? "مختارة لك" : "Featured for you"}
         title={t("home.featured.title")}
@@ -28,11 +35,17 @@ export default async function ProductsSection() {
         }
       />
 
-      <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      <SectionCarousel ariaLabel={t("home.featured.title")}>
         {products.map((product) => (
-          <ProductCard key={product.id} product={product} locale={locale} />
+          <ProductCard
+            key={product.id}
+            product={product}
+            locale={locale}
+            variant="catalog"
+            className="h-full"
+          />
         ))}
-      </div>
+      </SectionCarousel>
     </section>
   );
 }

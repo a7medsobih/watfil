@@ -20,9 +20,13 @@ const CompanyHeroGallery = dynamic(
 /**
  * Composes the public company storefront.
  * Info card overlaps the lower half of the hero slider.
- * @param {{ company: object }} props
+ * Products come from paginated GET /public/companies/{id}/products.
  */
-export default function CompanyStorePage({ company }) {
+export default function CompanyStorePage({
+  company,
+  productsMeta = null,
+  paginationLabels = {},
+}) {
   const [view, setView] = useState(company);
 
   useEffect(() => {
@@ -57,6 +61,8 @@ export default function CompanyStorePage({ company }) {
           />
           <CompanyStoreTabs
             company={view}
+            productsMeta={productsMeta}
+            paginationLabels={paginationLabels}
             onRatingSummaryChange={(summary) => {
               setView((prev) => ({
                 ...prev,

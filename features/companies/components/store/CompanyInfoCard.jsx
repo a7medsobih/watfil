@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Eye, Heart, MapPin, Package, Star } from "lucide-react";
 
+import MediaImage from "@/components/common/MediaImage";
 import { Badge } from "@/components/ui/badge";
 import CompanyLikeButton from "@/features/companies/components/store/CompanyLikeButton";
 import { cn } from "@/lib/utils";
@@ -34,10 +35,14 @@ function RatingStars({ value = 0 }) {
 export default function CompanyInfoCard({ company, className }) {
   const t = useTranslations("company");
   const [likesCount, setLikesCount] = useState(company?.likes ?? 0);
-
-  useEffect(() => {
+  const [likesSyncKey, setLikesSyncKey] = useState(
+    `${company?.id}-${company?.likes ?? 0}`,
+  );
+  const nextLikesSyncKey = `${company?.id}-${company?.likes ?? 0}`;
+  if (nextLikesSyncKey !== likesSyncKey) {
+    setLikesSyncKey(nextLikesSyncKey);
     setLikesCount(company?.likes ?? 0);
-  }, [company?.id, company?.likes]);
+  }
 
   if (!company) return null;
 
@@ -55,10 +60,10 @@ export default function CompanyInfoCard({ company, className }) {
             company.hasLogo ? "bg-muted" : "gradient-water",
           )}
         >
-          <img
-            src={company.logo}
+          <MediaImage
+            src={company.hasLogo ? company.logo : null}
             alt={company.name}
-            className="h-full w-full object-cover"
+            kind="company"
           />
         </div>
 
@@ -131,6 +136,7 @@ export default function CompanyInfoCard({ company, className }) {
         <div className="flex shrink-0 justify-center sm:justify-end">
           <CompanyLikeButton
             companyId={company.id}
+            company={company}
             initialLiked={company.isLiked}
             initialLikesCount={company.likes ?? 0}
             showCount={false}

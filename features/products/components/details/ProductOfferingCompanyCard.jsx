@@ -1,14 +1,29 @@
-import { Heart, MapPin, Star } from "lucide-react";
+"use client";
 
+import { Gift, MapPin, Star } from "lucide-react";
+import { useTranslations } from "next-intl";
+
+import MediaImage from "@/components/common/MediaImage";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { buildCompanyProductHref } from "@/features/companies/utils/resolve-company-product-params";
-import { resolveLucideIcon } from "@/features/companies/utils/resolve-lucide-icon";
 import { cn } from "@/lib/utils";
 
+const MAX_VISIBLE_CHIPS = 5;
+const MAX_OFFER_HIGHLIGHTS = 2;
+
+function isOfferPerk(perk) {
+  return (
+    perk?.type === "gift" ||
+    perk?.type === "other" ||
+    perk?.type === "support" ||
+    perk?.type === "maintenance"
+  );
+}
+
 /**
- * Company card for a product offering in a governorate.
- * Links to that company's full product-details page.
+ * Company card for a product offering — optimized for comparing value.
  */
 export default function ProductOfferingCompanyCard({
   offering,
@@ -16,156 +31,213 @@ export default function ProductOfferingCompanyCard({
   className,
   labels = {},
 }) {
+  const t = useTranslations("product");
+
   if (!offering?.company) return null;
 
   const { company, product } = offering;
   const currency = locale === "ar" ? "ج.م" : "EGP";
-  const coverageItems = company.coverage?.items ?? [];
-  const coverageOverflow = company.coverage?.overflow ?? 0;
-  const perks = product?.hasPerks ? (product.perks ?? []).slice(0, 3) : [];
+  const serviceLocationsTotal = company.coverage?.total ?? 0;
+  const perks = product?.hasPerks ? (product.perks ?? []) : [];
 
   const showSalePrice =
     product?.isOnSale &&
     product.originalPrice != null &&
     product.originalPrice > product.cashPrice;
 
-  const href = product?.id
+  const buyHref = product?.id
     ? buildCompanyProductHref(company.slug, product.id, {
         source: product.source ?? product.likeSource ?? "catalog",
       })
     : `/companies/${company.slug}`;
 
+  const companyHref = `/companies/${company.slug}`;
+
+  const benefitChips = [];
+
+  if (product?.hasInstallment) {
+    benefitChips.push({
+      key: "installment",
+      label: labels.installment ?? t("badges.installment"),
+      highlight: true,
+    });
+  }
+
+  if (product?.isOnSale) {
+    benefitChips.push({
+      key: "sale",
+      label: labels.offers ?? t("offers"),
+      highlight: true,
+    });
+  }
+
+  for (const perk of perks) {
+    if (!perk?.title) continue;
+    benefitChips.push({
+      key: perk.id ?? `${perk.type}-${perk.title}`,
+      label: perk.title,
+      highlight: isOfferPerk(perk) || perk.type === "warranty" || perk.type === "installation",
+    });
+  }
+
+  const visibleChips = benefitChips.slice(0, MAX_VISIBLE_CHIPS);
+  const overflowCount = Math.max(0, benefitChips.length - visibleChips.length);
+
+  const offerHighlights = perks
+    .filter((perk) => isOfferPerk(perk) && perk.title)
+    .slice(0, MAX_OFFER_HIGHLIGHTS);
+
   return (
     <article
       className={cn(
-        "group overflow-hidden rounded-3xl border border-border/60 bg-card transition-all duration-300 hover:border-primary/20 hover:shadow-card",
+        "group flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card transition-all duration-300 hover:border-primary/20 hover:shadow-card sm:rounded-3xl",
         className,
       )}
     >
-      <Link href={href} className="block">
-        <div
-          className={cn(
-            "relative h-40 overflow-hidden",
-            company.hasLogo ? "bg-muted" : "gradient-water",
-          )}
-        >
-          <img
-            src={company.logo}
-            alt={company.name}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-linear-to-t from-black/55 via-transparent to-transparent" />
-
-          <div className="absolute start-3 top-3 flex flex-wrap gap-2">
-            {company.verified && (
-              <Badge className="rounded-full">
-                {labels.verified ?? "Verified"}
-              </Badge>
+      <div className="flex flex-1 flex-col gap-4 p-4 sm:p-5">
+        <div className="flex items-start gap-3">
+          <div
+            className={cn(
+              "size-12 shrink-0 overflow-hidden rounded-xl border border-border/60",
+              company.hasLogo ? "bg-muted" : "gradient-water",
             )}
-            {product?.hasInstallment && (
-              <Badge className="rounded-full">
-                {labels.installment ?? "Installment"}
-              </Badge>
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-4 p-5">
-          <div>
-            <h3 className="line-clamp-1 text-lg font-semibold transition-colors group-hover:text-primary">
-              {company.name}
-            </h3>
-            {company.governorate?.name && (
-              <p className="mt-1 inline-flex items-center gap-1.5 text-sm text-muted-foreground">
-                <MapPin className="size-3.5 shrink-0" aria-hidden />
-                {company.governorate.name}
-              </p>
-            )}
+          >
+            <MediaImage
+              src={company.hasLogo ? company.logo : null}
+              alt=""
+              kind="company"
+            />
           </div>
 
-          <div className="flex flex-wrap items-center gap-4 text-sm">
-            {company.rating != null && (
-              <div className="flex items-center gap-1">
-                <Star className="h-4 w-4 text-warning" aria-hidden />
-                <span className="font-semibold">
-                  {Number(company.rating).toFixed(1)}
-                </span>
-                <span className="text-muted-foreground">
-                  ({company.reviews ?? 0})
-                </span>
-              </div>
-            )}
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <Heart className="h-4 w-4" aria-hidden />
-              <span>{company.likes ?? 0}</span>
-            </div>
-          </div>
-
-          {coverageItems.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {coverageItems.map((item) => (
-                <Badge
-                  key={item.id}
-                  variant="secondary"
-                  className="rounded-full bg-primary/10 text-primary hover:bg-primary/15"
-                >
-                  {item.name}
-                </Badge>
-              ))}
-              {coverageOverflow > 0 && (
-                <Badge
-                  variant="secondary"
-                  className="rounded-full bg-primary/10 text-primary hover:bg-primary/15"
-                >
-                  +{coverageOverflow}
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="line-clamp-1 text-base font-bold tracking-tight transition-colors group-hover:text-primary sm:text-lg">
+                {company.name}
+              </h3>
+              {company.verified && (
+                <Badge className="rounded-full px-2 py-0 text-[11px]">
+                  {labels.verified ?? t("verified")}
                 </Badge>
               )}
             </div>
-          )}
 
-          {product && (
-            <div className="border-t border-border/60 pt-4">
-              <div className="text-xs text-muted-foreground">
-                {labels.price ?? "Price"}
-              </div>
-              <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                <span className="text-xl font-bold text-primary">
-                  {product.cashPrice.toLocaleString(
+            <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+              {company.rating != null && (
+                <div className="flex items-center gap-1">
+                  <Star
+                    className="size-3.5 fill-warning text-warning"
+                    aria-hidden
+                  />
+                  <span className="font-semibold tabular-nums">
+                    {Number(company.rating).toFixed(1)}
+                  </span>
+                  <span className="text-muted-foreground">
+                    ({company.reviews ?? 0})
+                  </span>
+                </div>
+              )}
+              {company.governorate?.name && (
+                <p className="inline-flex items-center gap-1 text-muted-foreground">
+                  <MapPin className="size-3.5 shrink-0" aria-hidden />
+                  <span className="line-clamp-1">{company.governorate.name}</span>
+                </p>
+              )}
+              {serviceLocationsTotal > 0 && (
+                <span className="text-muted-foreground">
+                  {t("branchesCount", { count: serviceLocationsTotal })}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {product && (
+          <div>
+            <div className="text-xs text-muted-foreground">
+              {labels.price ?? t("price")}
+            </div>
+            <div className="mt-0.5 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+              <span className="text-xl font-bold text-primary tabular-nums sm:text-2xl">
+                {product.cashPrice.toLocaleString(
+                  locale === "ar" ? "ar-EG" : "en-EG",
+                )}
+              </span>
+              <span className="text-sm text-muted-foreground">{currency}</span>
+              {showSalePrice && (
+                <span className="text-sm text-muted-foreground line-through">
+                  {product.originalPrice.toLocaleString(
                     locale === "ar" ? "ar-EG" : "en-EG",
                   )}
                 </span>
-                <span className="text-sm text-muted-foreground">{currency}</span>
-                {showSalePrice && (
-                  <span className="text-sm text-muted-foreground line-through">
-                    {product.originalPrice.toLocaleString(
-                      locale === "ar" ? "ar-EG" : "en-EG",
-                    )}
-                  </span>
-                )}
-              </div>
-
-              {perks.length > 0 && (
-                <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                  {perks.map((perk) => {
-                    const Icon = resolveLucideIcon(perk.icon);
-                    return (
-                      <span
-                        key={perk.id ?? `${perk.title}-${perk.icon}`}
-                        title={perk.title}
-                        className="inline-flex size-7 items-center justify-center rounded-full bg-primary/10 text-primary"
-                      >
-                        <Icon className="size-3.5" aria-hidden />
-                        <span className="sr-only">{perk.title}</span>
-                      </span>
-                    );
-                  })}
-                </div>
               )}
             </div>
-          )}
+          </div>
+        )}
+
+        {visibleChips.length > 0 && (
+          <div className="flex flex-wrap gap-1.5" aria-label={t("tabs.perks")}>
+            {visibleChips.map((chip) => (
+              <Badge
+                key={chip.key}
+                variant="secondary"
+                className={cn(
+                  "rounded-full px-2.5 py-1 text-xs font-medium",
+                  chip.highlight
+                    ? "bg-primary/10 text-primary"
+                    : "bg-muted text-foreground",
+                )}
+              >
+                {chip.label}
+              </Badge>
+            ))}
+            {overflowCount > 0 && (
+              <Badge
+                variant="secondary"
+                className="rounded-full px-2.5 py-1 text-xs text-muted-foreground"
+              >
+                {t("moreBenefits", { count: overflowCount })}
+              </Badge>
+            )}
+          </div>
+        )}
+
+        {offerHighlights.length > 0 && (
+          <div className="space-y-2 rounded-2xl border border-primary/15 bg-primary/5 p-3">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
+              <Gift className="size-3.5" aria-hidden />
+              {labels.offers ?? t("offers")}
+            </div>
+            <ul className="space-y-1.5">
+              {offerHighlights.map((perk) => (
+                <li
+                  key={perk.id ?? perk.title}
+                  className="text-sm leading-snug"
+                >
+                  <span className="font-semibold">{perk.title}</span>
+                  {perk.description ? (
+                    <span className="mt-0.5 block line-clamp-1 text-xs text-muted-foreground">
+                      {perk.description}
+                    </span>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div className="mt-auto flex flex-col gap-2 pt-1 sm:flex-row">
+          <Button asChild className="flex-1">
+            <Link href={buyHref}>
+              {labels.buyNow ?? t("buyNow")}
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="flex-1">
+            <Link href={companyHref}>
+              {labels.browseCompany ?? t("browseCompany")}
+            </Link>
+          </Button>
         </div>
-      </Link>
+      </div>
     </article>
   );
 }

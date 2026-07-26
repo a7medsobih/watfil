@@ -79,7 +79,6 @@ export default async function Footer() {
                         title={t("footer.support")}
                         links={[
                             { href: "/wishlist", label: t("nav.wishlist") },
-                            { href: "/compare", label: t("nav.compare") },
                             { href: "/", label: "Help center" },
                             { href: "/", label: "Privacy" },
                         ]}

@@ -1,6 +1,6 @@
 /**
  * Resolves companies list query from Next.js searchParams.
- * Extensible for search / page / per_page / filters.
+ * governorate is optional — omit / empty / "all" means every governorate.
  *
  * @param {Record<string, string | string[] | undefined>} [searchParams]
  * @param {{ defaultGovernorateId?: string | number | null }} [options]
@@ -11,14 +11,28 @@ export function resolveCompaniesParams(searchParams = {}, options = {}) {
     return Array.isArray(value) ? value[0] : value;
   };
 
-  const governorate =
-    read("governorate") ?? options.defaultGovernorateId ?? null;
+  const rawGovernorate = read("governorate");
+  const hasExplicit =
+    Object.prototype.hasOwnProperty.call(searchParams, "governorate");
+
+  let governorate = null;
+  if (hasExplicit) {
+    if (
+      rawGovernorate != null &&
+      rawGovernorate !== "" &&
+      rawGovernorate !== "all"
+    ) {
+      governorate = rawGovernorate;
+    }
+  } else if (options.defaultGovernorateId != null) {
+    governorate = options.defaultGovernorateId;
+  }
 
   return {
     governorate_id: governorate,
     page: read("page") ?? 1,
     per_page: read("per_page") ?? 15,
-    search: read("search"),
+    search: read("search") || null,
   };
 }
 
@@ -26,21 +40,25 @@ export function resolveCompaniesParams(searchParams = {}, options = {}) {
  * Builds a /companies href while preserving list query params.
  *
  * @param {object} params
- * @param {string|number} [params.governorate]
+ * @param {string|number|null} [params.governorate]
+ * @param {string|number|null} [params.governorate_id]
  * @param {string|number} [params.page]
  * @param {string|number} [params.per_page]
- * @param {string} [params.search]
+ * @param {string|null} [params.search]
  */
 export function buildCompaniesHref({
   governorate,
+  governorate_id,
   page,
   per_page,
   search,
 } = {}) {
   const query = new URLSearchParams();
+  const gov =
+    governorate !== undefined ? governorate : governorate_id;
 
-  if (governorate != null && governorate !== "") {
-    query.set("governorate", String(governorate));
+  if (gov != null && gov !== "" && gov !== "all") {
+    query.set("governorate", String(gov));
   }
 
   if (page != null && Number(page) > 1) {

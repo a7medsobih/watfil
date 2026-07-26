@@ -1,8 +1,9 @@
 import { buildCompanySlug } from "@/features/companies/utils/company-slug";
 import { buildProductSlug } from "@/features/products/utils/product-slug";
+import { IMAGE_PLACEHOLDERS } from "@/lib/media/placeholders";
 
-const PRODUCT_IMAGE_PLACEHOLDER = "/images/product-placeholder.webp";
-const COMPANY_LOGO_PLACEHOLDER = "/images/company-placeholder.svg";
+const PRODUCT_IMAGE_PLACEHOLDER = IMAGE_PLACEHOLDERS.product;
+const COMPANY_LOGO_PLACEHOLDER = IMAGE_PLACEHOLDERS.company;
 const COVERAGE_BADGE_LIMIT = 3;
 
 function mapLocalizedName(entity, locale = "ar") {

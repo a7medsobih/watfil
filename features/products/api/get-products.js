@@ -57,39 +57,6 @@ export async function getProducts(params = {}) {
         }),
   });
 
-  // #region agent log
-  {
-    const rows = response?.data ?? [];
-    const sample = Array.isArray(rows) ? rows.slice(0, 3) : [];
-    fetch("http://127.0.0.1:7529/ingest/2917933e-5348-491e-879c-a647a465a9c2", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "e4f2de",
-      },
-      body: JSON.stringify({
-        sessionId: "e4f2de",
-        runId: "post-fix",
-        hypothesisId: "A,B",
-        location: "features/products/api/get-products.js:getProducts",
-        message: "Server products fetch with cookie token",
-        data: {
-          hasAuthOption: Boolean(token),
-          sampleCount: sample.length,
-          sampleLikes: sample.map((p) => ({
-            id: p?.id,
-            is_liked: p?.is_liked,
-            is_wishlisted: p?.is_wishlisted,
-            likes_count: p?.likes_count,
-            keys: p ? Object.keys(p).filter((k) => /like|wish/i.test(k)) : [],
-          })),
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-  }
-  // #endregion
-
   return {
     products: mapProducts(response?.data ?? []),
     meta: mapProductsMeta(response?.meta),

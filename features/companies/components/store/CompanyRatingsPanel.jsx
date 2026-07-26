@@ -133,6 +133,8 @@ export default function CompanyRatingsPanel({
   myRating: initialMyRating = null,
   averageRating: initialAverage = null,
   ratingsCount: initialCount = 0,
+  viewsCount = 0,
+  likesCount = 0,
   locale = "ar",
   onSummaryChange,
 }) {
@@ -149,6 +151,7 @@ export default function CompanyRatingsPanel({
   const [draftRating, setDraftRating] = useState(initialMyRating ?? 0);
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
+  const [sort, setSort] = useState("newest");
 
   useEffect(() => {
     setRatings(initialRatings);
@@ -170,6 +173,18 @@ export default function CompanyRatingsPanel({
     }),
     [t],
   );
+
+  const sortedRatings = useMemo(() => {
+    const list = [...ratings];
+    if (sort === "highest") {
+      return list.sort((a, b) => Number(b.rating ?? 0) - Number(a.rating ?? 0));
+    }
+    return list.sort((a, b) => {
+      const aTime = new Date(String(a.createdAt ?? "").replace(" ", "T")).getTime();
+      const bTime = new Date(String(b.createdAt ?? "").replace(" ", "T")).getTime();
+      return (Number.isNaN(bTime) ? 0 : bTime) - (Number.isNaN(aTime) ? 0 : aTime);
+    });
+  }, [ratings, sort]);
 
   const applySummary = (data) => {
     if (!data) return;
@@ -259,6 +274,9 @@ export default function CompanyRatingsPanel({
             <p className="font-medium text-foreground">
               {t("ratings.summary", { count: ratingsCount })}
             </p>
+            <p className="mt-1">
+              {viewsCount} {t("views")} · {likesCount} {t("likes")}
+            </p>
             {myRating != null && (
               <p className="mt-1">{t("myRating", { rating: myRating })}</p>
             )}
@@ -322,9 +340,33 @@ export default function CompanyRatingsPanel({
         </div>
       </div>
 
-      {ratings.length > 0 ? (
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h3 className="text-base font-semibold">
+          {t("ratings.customerReviews")}
+        </h3>
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            size="sm"
+            variant={sort === "newest" ? "default" : "outline"}
+            onClick={() => setSort("newest")}
+          >
+            {t("ratings.sortNewest")}
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant={sort === "highest" ? "default" : "outline"}
+            onClick={() => setSort("highest")}
+          >
+            {t("ratings.sortHighest")}
+          </Button>
+        </div>
+      </div>
+
+      {sortedRatings.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2">
-          {ratings.map((item) => (
+          {sortedRatings.map((item) => (
             <RatingCard
               key={item.id}
               item={item}

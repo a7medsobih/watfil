@@ -26,6 +26,12 @@ export function mapLikedProduct(item) {
     nested.company?.id ??
     null;
 
+  const companySlug =
+    item.company?.slug ??
+    nested.company?.slug ??
+    item.company_slug ??
+    null;
+
   return {
     ...product,
     isLiked: true,
@@ -34,6 +40,7 @@ export function mapLikedProduct(item) {
     ),
     likeSource: source === LIKE_SOURCE.COMPANY ? LIKE_SOURCE.COMPANY : LIKE_SOURCE.CATALOG,
     companyId: companyId != null ? companyId : null,
+    companySlug,
   };
 }
 
