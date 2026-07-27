@@ -63,14 +63,14 @@ export default async function Footer() {
                             { href: "/products", label: t("nav.products") },
                             { href: "/companies", label: t("nav.companies") },
                             { href: "/blog", label: t("nav.blog") },
-                            { href: "/search", label: t("nav.search") },
+                            { href: "/", label: t("nav.search") },
                         ]}
                     />
                     <FooterCol
                         title={t("footer.company")}
                         links={[
-                            { href: "/about", label: t("nav.about") },
-                            { href: "/contact", label: t("nav.contact") },
+                            { href: "/", label: t("nav.about") },
+                            { href: "/", label: t("nav.contact") },
                             { href: "/", label: "Careers" },
                             { href: "/", label: "Press" },
                         ]}

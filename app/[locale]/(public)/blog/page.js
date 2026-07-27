@@ -142,7 +142,7 @@ export default async function Page({ searchParams }) {
         </p>
 
         {articles.length > 0 ? (
-          <div className="space-y-8">
+          <div className="space-y-6">
             {featuredArticle && (
               <BlogFeaturedCard
                 article={featuredArticle}
@@ -153,7 +153,7 @@ export default async function Page({ searchParams }) {
             )}
 
             {gridArticles.length > 0 && (
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-2">
                 {gridArticles.map((article) => (
                   <BlogCard
                     key={article.id}
