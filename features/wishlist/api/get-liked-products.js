@@ -1,5 +1,5 @@
 import { endpoints } from "@/lib/api/endpoints";
-import { apiRequest } from "@/lib/api/request";
+import { fetchFromAPI } from "@/lib/api/fetcher";
 import { mapLikedProducts } from "@/features/wishlist/services/liked-product.mapper";
 import { mapProductsMeta } from "@/features/products/services/product.mapper";
 
@@ -20,16 +20,18 @@ function buildQueryParams(params = {}) {
 
 /**
  * Fetches the authenticated customer's liked products.
+ * Always uncached (personalized).
  *
  * @param {string} token
  * @param {{ source?: 'catalog'|'company', page?: number, per_page?: number }} [params]
  * @returns {Promise<{ products: object[], meta: object }>}
  */
 export async function getLikedProducts(token, params = {}) {
-  const response = await apiRequest(endpoints.likes.products, {
+  const response = await fetchFromAPI(endpoints.likes.products, {
     method: "GET",
     token,
     params: buildQueryParams(params),
+    cache: "no-store",
   });
 
   const rows = response?.data ?? response?.products ?? [];

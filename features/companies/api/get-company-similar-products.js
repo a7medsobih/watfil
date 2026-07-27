@@ -1,9 +1,8 @@
 import { cache } from "react";
 
-import { fetcher } from "@/lib/api/fetcher";
+import { fetchFromAPI } from "@/lib/api/fetcher";
 import { endpoints } from "@/lib/api/endpoints";
-import { cacheTags, revalidate } from "@/lib/cache";
-import { getCustomerTokenFromCookies } from "@/lib/auth/customer-token";
+import { cacheTags, companyTag, productTag, revalidate } from "@/lib/cache";
 import {
   mapCompaniesMeta,
   mapCompanyProducts,
@@ -11,16 +10,7 @@ import {
 
 /**
  * Fetches similar products for a company product offer.
- * GET /public/companies/{company_id}/products/similar
- *
- * @param {string|number} companyId
- * @param {{
- *   productId: string|number,
- *   source?: "catalog"|"company",
- *   governorateId?: string|number|null,
- *   locale?: string,
- * }} options
- * @returns {Promise<{ products: object[], meta: object }>}
+ * Cached public list — like state is handled per-card on interaction.
  */
 export const getCompanySimilarProducts = cache(
   async function getCompanySimilarProducts(companyId, options = {}) {
@@ -51,22 +41,18 @@ export const getCompanySimilarProducts = cache(
       params.governorate_id = governorateId;
     }
 
-    const token = await getCustomerTokenFromCookies();
-
     try {
-      const response = await fetcher(
+      const response = await fetchFromAPI(
         endpoints.companies.productsSimilar(companyId),
         {
           params,
-          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-          ...(token
-            ? { cache: "no-store" }
-            : {
-                next: {
-                  revalidate: revalidate.medium,
-                  tags: [cacheTags.companies, cacheTags.products],
-                },
-              }),
+          revalidate: revalidate.medium,
+          tags: [
+            cacheTags.companies,
+            cacheTags.products,
+            companyTag(companyId),
+            productTag(productId),
+          ],
         },
       );
 

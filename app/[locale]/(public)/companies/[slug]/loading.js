@@ -1,5 +1,5 @@
-import Spinner from "@/components/ui/Spinner";
+import { CompanyStoreSkeleton } from "@/components/skeletons";
 
 export default function Loading() {
-  return <Spinner />;
+  return <CompanyStoreSkeleton />;
 }

@@ -2,11 +2,17 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Building2, Heart, Loader2Icon, Package } from "lucide-react";
+import { Building2, Heart, Package } from "lucide-react";
 
 import CampanyCard from "@/components/common/CampanyCard";
 import EmptyState from "@/components/common/EmptyState";
 import ProductCard from "@/components/common/ProductCard";
+import {
+  CompanyCardSkeletonGrid,
+} from "@/components/skeletons/CompanyCardSkeleton";
+import {
+  ProductCardSkeletonGrid,
+} from "@/components/skeletons/ProductCardSkeleton";
 import { Button } from "@/components/ui/button";
 import { useRequireAuth } from "@/features/auth";
 import { getLikedProducts } from "@/features/wishlist/api";
@@ -95,14 +101,10 @@ export default function WishlistPage() {
   };
 
   if (!isHydrated || loading) {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center py-16">
-        <Loader2Icon
-          className="size-8 animate-spin text-primary"
-          aria-hidden
-        />
-        <span className="sr-only">{t("loading")}</span>
-      </div>
+    return tab === "companies" ? (
+      <CompanyCardSkeletonGrid count={6} />
+    ) : (
+      <ProductCardSkeletonGrid count={8} />
     );
   }
 

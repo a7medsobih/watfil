@@ -1,4 +1,4 @@
-import { fetcher } from "@/lib/api/fetcher";
+import { fetchFromAPI } from "@/lib/api/fetcher";
 import { endpoints } from "@/lib/api/endpoints";
 import { cacheTags, revalidate } from "@/lib/cache";
 import {
@@ -62,12 +62,16 @@ export async function getTopRatedCompanies({
       params.search = search;
     }
 
-    const response = await fetcher(endpoints.companies.topRated, {
+    const isSearch = Boolean(search);
+
+    const response = await fetchFromAPI(endpoints.companies.topRated, {
       params,
-      next: {
-        revalidate: revalidate.medium,
-        tags: [cacheTags.companies],
-      },
+      ...(isSearch
+        ? { cache: "no-store" }
+        : {
+            revalidate: revalidate.medium,
+            tags: [cacheTags.companies],
+          }),
     });
 
     const rows = response?.data ?? response ?? [];

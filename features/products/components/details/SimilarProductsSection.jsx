@@ -1,10 +1,10 @@
 import { Package } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
-import CardGridSkeleton from "@/components/common/CardGridSkeleton";
+import { ProductCardSkeletonGrid } from "@/components/skeletons";
 import EmptyState from "@/components/common/EmptyState";
 import ProductCard from "@/components/common/ProductCard";
-import SectionCarousel from "@/components/common/SectionCarousel";
+import LazySectionCarousel from "@/components/common/LazySectionCarousel";
 import SectionHeader from "@/components/common/SectionHeader";
 import { getCompanySimilarProducts } from "@/features/companies/api";
 import { getSimilarProducts } from "@/features/products/api";
@@ -21,7 +21,7 @@ export function SimilarProductsSkeleton({ locale = "ar" }) {
       <div className="mb-6 md:mb-8">
         <div className="h-8 w-48 animate-pulse rounded-md bg-muted md:h-9 md:w-64" />
       </div>
-      <CardGridSkeleton
+      <ProductCardSkeletonGrid
         count={4}
         className="grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
       />
@@ -95,7 +95,7 @@ export default async function SimilarProductsSection({
           icon={<Package className="size-7 sm:size-8" aria-hidden />}
         />
       ) : (
-        <SectionCarousel keepCarousel ariaLabel={title}>
+        <LazySectionCarousel keepCarousel ariaLabel={title}>
           {products.map((product) => (
             <ProductCard
               key={`${product.source ?? cardVariant}-${product.id}`}
@@ -106,7 +106,7 @@ export default async function SimilarProductsSection({
               className="h-full"
             />
           ))}
-        </SectionCarousel>
+        </LazySectionCarousel>
       )}
     </section>
   );

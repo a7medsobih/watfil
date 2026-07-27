@@ -6,7 +6,7 @@ import { Search } from "lucide-react";
 import { useCompaniesQuery } from "@/features/companies/hooks/use-companies-query";
 import { cn } from "@/lib/utils";
 
-const DEBOUNCE_MS = 400;
+const DEBOUNCE_MS = 300;
 
 /**
  * Debounced companies search wired to ?search= (backend via list page).

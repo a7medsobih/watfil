@@ -7,6 +7,7 @@ import BlogCard from "@/components/common/BlogCard";
 import EmptyState from "@/components/common/EmptyState";
 import PageHeader from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@/i18n/navigation";
 import {
   getArticles,
@@ -113,14 +114,22 @@ export default async function Page({ searchParams }) {
         subtitle={pageSubtitle}
         breadcrumbs={breadcrumbs}
         actions={
-          <Suspense fallback={null}>
+          <Suspense fallback={<Skeleton className="h-11 w-full max-w-md rounded-full" />}>
             <BlogSearch placeholder={t("blog.searchPlaceholder")} />
           </Suspense>
         }
       />
 
       <section className="container pb-16 pt-2 sm:pt-4">
-        <Suspense fallback={null}>
+        <Suspense
+          fallback={
+            <div className="mb-8 flex flex-wrap gap-2">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-9 w-24 rounded-full" />
+              ))}
+            </div>
+          }
+        >
           <BlogCategoriesNav
             categories={displayCategories}
             subCategories={subCategories}

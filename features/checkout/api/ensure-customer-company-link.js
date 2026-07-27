@@ -1,4 +1,4 @@
-import { apiRequest } from "@/lib/api/request";
+import { fetchFromAPI } from "@/lib/api/fetcher";
 import { endpoints } from "@/lib/api/endpoints";
 
 /**
@@ -19,9 +19,10 @@ export async function ensureCustomerCompanyLink(companyId, token) {
   }
 
   try {
-    await apiRequest(endpoints.companies.link(id), {
+    await fetchFromAPI(endpoints.companies.link(id), {
       method: "POST",
       token,
+      cache: "no-store",
       body: JSON.stringify({}),
     });
     return { linked: true, via: "link" };

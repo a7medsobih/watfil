@@ -1,4 +1,4 @@
-import { apiRequest } from "@/lib/api/request";
+import { fetchFromAPI } from "@/lib/api/fetcher";
 import { endpoints } from "@/lib/api/endpoints";
 
 /**
@@ -13,9 +13,10 @@ export async function createCustomerOrder(body, token) {
     throw error;
   }
 
-  return apiRequest(endpoints.orders.create, {
+  return fetchFromAPI(endpoints.orders.create, {
     method: "POST",
     token,
+    cache: "no-store",
     body: JSON.stringify(body),
   });
 }

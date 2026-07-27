@@ -4,9 +4,13 @@ import AppBreadcrumb from "@/components/common/AppBreadcrumb";
 import ProductDetailsTabs from "@/features/products/components/details/ProductDetailsTabs";
 import ProductHero from "@/features/products/components/details/ProductHero";
 import ProductOfferingCompanies from "@/features/products/components/details/ProductOfferingCompanies";
+import PersonalizedProductLike, {
+  ProductLikeFallback,
+} from "@/features/products/components/details/PersonalizedProductLike";
 import SimilarProductsSection, {
   SimilarProductsSkeleton,
 } from "@/features/products/components/details/SimilarProductsSection";
+import { LIKE_SOURCE } from "@/features/wishlist/types";
 
 /**
  * Composes the public catalog product detail page.
@@ -25,6 +29,14 @@ export default function ProductDetailsPage({
   if (!product) return null;
 
   const mode = company || !showOfferingCompanies ? "company" : "catalog";
+  const likeSource =
+    product.likeSource ??
+    product.source ??
+    (product.companyId != null ? LIKE_SOURCE.COMPANY : LIKE_SOURCE.CATALOG);
+  const likeCompanyId =
+    likeSource === LIKE_SOURCE.COMPANY
+      ? (product.companyId ?? company?.id ?? null)
+      : null;
 
   return (
     <div className="container pb-16 pt-4 md:pt-8">
@@ -40,6 +52,18 @@ export default function ProductDetailsPage({
         company={company}
         showOfferingCompanies={showOfferingCompanies}
         mode={mode}
+        likeSlot={
+          <Suspense fallback={<ProductLikeFallback className="size-10" />}>
+            <PersonalizedProductLike
+              slugOrId={product.slug}
+              productId={product.id}
+              source={likeSource}
+              companyId={likeCompanyId}
+              likesCount={product.likesCount ?? 0}
+              className="size-10"
+            />
+          </Suspense>
+        }
       />
       <ProductDetailsTabs product={product} locale={locale} mode={mode} />
 

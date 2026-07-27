@@ -1,5 +1,5 @@
-import CardGridSkeleton from "@/components/common/CardGridSkeleton";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CompanyCardSkeletonGrid } from "@/components/skeletons";
 
 export default function Loading() {
   return (
@@ -15,11 +15,7 @@ export default function Loading() {
         ))}
       </div>
 
-      <CardGridSkeleton
-        count={8}
-        className="sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-        mediaClassName="h-44"
-      />
+      <CompanyCardSkeletonGrid count={8} />
     </section>
   );
 }

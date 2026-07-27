@@ -29,13 +29,13 @@ export default function NavbarBrand() {
           <Image
             src={logo}
             alt={t("brand.name")}
-            width={100}
-            height={100}
+            width={140}
+            height={40}
             priority
-            className="h-10 w-auto"
+            className="h-9 w-auto"
           />
         )}
-        <span className="max-w-[9rem] truncate text-sm font-bold tracking-tight sm:max-w-[14rem] sm:text-base">
+        <span className="max-w-36 truncate text-sm font-bold tracking-tight sm:max-w-56 sm:text-base">
           {brand.name}
         </span>
       </Link>
@@ -43,8 +43,15 @@ export default function NavbarBrand() {
   }
 
   return (
-    <Link href="/" className="group flex shrink-0 items-center gap-2.5">
-      <Image src={logo} alt={t("brand.name")} width={100} height={100} priority />
+    <Link href="/" className="group flex shrink-0 items-center">
+      <Image
+        src={logo}
+        alt={t("brand.name")}
+        width={140}
+        height={40}
+        priority
+        className="h-9 w-auto md:h-10"
+      />
     </Link>
   );
 }

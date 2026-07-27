@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { ArrowLeftIcon, Loader2Icon } from "lucide-react";
+import { ArrowLeftIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { endpoints } from "@/lib/api/endpoints";
-import { apiRequest } from "@/lib/api/request";
+import { fetchFromAPI } from "@/lib/api/fetcher";
 import { mapGovernorates } from "@/features/companies/services/company.mapper";
 import {
   getFieldError,
@@ -42,7 +42,9 @@ export default function RegisterStep({ phone, onBack, onOtpSent, onError }) {
     async function loadGovernorates() {
       setLoadingGovernorates(true);
       try {
-        const response = await apiRequest(endpoints.governorates.list);
+        const response = await fetchFromAPI(endpoints.governorates.list, {
+          cache: "no-store",
+        });
         const mapped = mapGovernorates(response?.data ?? [], locale);
         if (!cancelled) setGovernorates(mapped);
       } catch {
@@ -228,7 +230,10 @@ export default function RegisterStep({ phone, onBack, onOtpSent, onError }) {
         >
           {isLoading ? (
             <>
-              <Loader2Icon className="animate-spin" />
+              <span
+                className="size-2 animate-pulse rounded-full bg-current"
+                aria-hidden
+              />
               {t("actions.sendingOtp")}
             </>
           ) : (

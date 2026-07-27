@@ -1,5 +1,5 @@
 import { endpoints } from "@/lib/api/endpoints";
-import { apiRequest } from "@/lib/api/request";
+import { fetchFromAPI } from "@/lib/api/fetcher";
 
 /**
  * Submit a public company join request (no auth).
@@ -16,8 +16,9 @@ import { apiRequest } from "@/lib/api/request";
  * }} payload
  */
 export async function createCompanyJoinRequest(payload) {
-  return apiRequest(endpoints.companyJoinRequests.create, {
+  return fetchFromAPI(endpoints.companyJoinRequests.create, {
     method: "POST",
+    cache: "no-store",
     body: JSON.stringify(payload),
   });
 }

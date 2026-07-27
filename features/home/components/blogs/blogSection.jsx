@@ -2,7 +2,7 @@ import { ArrowRight } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import BlogCard from "@/components/common/BlogCard";
-import SectionCarousel from "@/components/common/SectionCarousel";
+import LazySectionCarousel from "@/components/common/LazySectionCarousel";
 import SectionHeader from "@/components/common/SectionHeader";
 import { Button } from "@/components/ui/button";
 import { getFeaturedArticles } from "@/features/blog/api";
@@ -35,7 +35,7 @@ export default async function BlogSection() {
         }
       />
 
-      <SectionCarousel
+      <LazySectionCarousel
         ariaLabel={t("blog.latest")}
         gridClassName="md:grid-cols-2 lg:grid-cols-3"
         itemClassName="basis-[88%] sm:basis-[60%]"
@@ -49,7 +49,7 @@ export default async function BlogSection() {
             readTimeLabel={t("blog.readTime")}
           />
         ))}
-      </SectionCarousel>
+      </LazySectionCarousel>
     </section>
   );
 }

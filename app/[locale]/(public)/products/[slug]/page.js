@@ -5,6 +5,7 @@ import { getGovernorates } from "@/features/companies/api";
 import {
   getProduct,
   getProductCompanies,
+  getProducts,
 } from "@/features/products/api";
 import ProductDetailsPage from "@/features/products/components/details/ProductDetailsPage";
 import {
@@ -13,6 +14,24 @@ import {
 } from "@/features/products/utils/resolve-product-detail-params";
 import { redirect as i18nRedirect } from "@/i18n/navigation";
 import { buildMetadata } from "@/lib/seo/metadata";
+
+/** ISR: product details refresh every 5 minutes. */
+export const revalidate = 300;
+
+/**
+ * Pre-render the top products; remaining slugs are generated on-demand (ISR).
+ */
+export async function generateStaticParams() {
+  try {
+    const { products } = await getProducts({ page: 1, per_page: 50 });
+    return (products || [])
+      .map((product) => product.slug)
+      .filter(Boolean)
+      .map((slug) => ({ slug }));
+  } catch {
+    return [];
+  }
+}
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;

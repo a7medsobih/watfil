@@ -6,7 +6,7 @@ import { Search } from "lucide-react";
 import { useProductsQuery } from "@/features/products/hooks/use-products-query";
 import { cn } from "@/lib/utils";
 
-const DEBOUNCE_MS = 400;
+const DEBOUNCE_MS = 300;
 
 /**
  * Debounced products search wired to ?search=

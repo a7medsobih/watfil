@@ -24,6 +24,8 @@ export default function ProductHero({
   company = null,
   showOfferingCompanies = true,
   mode,
+  /** Server Suspense slot that replaces the default like + count cluster. */
+  likeSlot = null,
 }) {
   const t = useTranslations("product");
   const currency = locale === "ar" ? "ج.م" : "EGP";
@@ -81,6 +83,7 @@ export default function ProductHero({
             kind="product"
             loading="eager"
             fetchPriority="high"
+            sizes="(max-width: 1024px) 100vw, 320px"
           />
 
           <div className="absolute start-3 top-3 z-[2] flex flex-col gap-1.5">
@@ -238,23 +241,25 @@ export default function ProductHero({
         </div>
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2">
-            <ProductLikeButton
-              productId={product.id}
-              source={likeSource}
-              companyId={likeCompanyId}
-              initialLiked={product.isLiked ?? product.isWishlisted}
-              initialLikesCount={product.likesCount ?? 0}
-              onChange={(next) => setLikesCount(next.likesCount)}
-              className="size-10"
-            />
-            <span className="text-sm text-muted-foreground">
-              <span className="font-semibold tabular-nums text-foreground">
-                {likesCount}
-              </span>{" "}
-              {t("likes")}
-            </span>
-          </div>
+          {likeSlot ?? (
+            <div className="flex items-center gap-2">
+              <ProductLikeButton
+                productId={product.id}
+                source={likeSource}
+                companyId={likeCompanyId}
+                initialLiked={product.isLiked ?? product.isWishlisted}
+                initialLikesCount={product.likesCount ?? 0}
+                onChange={(next) => setLikesCount(next.likesCount)}
+                className="size-10"
+              />
+              <span className="text-sm text-muted-foreground">
+                <span className="font-semibold tabular-nums text-foreground">
+                  {likesCount}
+                </span>{" "}
+                {t("likes")}
+              </span>
+            </div>
+          )}
 
           {COMPARE_UI_ENABLED ? (
             <Button

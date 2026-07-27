@@ -32,7 +32,7 @@ function RatingStars({ value = 0 }) {
 /**
  * Identity card under the gallery — quick snapshot before browsing the store.
  */
-export default function CompanyInfoCard({ company, className }) {
+export default function CompanyInfoCard({ company, className, likeSlot = null }) {
   const t = useTranslations("company");
   const [likesCount, setLikesCount] = useState(company?.likes ?? 0);
   const [likesSyncKey, setLikesSyncKey] = useState(
@@ -134,14 +134,16 @@ export default function CompanyInfoCard({ company, className }) {
         </div>
 
         <div className="flex shrink-0 justify-center sm:justify-end">
-          <CompanyLikeButton
-            companyId={company.id}
-            company={company}
-            initialLiked={company.isLiked}
-            initialLikesCount={company.likes ?? 0}
-            showCount={false}
-            onChange={(next) => setLikesCount(next.likesCount)}
-          />
+          {likeSlot ?? (
+            <CompanyLikeButton
+              companyId={company.id}
+              company={company}
+              initialLiked={company.isLiked}
+              initialLikesCount={company.likes ?? 0}
+              showCount={false}
+              onChange={(next) => setLikesCount(next.likesCount)}
+            />
+          )}
         </div>
       </div>
     </section>

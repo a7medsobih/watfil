@@ -29,6 +29,7 @@ export default function BlogCard({
                         src={article.featuredImage}
                         alt={article.imageAlt || article.title}
                         kind="article"
+                        sizes="104px"
                         className="transition-transform duration-500 group-hover:scale-105"
                     />
                 </div>

@@ -28,7 +28,8 @@
         "language": "Language",
         "theme": "Theme",
         "themeLight": "Light",
-        "themeDark": "Dark"
+        "themeDark": "Dark",
+        "continueInApp": "Continue in the app"
     },
     "cta": {
         "explore": "Explore products",
@@ -471,6 +472,10 @@
         "explore": "Explore",
         "company": "Company",
         "support": "Support",
+        "app": "Watfil App",
+        "appTitle": "Continue your journey in the app",
+        "appDescription": "Track orders, installation, maintenance, and warranty from your phone.",
+        "appCta": "Get it on Google Play",
         "rights": "All rights reserved."
     },
     "cart": {

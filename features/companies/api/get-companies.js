@@ -1,4 +1,4 @@
-import { fetcher } from "@/lib/api/fetcher";
+import { fetchFromAPI } from "@/lib/api/fetcher";
 import { endpoints } from "@/lib/api/endpoints";
 import { cacheTags, revalidate } from "@/lib/cache";
 import {
@@ -31,6 +31,7 @@ function buildQueryParams(params = {}) {
 /**
  * Fetches paginated public companies.
  * governorate_id is optional (all governorates when omitted).
+ * Search queries are never cached.
  *
  * @param {object} params
  * @param {string|number} [params.governorate_id]
@@ -38,12 +39,16 @@ function buildQueryParams(params = {}) {
  * @returns {Promise<{ companies: object[], meta: object }>}
  */
 export async function getCompanies(params = {}) {
-  const response = await fetcher(endpoints.companies.list, {
+  const isSearch = Boolean(params.search);
+
+  const response = await fetchFromAPI(endpoints.companies.list, {
     params: buildQueryParams(params),
-    next: {
-      revalidate: revalidate.medium,
-      tags: [cacheTags.companies],
-    },
+    ...(isSearch
+      ? { cache: "no-store" }
+      : {
+          revalidate: revalidate.medium,
+          tags: [cacheTags.companies],
+        }),
   });
 
   return {

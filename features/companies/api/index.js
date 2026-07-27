@@ -2,6 +2,7 @@ export { getCompanies } from "./get-companies";
 export { getFeaturedCompanies } from "./get-featured-companies";
 export { getTopRatedCompanies } from "./get-top-rated-companies";
 export { getCompany } from "./get-company";
+export { getCompanyPersonalization } from "./get-company-personalization";
 export { getCompanyProducts } from "./get-company-products";
 export { getCompanySimilarProducts } from "./get-company-similar-products";
 export { getCompanyProductDetails } from "./get-company-product-details";

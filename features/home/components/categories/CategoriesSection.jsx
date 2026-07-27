@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Droplets,
   Factory,
@@ -8,7 +6,7 @@ import {
   Sun,
   Wrench,
 } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import SectionHeader from "@/components/common/SectionHeader";
 import { categories } from "@/features/home/data/categories";
@@ -24,9 +22,9 @@ const iconMap = {
   wrench: Wrench,
 };
 
-export default function CategoriesSection() {
-  const t = useTranslations();
-  const locale = useLocale();
+export default async function CategoriesSection() {
+  const t = await getTranslations();
+  const locale = await getLocale();
 
   return (
     <section className="container py-10">

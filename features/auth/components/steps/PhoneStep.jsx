@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Loader2Icon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -77,7 +76,10 @@ export default function PhoneStep({ initialPhone = "", onChecked, onError }) {
       >
         {isLoading ? (
           <>
-            <Loader2Icon className="animate-spin" />
+            <span
+              className="size-2 animate-pulse rounded-full bg-current"
+              aria-hidden
+            />
             {t("actions.checking")}
           </>
         ) : (

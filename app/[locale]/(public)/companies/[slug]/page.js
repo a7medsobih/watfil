@@ -1,13 +1,39 @@
+import { Suspense } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 
 import {
   getCompany,
   getCompanyProducts,
+  getTopRatedCompanies,
 } from "@/features/companies/api";
 import { CompanyBrandSetter } from "@/features/companies/context/company-brand-context";
 import CompanyStorePage from "@/features/companies/components/store/CompanyStorePage";
+import PersonalizedCompanyActions, {
+  CompanyLikeFallback,
+} from "@/features/companies/components/store/PersonalizedCompanyActions";
 import { buildMetadata } from "@/lib/seo/metadata";
+
+/** ISR: company details refresh every 5 minutes. */
+export const revalidate = 300;
+
+/**
+ * Pre-render top-rated companies; remaining slugs via on-demand ISR.
+ */
+export async function generateStaticParams() {
+  try {
+    const { companies } = await getTopRatedCompanies({
+      limit: 50,
+      min_ratings: 1,
+    });
+    return (companies || [])
+      .map((company) => company.slug)
+      .filter(Boolean)
+      .map((slug) => ({ slug }));
+  } catch {
+    return [];
+  }
+}
 
 function readPage(searchParams) {
   const value = searchParams?.page;
@@ -82,6 +108,14 @@ export default async function CompanyStoreRoute({ params, searchParams }) {
           previous: t("pagination.previous"),
           next: t("pagination.next"),
         }}
+        likeSlot={
+          <Suspense fallback={<CompanyLikeFallback />}>
+            <PersonalizedCompanyActions
+              slugOrId={company.slug}
+              company={company}
+            />
+          </Suspense>
+        }
       />
     </>
   );

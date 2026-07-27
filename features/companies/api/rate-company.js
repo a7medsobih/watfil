@@ -1,5 +1,5 @@
 import { endpoints } from "@/lib/api/endpoints";
-import { apiRequest } from "@/lib/api/request";
+import { fetchFromAPI } from "@/lib/api/fetcher";
 
 /**
  * Create or update the authenticated customer's company rating.
@@ -8,9 +8,10 @@ import { apiRequest } from "@/lib/api/request";
  * @param {string} token
  */
 export async function rateCompany(companyId, payload, token) {
-  return apiRequest(endpoints.companies.rating(companyId), {
+  return fetchFromAPI(endpoints.companies.rating(companyId), {
     method: "POST",
     token,
+    cache: "no-store",
     body: JSON.stringify({
       rating: Number(payload.rating),
       ...(payload.comment !== undefined
@@ -26,8 +27,9 @@ export async function rateCompany(companyId, payload, token) {
  * @param {string} token
  */
 export async function deleteCompanyRating(companyId, token) {
-  return apiRequest(endpoints.companies.rating(companyId), {
+  return fetchFromAPI(endpoints.companies.rating(companyId), {
     method: "DELETE",
     token,
+    cache: "no-store",
   });
 }

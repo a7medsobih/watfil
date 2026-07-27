@@ -1,5 +1,5 @@
 import { endpoints } from "@/lib/api/endpoints";
-import { apiRequest } from "@/lib/api/request";
+import { fetchFromAPI } from "@/lib/api/fetcher";
 
 /**
  * Like a company.
@@ -7,9 +7,10 @@ import { apiRequest } from "@/lib/api/request";
  * @param {string} token
  */
 export async function likeCompany(companyId, token) {
-  return apiRequest(endpoints.companies.like(companyId), {
+  return fetchFromAPI(endpoints.companies.like(companyId), {
     method: "POST",
     token,
+    cache: "no-store",
   });
 }
 
@@ -19,8 +20,9 @@ export async function likeCompany(companyId, token) {
  * @param {string} token
  */
 export async function unlikeCompany(companyId, token) {
-  return apiRequest(endpoints.companies.like(companyId), {
+  return fetchFromAPI(endpoints.companies.like(companyId), {
     method: "DELETE",
     token,
+    cache: "no-store",
   });
 }

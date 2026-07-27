@@ -1,6 +1,6 @@
-import { fetcher } from "@/lib/api/fetcher";
+import { fetchFromAPI } from "@/lib/api/fetcher";
 import { endpoints } from "@/lib/api/endpoints";
-import { cacheTags, revalidate } from "@/lib/cache";
+import { cacheTags, productTag, revalidate } from "@/lib/cache";
 import { mapProductOfferings } from "@/features/products/services/product.mapper";
 
 /**
@@ -17,12 +17,10 @@ export async function getProductCompanies(productId, options = {}) {
   if (governorateId == null || governorateId === "") return [];
 
   try {
-    const response = await fetcher(endpoints.products.companies(productId), {
+    const response = await fetchFromAPI(endpoints.products.companies(productId), {
       params: { governorate_id: governorateId },
-      next: {
-        revalidate: revalidate.medium,
-        tags: [cacheTags.products, cacheTags.companies],
-      },
+      revalidate: revalidate.medium,
+      tags: [cacheTags.products, cacheTags.companies, productTag(productId)],
     });
 
     const rows = response?.data ?? response ?? [];

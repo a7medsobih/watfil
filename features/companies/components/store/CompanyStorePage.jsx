@@ -27,6 +27,7 @@ export default function CompanyStorePage({
   company,
   productsMeta = null,
   paginationLabels = {},
+  likeSlot = null,
 }) {
   const [view, setView] = useState(company);
 
@@ -59,6 +60,7 @@ export default function CompanyStorePage({
           <CompanyInfoCard
             company={view}
             className={hasGallery ? "shadow-elegant" : undefined}
+            likeSlot={likeSlot}
           />
           <CompanyStoreTabs
             company={view}

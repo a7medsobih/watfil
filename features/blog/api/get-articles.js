@@ -1,4 +1,4 @@
-import { fetcher } from "@/lib/api/fetcher";
+import { fetchFromAPI } from "@/lib/api/fetcher";
 import { endpoints } from "@/lib/api/endpoints";
 import { cacheTags, revalidate } from "@/lib/cache";
 import {
@@ -52,12 +52,16 @@ function buildQueryParams(params = {}) {
  * @returns {Promise<{ articles: object[], meta: object }>}
  */
 export async function getArticles(params = {}) {
-  const response = await fetcher(endpoints.blog.list, {
+  const isSearch = Boolean(params.search);
+
+  const response = await fetchFromAPI(endpoints.blog.list, {
     params: buildQueryParams(params),
-    next: {
-      revalidate: revalidate.blogList,
-      tags: [cacheTags.blog],
-    },
+    ...(isSearch
+      ? { cache: "no-store" }
+      : {
+          revalidate: revalidate.long,
+          tags: [cacheTags.blog],
+        }),
   });
 
   return {

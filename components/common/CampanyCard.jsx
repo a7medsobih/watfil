@@ -38,6 +38,7 @@ export default function CampanyCard({ company, className }) {
             src={hasLogo ? company.logo : null}
             alt={company.name}
             kind="company"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             className="transition-transform duration-500 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />

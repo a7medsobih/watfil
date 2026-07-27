@@ -16,13 +16,13 @@ import { useTranslations } from "next-intl";
 
 import logo from "@/assets/watfil-logo.png";
 import { Badge } from "@/components/ui/badge";
+import {
+  WATFIL_APP_STORE_URL,
+  WATFIL_PLAY_STORE_URL,
+} from "@/lib/constants/app-store";
 import { cn } from "@/lib/utils";
 
-export const WATFIL_PLAY_STORE_URL =
-  "https://play.google.com/store/apps/details?id=com.watfil.client";
-
-/** Set when the iOS listing is published. */
-export const WATFIL_APP_STORE_URL = null;
+export { WATFIL_APP_STORE_URL, WATFIL_PLAY_STORE_URL };
 
 const BENEFIT_ICONS = [Package, Wrench, Droplets, Shield, Bell, Smartphone];
 
@@ -234,7 +234,13 @@ export default function DownloadAppSection({
             variant="secondary"
             className="mb-3 gap-1.5 bg-primary/10 text-primary hover:bg-primary/15"
           >
-            <Smartphone className="size-3.5" />
+            <img
+              src="/favicon.ico"
+              alt=""
+              width={14}
+              height={14}
+              className="size-3.5 object-contain"
+            />
             {t("badge")}
           </Badge>
 

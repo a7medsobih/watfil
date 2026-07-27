@@ -28,7 +28,8 @@
         "language": "اللغة",
         "theme": "المظهر",
         "themeLight": "فاتح",
-        "themeDark": "داكن"
+        "themeDark": "داكن",
+        "continueInApp": "أكمل من التطبيق"
     },
     "cta": {
         "explore": "استكشف المنتجات",
@@ -471,6 +472,10 @@
         "explore": "استكشف",
         "company": "الشركة",
         "support": "الدعم",
+        "app": "تطبيق واتفل",
+        "appTitle": "أكمل رحلتك عبر التطبيق",
+        "appDescription": "تابع الطلب والتركيب والصيانة والضمان بسهولة من هاتفك.",
+        "appCta": "حمّله من Google Play",
         "rights": "جميع الحقوق محفوظة."
     },
     "cart": {

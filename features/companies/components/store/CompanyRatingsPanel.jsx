@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Loader2Icon, MessageSquareQuote, Star, Trash2 } from "lucide-react";
+import { MessageSquareQuote, Star, Trash2 } from "lucide-react";
 
 import EmptyState from "@/components/common/EmptyState";
 import { Button } from "@/components/ui/button";
@@ -318,7 +318,10 @@ export default function CompanyRatingsPanel({
               <div className="flex flex-wrap gap-2">
                 <Button type="button" disabled={loading} onClick={submit}>
                   {loading ? (
-                    <Loader2Icon className="animate-spin" aria-hidden />
+                    <span
+                      className="size-2 animate-pulse rounded-full bg-current"
+                      aria-hidden
+                    />
                   ) : null}
                   {myRating != null ? t("ratings.update") : t("ratings.submit")}
                 </Button>

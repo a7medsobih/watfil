@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Heart, Loader2Icon } from "lucide-react";
+import { Heart } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useRequireAuth } from "@/features/auth";
@@ -151,7 +151,7 @@ export default function CompanyLikeButton({
         onClick={toggleLike}
       >
         {loading ? (
-          <Loader2Icon className="h-4 w-4 animate-spin" aria-hidden />
+          <Heart className="h-4 w-4 animate-pulse opacity-50" aria-hidden />
         ) : (
           <Heart className={cn("h-4 w-4", liked && "fill-current")} aria-hidden />
         )}

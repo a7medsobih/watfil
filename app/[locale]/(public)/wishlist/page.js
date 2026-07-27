@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 
 import PageHeader from "@/components/common/PageHeader";
+import { ProductCardSkeletonGrid } from "@/components/skeletons";
 import { WishlistPage } from "@/features/wishlist";
 
 export default async function Page() {
@@ -19,7 +20,7 @@ export default async function Page() {
       />
 
       <section className="container pb-16 pt-2 sm:pt-4">
-        <Suspense fallback={null}>
+        <Suspense fallback={<ProductCardSkeletonGrid count={8} />}>
           <WishlistPage />
         </Suspense>
       </section>

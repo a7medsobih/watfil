@@ -2,7 +2,7 @@
 
 import { useId, useState } from "react";
 import { useTranslations } from "next-intl";
-import { CheckCircle2, Loader2Icon } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -360,7 +360,10 @@ export default function JoinUsForm({ governorates = [] }) {
       >
         {isLoading ? (
           <>
-            <Loader2Icon className="animate-spin" aria-hidden />
+            <span
+              className="size-2 animate-pulse rounded-full bg-current"
+              aria-hidden
+            />
             {t("actions.submitting")}
           </>
         ) : (

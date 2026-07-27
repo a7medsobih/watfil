@@ -1,7 +1,5 @@
-"use client";
-
 import { Headset, ShieldCheck, Sparkles, Truck } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import SectionHeader from "@/components/common/SectionHeader";
 import { whyItems } from "@/features/home/data/why";
@@ -15,9 +13,9 @@ const iconMap = {
   headset: Headset,
 };
 
-export default function WhySection() {
-  const t = useTranslations();
-  const locale = useLocale();
+export default async function WhySection() {
+  const t = await getTranslations();
+  const locale = await getLocale();
 
   return (
     <section className="container py-10">

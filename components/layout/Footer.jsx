@@ -1,5 +1,5 @@
+import Image from "next/image";
 import {
-    Droplets,
     Facebook,
     Instagram,
     Send,
@@ -8,8 +8,10 @@ import {
 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
+import logo from "@/assets/watfil-logo.png";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
+import { WATFIL_PLAY_STORE_URL } from "@/lib/constants/app-store";
 
 export default async function Footer() {
     const t = await getTranslations();
@@ -19,11 +21,14 @@ export default async function Footer() {
             <div className="container py-8">
                 <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
                     <div>
-                        <Link href="/" className="flex items-center gap-2.5">
-                            <div className="grid h-10 w-10 place-items-center rounded-2xl gradient-hero shadow-glow">
-                                <Droplets className="h-5 w-5 text-white" strokeWidth={2.5} />
-                            </div>
-                            <span className="text-xl font-extrabold">{t("brand.name")}</span>
+                        <Link href="/" className="inline-flex items-center">
+                            <Image
+                                src={logo}
+                                alt={t("brand.name")}
+                                width={140}
+                                height={40}
+                                className="h-9 w-auto"
+                            />
                         </Link>
 
                         <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
@@ -63,29 +68,47 @@ export default async function Footer() {
                             { href: "/products", label: t("nav.products") },
                             { href: "/companies", label: t("nav.companies") },
                             { href: "/blog", label: t("nav.blog") },
-                            { href: "/", label: t("nav.search") },
                         ]}
                     />
                     <FooterCol
                         title={t("footer.company")}
                         links={[
-                            { href: "/", label: t("nav.about") },
-                            { href: "/", label: t("nav.contact") },
-                            { href: "/", label: "Careers" },
-                            { href: "/", label: "Press" },
-                        ]}
-                    />
-                    <FooterCol
-                        title={t("footer.support")}
-                        links={[
+                            { href: "/join-us", label: t("nav.joinUs") },
                             { href: "/wishlist", label: t("nav.wishlist") },
-                            { href: "/", label: "Help center" },
-                            { href: "/", label: "Privacy" },
                         ]}
                     />
+
+                    <div>
+                        <h4 className="mb-4 text-sm font-semibold">{t("footer.app")}</h4>
+                        <div className="rounded-2xl border border-border/60 bg-card/60 p-4">
+                            <div className="mb-3 flex size-10 items-center justify-center overflow-hidden rounded-xl bg-background ring-1 ring-border/60">
+                                <img
+                                    src="/favicon.ico"
+                                    alt=""
+                                    width={28}
+                                    height={28}
+                                    className="size-7 object-contain"
+                                />
+                            </div>
+                            <p className="text-sm font-semibold leading-snug">
+                                {t("footer.appTitle")}
+                            </p>
+                            <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                                {t("footer.appDescription")}
+                            </p>
+                            <a
+                                href={WATFIL_PLAY_STORE_URL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="mt-4 inline-flex h-9 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#111111] px-3 text-xs font-medium text-white transition-colors hover:bg-black"
+                            >
+                                {t("footer.appCta")}
+                            </a>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="mt-12 flex flex-wrap justify-between gap-3 border-t border-border/60 pt-6 text-xs text-muted-foreground">
+                <div className="mt-3 flex flex-wrap justify-between gap-3 border-t border-border/60 pt-6 text-xs text-muted-foreground">
                     <span>
                         © {new Date().getFullYear()} {t("brand.name")}. {t("footer.rights")}
                     </span>

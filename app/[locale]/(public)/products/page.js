@@ -7,6 +7,7 @@ import EmptyState from "@/components/common/EmptyState";
 import PageHeader from "@/components/common/PageHeader";
 import ProductCard from "@/components/common/ProductCard";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@/i18n/navigation";
 import { getCategories } from "@/features/categories/api";
 import { getGovernorates } from "@/features/companies/api";
@@ -59,7 +60,7 @@ export default async function Page({ searchParams }) {
           { label: t("nav.products") },
         ]}
         actions={
-          <Suspense fallback={null}>
+          <Suspense fallback={<Skeleton className="h-11 w-full max-w-md rounded-full" />}>
             <ProductsSearch placeholder={t("products.searchPlaceholder")} />
           </Suspense>
         }
@@ -70,7 +71,7 @@ export default async function Page({ searchParams }) {
           <p className="text-sm text-muted-foreground">
             {t("products.count", { count: meta.total })}
           </p>
-          <Suspense fallback={null}>
+          <Suspense fallback={<Skeleton className="h-10 w-36 rounded-xl" />}>
             <ProductsFiltersSheet
               categories={categories}
               governorates={governorates}
@@ -81,7 +82,9 @@ export default async function Page({ searchParams }) {
 
         <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)]">
           <div className="hidden lg:block">
-            <Suspense fallback={null}>
+            <Suspense
+              fallback={<Skeleton className="h-[420px] w-full rounded-3xl" />}
+            >
               <ProductsFilters
                 categories={categories}
                 governorates={governorates}

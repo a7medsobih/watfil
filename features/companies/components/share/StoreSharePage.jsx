@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "motion/react";
-import { Loader2, Store } from "lucide-react";
+import { Store } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import MediaImage from "@/components/common/MediaImage";
@@ -155,7 +155,10 @@ export default function StoreSharePage({ store }) {
                   exit={{ opacity: 0, y: -6 }}
                   className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/80 px-4 py-2.5 text-sm text-muted-foreground shadow-soft backdrop-blur-sm"
                 >
-                  <Loader2 className="size-4 animate-spin text-primary" />
+                  <span
+                    className="size-2 animate-pulse rounded-full bg-primary"
+                    aria-hidden
+                  />
                   {t("openingApp")}
                 </motion.div>
               ) : null}

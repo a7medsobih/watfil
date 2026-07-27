@@ -1,5 +1,3 @@
-"use client";
-
 import { Link } from "@/i18n/navigation";
 import { buildBlogHref } from "@/features/blog/utils/resolve-articles-params";
 import { cn } from "@/lib/utils";

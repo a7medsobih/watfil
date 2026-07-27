@@ -116,6 +116,7 @@ export default function ProductCard({
           kind="product"
           width={900}
           height={900}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           className="transition-transform duration-500 group-hover:scale-105"
         />
 

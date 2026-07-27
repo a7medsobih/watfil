@@ -1,15 +1,15 @@
 import { cache } from "react";
 
-import { fetcher } from "@/lib/api/fetcher";
+import { fetchFromAPI } from "@/lib/api/fetcher";
 import { endpoints } from "@/lib/api/endpoints";
-import { cacheTags, revalidate } from "@/lib/cache";
-import { getCustomerTokenFromCookies } from "@/lib/auth/customer-token";
+import { cacheTags, productTag, revalidate } from "@/lib/cache";
 import { mapProduct } from "@/features/products/services/product.mapper";
 import { resolveProductIdFromParam } from "@/features/products/utils/product-slug";
 
 /**
  * Fetches a single public product by route slug or id.
- * Forwards customer token when present so `is_liked` is personalized.
+ * Always cached — does not read cookies so the page shell stays ISR-friendly.
+ * Use `getProductPersonalization` inside Suspense for `is_liked`.
  *
  * @param {string|number} slugOrId
  * @param {string} [locale]
@@ -23,19 +23,10 @@ export const getProduct = cache(async function getProduct(
   const productId = resolveProductIdFromParam(slugOrId);
   if (!productId) return null;
 
-  const token = await getCustomerTokenFromCookies();
-
   try {
-    const response = await fetcher(endpoints.products.detail(productId), {
-      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      ...(token
-        ? { cache: "no-store" }
-        : {
-            next: {
-              revalidate: revalidate.medium,
-              tags: [cacheTags.products],
-            },
-          }),
+    const response = await fetchFromAPI(endpoints.products.detail(productId), {
+      revalidate: revalidate.medium,
+      tags: [cacheTags.products, productTag(slugOrId), productTag(productId)],
     });
 
     const payload = response?.data ?? response;

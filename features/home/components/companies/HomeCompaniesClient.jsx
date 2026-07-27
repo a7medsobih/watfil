@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
 import CampanyCard from "@/components/common/CampanyCard";
-import SectionCarousel from "@/components/common/SectionCarousel";
+import LazySectionCarousel from "@/components/common/LazySectionCarousel";
 import SectionHeader from "@/components/common/SectionHeader";
+import { CompanyCardSkeletonGrid } from "@/components/skeletons/CompanyCardSkeleton";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -17,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { getTopRatedCompanies } from "@/features/companies/api/get-top-rated-companies";
 import { Link } from "@/i18n/navigation";
+import { cn } from "@/lib/utils";
 
 const ALL_OPTION = "all";
 const HOME_COMPANIES_LIMIT = 10;
@@ -108,27 +110,27 @@ export default function HomeCompaniesClient({
         }
       />
 
-      <div className="relative" aria-busy={loading}>
-        {loading && (
+      <div className="relative" aria-busy={loading || undefined}>
+        {loading && companies.length === 0 ? (
+          <CompanyCardSkeletonGrid count={4} />
+        ) : companies.length > 0 ? (
           <div
-            className="absolute inset-0 z-10 flex items-center justify-center rounded-3xl bg-background/60 backdrop-blur-[1px]"
-            aria-hidden
+            className={cn(
+              "transition-opacity duration-200",
+              loading && "opacity-50",
+            )}
           >
-            <Loader2 className="size-6 animate-spin text-primary" />
+            <LazySectionCarousel ariaLabel={t("home.companies.title")}>
+              {companies.map((company) => (
+                <CampanyCard
+                  key={company.id}
+                  company={company}
+                  locale={locale}
+                  className="h-full"
+                />
+              ))}
+            </LazySectionCarousel>
           </div>
-        )}
-
-        {companies.length > 0 ? (
-          <SectionCarousel ariaLabel={t("home.companies.title")}>
-            {companies.map((company) => (
-              <CampanyCard
-                key={company.id}
-                company={company}
-                locale={locale}
-                className="h-full"
-              />
-            ))}
-          </SectionCarousel>
         ) : (
           <p className="rounded-3xl border border-border/60 bg-card px-6 py-10 text-center text-sm text-muted-foreground">
             {t("home.companies.empty")}

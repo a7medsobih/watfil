@@ -1,7 +1,6 @@
-import { fetcher } from "@/lib/api/fetcher";
+import { fetchFromAPI } from "@/lib/api/fetcher";
 import { endpoints } from "@/lib/api/endpoints";
 import { cacheTags, revalidate } from "@/lib/cache";
-import { getCustomerTokenFromCookies } from "@/lib/auth/customer-token";
 import {
   mapProducts,
   mapProductsMeta,
@@ -36,24 +35,21 @@ function buildQueryParams(params = {}) {
 
 /**
  * Fetches paginated public products from the backend.
- * Forwards customer token when present so `is_liked` is personalized.
+ * Search queries are never cached. Auth personalization lives in Suspense islands.
  *
  * @param {object} [params]
  * @returns {Promise<{ products: object[], meta: object }>}
  */
 export async function getProducts(params = {}) {
-  const token = await getCustomerTokenFromCookies();
+  const isSearch = Boolean(params.search);
 
-  const response = await fetcher(endpoints.products.list, {
+  const response = await fetchFromAPI(endpoints.products.list, {
     params: buildQueryParams(params),
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-    ...(token
+    ...(isSearch
       ? { cache: "no-store" }
       : {
-          next: {
-            revalidate: revalidate.medium,
-            tags: [cacheTags.products],
-          },
+          revalidate: revalidate.medium,
+          tags: [cacheTags.products],
         }),
   });
 

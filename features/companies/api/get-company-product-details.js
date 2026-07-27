@@ -1,21 +1,14 @@
 import { cache } from "react";
 
-import { fetcher } from "@/lib/api/fetcher";
+import { fetchFromAPI } from "@/lib/api/fetcher";
 import { endpoints } from "@/lib/api/endpoints";
-import { cacheTags, revalidate } from "@/lib/cache";
-import { getCustomerTokenFromCookies } from "@/lib/auth/customer-token";
+import { cacheTags, companyTag, productTag, revalidate } from "@/lib/cache";
 import { mapProduct } from "@/features/products/services/product.mapper";
 import { resolveCompanyIdFromParam } from "@/features/companies/utils/company-slug";
 
 /**
  * Fetches a company's product offering details.
- * GET /public/companies/{company_id}/product-details?source=&product_id=
- *
- * @param {object} options
- * @param {string|number} options.companySlugOrId
- * @param {string|number} options.productId
- * @param {"catalog"|"company"} [options.source]
- * @param {string} [options.locale]
+ * Cached public payload — like personalization is a Suspense island on the page.
  */
 export const getCompanyProductDetails = cache(
   async function getCompanyProductDetails({
@@ -30,26 +23,23 @@ export const getCompanyProductDetails = cache(
     const companyId = resolveCompanyIdFromParam(companySlugOrId);
     if (!companyId) return null;
 
-    const token = await getCustomerTokenFromCookies();
     const resolvedSource = source === "company" ? "company" : "catalog";
 
     try {
-      const response = await fetcher(
+      const response = await fetchFromAPI(
         endpoints.companies.productDetails(companyId),
         {
           params: {
             source: resolvedSource,
             product_id: productId,
           },
-          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-          ...(token
-            ? { cache: "no-store" }
-            : {
-                next: {
-                  revalidate: revalidate.medium,
-                  tags: [cacheTags.companies, cacheTags.products],
-                },
-              }),
+          revalidate: revalidate.medium,
+          tags: [
+            cacheTags.companies,
+            cacheTags.products,
+            companyTag(companyId),
+            productTag(productId),
+          ],
         },
       );
 
@@ -59,9 +49,6 @@ export const getCompanyProductDetails = cache(
 
       const sellingCompanyId = Number(companyId);
 
-      // Prefer explicit company_product_id from API (required by POST /customer/orders).
-      // Fall back to payload.id which is the company-product row for source=company,
-      // and often the catalog pivot id when the details endpoint scopes by company.
       const companyProductId = Number(
         payload?.company_product_id ??
           payload?.company_product?.id ??
@@ -74,7 +61,6 @@ export const getCompanyProductDetails = cache(
         ...product,
         source: payload?.source ?? resolvedSource,
         likeSource: payload?.source ?? resolvedSource,
-        // Always the company the customer is buying from (route company).
         companyId: sellingCompanyId,
         companyProductId: Number.isFinite(companyProductId)
           ? companyProductId

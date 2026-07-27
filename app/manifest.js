@@ -1,12 +1,12 @@
 export default function manifest() {
   return {
-    name: "Next Template",
-    short_name: "NextTemplate",
-    description: "Next.js application template",
+    name: "Watfil",
+    short_name: "Watfil",
+    description: "Pure Water. Trusted Technology.",
     start_url: "/",
     display: "standalone",
     background_color: "#ffffff",
-    theme_color: "#000000",
+    theme_color: "#00A3E0",
     icons: [
       {
         src: "/favicon.ico",

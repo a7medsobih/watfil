@@ -1,8 +1,8 @@
 import { cache } from "react";
 
-import { fetcher } from "@/lib/api/fetcher";
+import { fetchFromAPI } from "@/lib/api/fetcher";
 import { endpoints } from "@/lib/api/endpoints";
-import { cacheTags, revalidate } from "@/lib/cache";
+import { cacheTags, companyTag, revalidate } from "@/lib/cache";
 import { IMAGE_PLACEHOLDERS } from "@/lib/media/placeholders";
 
 /**
@@ -52,11 +52,9 @@ export const getPublicStore = cache(async function getPublicStore(taxNumber) {
   if (!decoded) return null;
 
   try {
-    const response = await fetcher(endpoints.store.detail(decoded), {
-      next: {
-        revalidate: revalidate.medium,
-        tags: [cacheTags.companies],
-      },
+    const response = await fetchFromAPI(endpoints.store.detail(decoded), {
+      revalidate: revalidate.medium,
+      tags: [cacheTags.companies, companyTag(decoded)],
     });
 
     const payload = response?.data ?? response;

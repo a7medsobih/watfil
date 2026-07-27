@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { ArrowLeftIcon, Loader2Icon } from "lucide-react";
+import { ArrowLeftIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -96,7 +96,10 @@ export default function PasswordStep({
         >
           {isLoading ? (
             <>
-              <Loader2Icon className="animate-spin" />
+              <span
+                className="size-2 animate-pulse rounded-full bg-current"
+                aria-hidden
+              />
               {t("actions.signingIn")}
             </>
           ) : (

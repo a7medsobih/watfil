@@ -1,9 +1,8 @@
 import { cache } from "react";
 
-import { fetcher } from "@/lib/api/fetcher";
+import { fetchFromAPI } from "@/lib/api/fetcher";
 import { endpoints } from "@/lib/api/endpoints";
-import { cacheTags, revalidate } from "@/lib/cache";
-import { getCustomerTokenFromCookies } from "@/lib/auth/customer-token";
+import { cacheTags, productTag, revalidate } from "@/lib/cache";
 import {
   mapProducts,
   mapProductsMeta,
@@ -11,7 +10,7 @@ import {
 
 /**
  * Fetches similar catalog products for a supplier product.
- * GET /public/products/{supplier_product_id}/similar?company_id=&page=&per_page=
+ * Cached public list — like state is handled per-card on interaction.
  *
  * @param {string|number} productId Supplier / catalog product id
  * @param {{
@@ -49,20 +48,11 @@ export const getSimilarProducts = cache(async function getSimilarProducts(
     params.company_id = companyId;
   }
 
-  const token = await getCustomerTokenFromCookies();
-
   try {
-    const response = await fetcher(endpoints.products.similar(productId), {
+    const response = await fetchFromAPI(endpoints.products.similar(productId), {
       params,
-      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      ...(token
-        ? { cache: "no-store" }
-        : {
-            next: {
-              revalidate: revalidate.medium,
-              tags: [cacheTags.products],
-            },
-          }),
+      revalidate: revalidate.medium,
+      tags: [cacheTags.products, productTag(productId)],
     });
 
     const rows = response?.data ?? [];

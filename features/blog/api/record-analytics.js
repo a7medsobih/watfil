@@ -1,4 +1,4 @@
-import { fetcher } from "@/lib/api/fetcher";
+import { fetchFromAPI } from "@/lib/api/fetcher";
 import { endpoints } from "@/lib/api/endpoints";
 
 const SESSION_KEY_STORAGE = "watfil_blog_session";
@@ -29,7 +29,7 @@ export async function recordArticleView(slug) {
 
   const sessionKey = getSessionKey();
 
-  await fetcher(endpoints.blog.views(slug), {
+  await fetchFromAPI(endpoints.blog.views(slug), {
     method: "POST",
     body: JSON.stringify(sessionKey ? { session_key: sessionKey } : {}),
   });
@@ -43,7 +43,7 @@ export async function recordArticleView(slug) {
 export async function recordArticleLinkClick(slug, link) {
   if (!slug || !link) return;
 
-  await fetcher(endpoints.blog.linkClick(slug, link), {
+  await fetchFromAPI(endpoints.blog.linkClick(slug, link), {
     method: "POST",
     body: JSON.stringify({}),
   });

@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, Loader2Icon } from "lucide-react";
+import { Heart } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
@@ -62,7 +62,7 @@ export default function ProductLikeButton({
       }}
     >
       {loading ? (
-        <Loader2Icon className="h-4 w-4 animate-spin" aria-hidden />
+        <Heart className="h-4 w-4 animate-pulse opacity-50" aria-hidden />
       ) : (
         <Heart className={cn("h-4 w-4", liked && "fill-current")} aria-hidden />
       )}

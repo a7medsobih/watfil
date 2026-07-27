@@ -1,5 +1,5 @@
 import { endpoints } from "@/lib/api/endpoints";
-import { apiRequest } from "@/lib/api/request";
+import { fetchFromAPI } from "@/lib/api/fetcher";
 
 /**
  * Normalize Egyptian mobile numbers to digits starting with 01…
@@ -17,15 +17,17 @@ export function isValidEgyptianPhone(phone) {
 }
 
 export async function checkPhone(phone) {
-  return apiRequest(endpoints.auth.checkPhone, {
+  return fetchFromAPI(endpoints.auth.checkPhone, {
     method: "POST",
+    cache: "no-store",
     body: JSON.stringify({ phone: normalizePhone(phone) }),
   });
 }
 
 export async function loginCustomer({ phone, password }) {
-  return apiRequest(endpoints.auth.login, {
+  return fetchFromAPI(endpoints.auth.login, {
     method: "POST",
+    cache: "no-store",
     body: JSON.stringify({
       phone: normalizePhone(phone),
       password,
@@ -34,15 +36,17 @@ export async function loginCustomer({ phone, password }) {
 }
 
 export async function requestRegisterOtp(phone) {
-  return apiRequest(endpoints.auth.requestOtp, {
+  return fetchFromAPI(endpoints.auth.requestOtp, {
     method: "POST",
+    cache: "no-store",
     body: JSON.stringify({ phone: normalizePhone(phone) }),
   });
 }
 
 export async function verifyRegister(payload) {
-  return apiRequest(endpoints.auth.verifyRegister, {
+  return fetchFromAPI(endpoints.auth.verifyRegister, {
     method: "POST",
+    cache: "no-store",
     body: JSON.stringify({
       ...payload,
       phone: normalizePhone(payload.phone),
@@ -51,23 +55,26 @@ export async function verifyRegister(payload) {
 }
 
 export async function logoutCustomer(token) {
-  return apiRequest(endpoints.auth.logout, {
+  return fetchFromAPI(endpoints.auth.logout, {
     method: "POST",
     token,
+    cache: "no-store",
   });
 }
 
 export async function getCustomerMe(token) {
-  return apiRequest(endpoints.auth.me, {
+  return fetchFromAPI(endpoints.auth.me, {
     method: "GET",
     token,
+    cache: "no-store",
   });
 }
 
 export async function updateCustomerProfile(token, payload) {
-  return apiRequest(endpoints.auth.profile, {
+  return fetchFromAPI(endpoints.auth.profile, {
     method: "PATCH",
     token,
+    cache: "no-store",
     body: JSON.stringify(payload),
   });
 }

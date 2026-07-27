@@ -2,7 +2,7 @@ import { ArrowRight } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import ProductCard from "@/components/common/ProductCard";
-import SectionCarousel from "@/components/common/SectionCarousel";
+import LazySectionCarousel from "@/components/common/LazySectionCarousel";
 import SectionHeader from "@/components/common/SectionHeader";
 import { Button } from "@/components/ui/button";
 import { getFeaturedProducts } from "@/features/products/api";
@@ -35,7 +35,7 @@ export default async function ProductsSection() {
         }
       />
 
-      <SectionCarousel ariaLabel={t("home.featured.title")}>
+      <LazySectionCarousel ariaLabel={t("home.featured.title")}>
         {products.map((product) => (
           <ProductCard
             key={product.id}
@@ -45,7 +45,7 @@ export default async function ProductsSection() {
             className="h-full"
           />
         ))}
-      </SectionCarousel>
+      </LazySectionCarousel>
     </section>
   );
 }

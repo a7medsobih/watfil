@@ -1,5 +1,5 @@
 import { endpoints } from "@/lib/api/endpoints";
-import { apiRequest } from "@/lib/api/request";
+import { fetchFromAPI } from "@/lib/api/fetcher";
 import { LIKE_SOURCE } from "@/features/wishlist/types";
 
 /**
@@ -25,9 +25,10 @@ function resolveLikePath(target) {
  * @param {string} token
  */
 export async function likeProduct(target, token) {
-  return apiRequest(resolveLikePath(target), {
+  return fetchFromAPI(resolveLikePath(target), {
     method: "POST",
     token,
+    cache: "no-store",
   });
 }
 
@@ -37,8 +38,9 @@ export async function likeProduct(target, token) {
  * @param {string} token
  */
 export async function unlikeProduct(target, token) {
-  return apiRequest(resolveLikePath(target), {
+  return fetchFromAPI(resolveLikePath(target), {
     method: "DELETE",
     token,
+    cache: "no-store",
   });
 }

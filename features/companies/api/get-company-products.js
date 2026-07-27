@@ -1,7 +1,6 @@
-import { fetcher } from "@/lib/api/fetcher";
+import { fetchFromAPI } from "@/lib/api/fetcher";
 import { endpoints } from "@/lib/api/endpoints";
-import { cacheTags, revalidate } from "@/lib/cache";
-import { getCustomerTokenFromCookies } from "@/lib/auth/customer-token";
+import { cacheTags, companyTag, revalidate } from "@/lib/cache";
 import {
   mapCompaniesMeta,
   mapCompanyProducts,
@@ -10,6 +9,7 @@ import {
 /**
  * Fetches paginated public products for a company store.
  * GET /public/companies/{company}/products?page=&per_page=
+ * Auth personalization lives in Suspense islands on detail pages.
  *
  * @param {string|number} companyId
  * @param {{
@@ -35,8 +35,6 @@ export async function getCompanyProducts(companyId, options = {}) {
     locale = "ar",
   } = options;
 
-  const token = await getCustomerTokenFromCookies();
-
   const params = {
     page,
     per_page,
@@ -47,17 +45,14 @@ export async function getCompanyProducts(companyId, options = {}) {
   }
 
   try {
-    const response = await fetcher(endpoints.companies.products(companyId), {
+    const response = await fetchFromAPI(endpoints.companies.products(companyId), {
       params,
-      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      ...(token
-        ? { cache: "no-store" }
-        : {
-            next: {
-              revalidate: revalidate.medium,
-              tags: [cacheTags.companies, cacheTags.products],
-            },
-          }),
+      revalidate: revalidate.medium,
+      tags: [
+        cacheTags.companies,
+        cacheTags.products,
+        companyTag(companyId),
+      ],
     });
 
     const rows = response?.data ?? [];

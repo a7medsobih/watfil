@@ -7,6 +7,7 @@ import AppPagination from "@/components/common/AppPagination";
 import CampanyCard from "@/components/common/CampanyCard";
 import EmptyState from "@/components/common/EmptyState";
 import PageHeader from "@/components/common/PageHeader";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   getCompanies,
   getGovernorates,
@@ -85,7 +86,7 @@ export default async function Page({ searchParams }) {
           { label: t("nav.companies") },
         ]}
         actions={
-          <Suspense fallback={null}>
+          <Suspense fallback={<Skeleton className="h-11 w-full max-w-md rounded-full" />}>
             <CompaniesSearch placeholder={t("companies.searchPlaceholder")} />
           </Suspense>
         }
@@ -93,7 +94,7 @@ export default async function Page({ searchParams }) {
 
       <section className="container pb-8 pt-2 sm:pt-4">
         <div className="mb-6 max-w-sm">
-          <Suspense fallback={null}>
+          <Suspense fallback={<Skeleton className="h-11 w-full rounded-xl" />}>
             <CompaniesGovernorateSelect
               governorates={governorates}
               selectedId={selectedGovernorateId}

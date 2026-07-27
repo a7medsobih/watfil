@@ -1,6 +1,6 @@
-import { fetcher } from "@/lib/api/fetcher";
+import { fetchFromAPI } from "@/lib/api/fetcher";
 import { endpoints } from "@/lib/api/endpoints";
-import { cacheTags, revalidate } from "@/lib/cache";
+import { blogArticleTag, cacheTags, revalidate } from "@/lib/cache";
 import { mapArticleDetail } from "@/features/blog/services/article.mapper";
 
 /**
@@ -11,11 +11,9 @@ export async function getArticle(slug) {
   if (!slug) return null;
 
   try {
-    const response = await fetcher(endpoints.blog.detail(slug), {
-      next: {
-        revalidate: revalidate.blogList,
-        tags: [cacheTags.blog, `blog-article-${slug}`],
-      },
+    const response = await fetchFromAPI(endpoints.blog.detail(slug), {
+      revalidate: revalidate.medium,
+      tags: [cacheTags.blog, blogArticleTag(slug)],
     });
 
     return mapArticleDetail(response?.data ?? response);
