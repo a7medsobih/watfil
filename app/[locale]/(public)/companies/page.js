@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
+import { redirect } from "next/navigation";
 import { Building2 } from "lucide-react";
 
 import AppPagination from "@/components/common/AppPagination";
@@ -7,8 +8,8 @@ import CampanyCard from "@/components/common/CampanyCard";
 import EmptyState from "@/components/common/EmptyState";
 import PageHeader from "@/components/common/PageHeader";
 import {
+  getCompanies,
   getGovernorates,
-  getTopRatedCompanies,
 } from "@/features/companies/api";
 import CompaniesGovernorateSelect from "@/features/companies/components/CompaniesGovernorateSelect";
 import CompaniesSearch from "@/features/companies/components/CompaniesSearch";
@@ -19,8 +20,8 @@ import {
 } from "@/features/companies/utils/resolve-companies-params";
 
 /**
- * Companies directory — top-rated order (same backend as home),
- * optional governorate filter including "all", backend search + pagination.
+ * Companies directory using public companies listing endpoint
+ * with governorate + search + pagination filters.
  */
 export default async function Page({ searchParams }) {
   const locale = await getLocale();
@@ -36,18 +37,43 @@ export default async function Page({ searchParams }) {
       (item) => String(item.id) === String(params.governorate_id),
     );
 
+  const fallbackGovernorateId = governorates[0]?.id ?? null;
   const selectedGovernorateId = isKnownGovernorate
     ? params.governorate_id
-    : null;
+    : fallbackGovernorateId;
 
-  const { companies, meta } = await getTopRatedCompanies({
-    page: params.page,
-    per_page: params.per_page,
-    search: params.search,
-    governorate_id: selectedGovernorateId,
-    min_ratings: 1,
-    locale,
-  });
+  if (
+    selectedGovernorateId != null &&
+    String(params.governorate_id ?? "") !== String(selectedGovernorateId)
+  ) {
+    redirect(
+      buildCompaniesHref({
+        governorate_id: selectedGovernorateId,
+        page: params.page,
+        per_page: params.per_page,
+        search: params.search,
+      }),
+    );
+  }
+
+  const { companies, meta } =
+    selectedGovernorateId != null
+      ? await getCompanies({
+          page: params.page,
+          per_page: params.per_page,
+          search: params.search,
+          governorate_id: selectedGovernorateId,
+          locale,
+        })
+      : {
+          companies: [],
+          meta: {
+            total: 0,
+            currentPage: 1,
+            lastPage: 1,
+            perPage: Number(params.per_page ?? 15) || 15,
+          },
+        };
 
   return (
     <>
@@ -74,8 +100,12 @@ export default async function Page({ searchParams }) {
               ariaLabel={t("companies.governoratesLabel")}
               label={t("companies.governoratesLabel")}
               allLabel={t("companies.allGovernorates")}
+              allowAll={false}
             />
           </Suspense>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {t("companies.governorateHint")}
+          </p>
         </div>
 
         {companies.length > 0 ? (

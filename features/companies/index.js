@@ -35,5 +35,6 @@ export {
 } from "./utils/company-slug";
 export {
   buildCompanyProductHref,
+  resolveCompanyProductGovernorate,
   resolveCompanyProductSource,
 } from "./utils/resolve-company-product-params";

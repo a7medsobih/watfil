@@ -46,6 +46,7 @@ export default async function BlogSection() {
             article={article}
             locale={locale}
             readMoreLabel={t("cta.readMore")}
+            readTimeLabel={t("blog.readTime")}
           />
         ))}
       </SectionCarousel>

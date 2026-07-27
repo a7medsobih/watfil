@@ -169,6 +169,18 @@ export function mapProduct(product, locale = "ar") {
     numberOfStages: category?.numberOfStages ?? null,
     source,
     companyId: product.company_id ?? product.company?.id ?? null,
+    /** Prefer explicit company_product_id for POST /customer/orders items. */
+    companyProductId: (() => {
+      const explicit =
+        product.company_product_id ??
+        product.company_product?.id ??
+        product.companyProductId;
+      if (explicit != null && explicit !== "") return Number(explicit);
+      // Company-owned products use `id` as company_product_id.
+      if ((product.source ?? source) === "company") return Number(product.id);
+      // Catalog offerings often expose the company catalog row as `id`.
+      return product.id != null ? Number(product.id) : null;
+    })(),
     cashPrice: Number(product.cash_price ?? 0),
     originalPrice: toNumberOrNull(product.original_price),
     isOnSale: Boolean(product.is_on_sale),

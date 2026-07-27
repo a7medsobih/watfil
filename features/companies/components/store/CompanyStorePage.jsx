@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 
+import DownloadAppPromo from "@/components/common/DownloadAppPromo";
 import CompanyInfoCard from "@/features/companies/components/store/CompanyInfoCard";
 import CompanyStoreTabs from "@/features/companies/components/store/CompanyStoreTabs";
 import { cn } from "@/lib/utils";

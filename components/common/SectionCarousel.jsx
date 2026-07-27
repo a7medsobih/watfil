@@ -38,26 +38,37 @@ function getReducedMotionOnServer() {
  * from `md` upwards Embla deactivates itself and the exact same DOM renders as the
  * existing grid — so markup stays server-rendered and SEO/CLS are untouched.
  *
+ * Pass `keepCarousel` to keep Embla active at every breakpoint (multi-card slides +
+ * nav arrows) — used by similar-products and other dedicated carousels.
+ *
  * @param {object} props
  * @param {import("react").ReactNode} props.children One node per card.
  * @param {string} [props.gridClassName] Grid columns applied from `md` upwards.
- * @param {string} [props.itemClassName] Slide width on mobile.
+ * @param {string} [props.itemClassName] Slide width on mobile / all sizes when keepCarousel.
  * @param {number} [props.autoplayDelay]
  * @param {string} [props.ariaLabel]
  * @param {string} [props.className]
+ * @param {boolean} [props.keepCarousel] Keep Embla + arrows on all breakpoints.
  */
 export default function SectionCarousel({
   children,
   gridClassName = "md:grid-cols-3 lg:grid-cols-4",
-  itemClassName = "basis-[86%] sm:basis-[48%]",
+  itemClassName,
   autoplayDelay = 4500,
   ariaLabel,
   className,
+  keepCarousel = false,
 }) {
   const locale = useLocale();
   const t = useTranslations("pagination");
   const direction = locale === "ar" ? "rtl" : "ltr";
   const slides = Children.toArray(children);
+
+  const resolvedItemClassName =
+    itemClassName ??
+    (keepCarousel
+      ? "basis-[86%] sm:basis-1/2 md:basis-1/3 lg:basis-1/4"
+      : "basis-[86%] sm:basis-[48%]");
 
   const autoplay = useRef(
     Autoplay({
@@ -102,7 +113,9 @@ export default function SectionCarousel({
         direction,
         loop: isInteractive,
         watchDrag: isInteractive,
-        breakpoints: { [GRID_BREAKPOINT]: { active: false } },
+        ...(keepCarousel
+          ? {}
+          : { breakpoints: { [GRID_BREAKPOINT]: { active: false } } }),
       }}
       plugins={
         isInteractive && !prefersReducedMotion ? [autoplay.current] : undefined
@@ -110,13 +123,21 @@ export default function SectionCarousel({
       className={className}
     >
       <CarouselContent
-        viewportClassName="md:overflow-visible"
-        className={cn("ml-0 -ms-4 md:ms-0 md:grid md:gap-5", gridClassName)}
+        viewportClassName={keepCarousel ? undefined : "md:overflow-visible"}
+        className={cn(
+          "ml-0 -ms-4",
+          keepCarousel ? null : "md:ms-0 md:grid md:gap-5",
+          keepCarousel ? null : gridClassName,
+        )}
       >
         {slides.map((slide, index) => (
           <CarouselItem
             key={slide.key ?? index}
-            className={cn("pl-0 ps-4 md:ps-0", itemClassName, "md:basis-auto")}
+            className={cn(
+              "pl-0 ps-4",
+              resolvedItemClassName,
+              keepCarousel ? null : "md:ps-0 md:basis-auto",
+            )}
           >
             {slide}
           </CarouselItem>
@@ -124,7 +145,17 @@ export default function SectionCarousel({
       </CarouselContent>
 
       {isInteractive && (
-        <div className="mt-6 flex items-center justify-center gap-4 md:hidden">
+        <div
+          className={cn(
+            "mt-6 flex items-center justify-center gap-4",
+            keepCarousel ? null : "md:hidden",
+          )}
+        >
+          {/*
+            With dir=rtl on the Carousel root, flex main-start is on the right:
+            Previous (scrollPrev) sits on the right; Next on the left.
+            Embla opts.direction flips scrollPrev/Next to match reading order.
+          */}
           <CarouselPrevious
             aria-label={t("previous")}
             className="static my-0 size-9 translate-y-0"

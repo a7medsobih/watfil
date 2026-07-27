@@ -1,7 +1,12 @@
+import { Suspense } from "react";
+
 import AppBreadcrumb from "@/components/common/AppBreadcrumb";
 import ProductDetailsTabs from "@/features/products/components/details/ProductDetailsTabs";
 import ProductHero from "@/features/products/components/details/ProductHero";
 import ProductOfferingCompanies from "@/features/products/components/details/ProductOfferingCompanies";
+import SimilarProductsSection, {
+  SimilarProductsSkeleton,
+} from "@/features/products/components/details/SimilarProductsSection";
 
 /**
  * Composes the public catalog product detail page.
@@ -48,6 +53,15 @@ export default function ProductDetailsPage({
           labels={companiesLabels}
         />
       )}
+
+      <Suspense fallback={<SimilarProductsSkeleton locale={locale} />}>
+        <SimilarProductsSection
+          mode="catalog"
+          productId={product.id}
+          companyId={offerings[0]?.company?.id ?? null}
+          locale={locale}
+        />
+      </Suspense>
     </div>
   );
 }

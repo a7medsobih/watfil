@@ -8,6 +8,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { COMPARE_UI_ENABLED } from "@/features/compare";
+import { MiniCartTrigger } from "@/features/cart";
 import { Link } from "@/i18n/navigation";
 import { useCompareStore, useWishlistCountStore } from "@/stores";
 
@@ -52,6 +53,8 @@ export default function NavbarActions() {
           ) : null}
         </Link>
       </Button>
+
+      <MiniCartTrigger />
 
       <LanguageSwitcher />
       <ThemeToggle />

@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 
+import DownloadAppPromo from "@/components/common/DownloadAppPromo";
 import JoinCompanyCTA from "@/features/companies/components/JoinCompanyCTA";
 import {
   BlogSection,
@@ -23,6 +24,7 @@ export default async function Page() {
       <CompaniesSection />
       <WhySection />
       <BlogSection />
+      <DownloadAppPromo placement="home" />
       <JoinCompanyCTA
         title={t("cta.home.title")}
         description={t("cta.home.description")}

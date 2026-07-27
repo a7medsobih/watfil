@@ -6,3 +6,7 @@ export { default as ProductOfferingCompanies } from "./ProductOfferingCompanies"
 export { default as ProductOfferingCompanyCard } from "./ProductOfferingCompanyCard";
 export { default as ProductGovernorateTabs } from "./ProductGovernorateTabs";
 export { default as ProductGovernorateSelect } from "./ProductGovernorateSelect";
+export {
+  default as SimilarProductsSection,
+  SimilarProductsSkeleton,
+} from "./SimilarProductsSection";

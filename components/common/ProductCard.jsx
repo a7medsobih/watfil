@@ -98,8 +98,8 @@ export default function ProductCard({
     hrefOverride ??
     ((companySlug || product.companySlug) && product.id
       ? buildCompanyProductHref(companySlug || product.companySlug, product.id, {
-          source: product.source ?? likeSource ?? "catalog",
-        })
+        source: product.source ?? likeSource ?? "catalog",
+      })
       : `/products/${product.slug}`);
 
   return (

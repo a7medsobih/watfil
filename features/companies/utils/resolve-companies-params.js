@@ -1,6 +1,6 @@
 /**
  * Resolves companies list query from Next.js searchParams.
- * governorate is optional — omit / empty / "all" means every governorate.
+ * governorate_id is optional — omit / empty / "all" means every governorate.
  *
  * @param {Record<string, string | string[] | undefined>} [searchParams]
  * @param {{ defaultGovernorateId?: string | number | null }} [options]
@@ -11,18 +11,19 @@ export function resolveCompaniesParams(searchParams = {}, options = {}) {
     return Array.isArray(value) ? value[0] : value;
   };
 
-  const rawGovernorate = read("governorate");
+  const rawGovernorateId = read("governorate_id") ?? read("governorate");
   const hasExplicit =
+    Object.prototype.hasOwnProperty.call(searchParams, "governorate_id") ||
     Object.prototype.hasOwnProperty.call(searchParams, "governorate");
 
   let governorate = null;
   if (hasExplicit) {
     if (
-      rawGovernorate != null &&
-      rawGovernorate !== "" &&
-      rawGovernorate !== "all"
+      rawGovernorateId != null &&
+      rawGovernorateId !== "" &&
+      rawGovernorateId !== "all"
     ) {
-      governorate = rawGovernorate;
+      governorate = rawGovernorateId;
     }
   } else if (options.defaultGovernorateId != null) {
     governorate = options.defaultGovernorateId;
@@ -58,7 +59,7 @@ export function buildCompaniesHref({
     governorate !== undefined ? governorate : governorate_id;
 
   if (gov != null && gov !== "" && gov !== "all") {
-    query.set("governorate", String(gov));
+    query.set("governorate_id", String(gov));
   }
 
   if (page != null && Number(page) > 1) {

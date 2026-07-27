@@ -18,6 +18,7 @@ import {
   buildProductsHref,
   resolveProductsParams,
 } from "@/features/products/utils/resolve-products-params";
+import DownloadAppPromo from "@/components/common/DownloadAppPromo";
 
 export default async function Page({ searchParams }) {
   const locale = await getLocale();
@@ -64,7 +65,7 @@ export default async function Page({ searchParams }) {
         }
       />
 
-      <section className="container pb-16 pt-2 sm:pt-4">
+      <section className="container py-10 pt-2 sm:pt-4">
         <div className="mb-4 flex items-center justify-between gap-3 lg:hidden">
           <p className="text-sm text-muted-foreground">
             {t("products.count", { count: meta.total })}
@@ -140,6 +141,10 @@ export default async function Page({ searchParams }) {
           </div>
         </div>
       </section>
+      <section className="pb-10 ">
+        <DownloadAppPromo placement="products" />
+      </section>
+
     </>
   );
 }

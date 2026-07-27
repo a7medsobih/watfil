@@ -6,6 +6,7 @@ import AppBreadcrumb from "@/components/common/AppBreadcrumb";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
+import { useAddToCart } from "@/features/cart";
 import ProductDetailsTabs from "@/features/products/components/details/ProductDetailsTabs";
 import ProductHero from "@/features/products/components/details/ProductHero";
 
@@ -35,19 +36,26 @@ function groupPerks(perks = []) {
 
 /**
  * Company product purchase page composition.
+ * `children` is reserved for server-streamed blocks (e.g. similar products).
  */
 export default function CompanyOfferDetailsPage({
   product,
   company,
   locale = "ar",
   breadcrumbs = [],
+  children = null,
 }) {
   const t = useTranslations("product");
+  const { addToCart } = useAddToCart();
   const currency = locale === "ar" ? "ج.م" : "EGP";
 
   const grouped = groupPerks(product?.hasPerks ? product.perks ?? [] : []);
 
   if (!product || !company) return null;
+
+  const handleAddToCart = () => {
+    addToCart({ company, product, quantity: 1, openCart: true });
+  };
 
   return (
     <div className="container pb-16 pt-4 md:pt-8">
@@ -116,10 +124,8 @@ export default function CompanyOfferDetailsPage({
             </div>
 
             <div className="flex w-full flex-col gap-3 sm:max-w-xs">
-              <Button size="lg" className="w-full" asChild>
-                <Link href={`/companies/${company.slug}#contact`}>
-                  {t("orderNow")}
-                </Link>
+              <Button size="lg" className="w-full" onClick={handleAddToCart}>
+                {t("purchase.addToCart")}
               </Button>
               <Button size="lg" variant="outline" className="w-full" asChild>
                 <Link href={`/companies/${company.slug}`}>
@@ -130,6 +136,8 @@ export default function CompanyOfferDetailsPage({
           </div>
         </div>
       </section>
+
+      {children}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, MapPin, Star } from "lucide-react";
+import { Eye, Heart, MapPin, Star } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import MediaImage from "@/components/common/MediaImage";
@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 
 export default function CampanyCard({ company, className }) {
   const t = useTranslations("company");
+  const tCompanies = useTranslations("companies");
 
   if (!company) return null;
 
@@ -17,6 +18,7 @@ export default function CampanyCard({ company, className }) {
   const coverageOverflow = company.coverage?.overflow ?? 0;
   const coverageTotal = company.coverage?.total ?? 0;
   const hasLogo = company.hasLogo === true;
+  const hasCoverageChips = coverageItems.length > 0 || company.coversAllGovernorates;
 
   return (
     <article
@@ -46,36 +48,55 @@ export default function CampanyCard({ company, className }) {
             {company.name}
           </h3>
 
+          {company.governorate?.name ? (
+            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <MapPin className="h-4 w-4 shrink-0" />
+              <span>{company.governorate.name}</span>
+            </div>
+          ) : null}
+
           <div className="flex flex-wrap items-center gap-4 text-sm">
-            {company.rating != null && (
-              <div className="flex items-center gap-1">
-                <Star className="h-4 w-4 text-warning" />
-                <span className="font-semibold">
-                  {Number(company.rating).toFixed(1)}
-                </span>
-                <span className="text-muted-foreground">
-                  ({company.reviews ?? 0})
-                </span>
-              </div>
-            )}
+            <div className="flex items-center gap-1">
+              <Star className="h-4 w-4 text-warning" />
+              <span className="font-semibold">
+                {company.rating != null ? Number(company.rating).toFixed(1) : "0.0"}
+              </span>
+              <span className="text-muted-foreground">
+                ({company.reviews ?? 0})
+              </span>
+            </div>
 
             <div className="flex items-center gap-1 text-muted-foreground">
               <Heart className="h-4 w-4" />
               <span>{company.likes ?? 0}</span>
             </div>
 
-            {coverageTotal > 0 && (
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <Eye className="h-4 w-4" />
+              <span>{company.viewsCount ?? 0}</span>
+            </div>
+
+            {!company.coversAllGovernorates && coverageTotal > 0 && (
               <div className="flex items-center gap-1 text-muted-foreground">
                 <MapPin className="h-4 w-4 shrink-0" />
                 <span>
-                  {t("tabs.branches")} · {coverageTotal}
+                  {t("serviceLocations")} · {coverageTotal}
                 </span>
               </div>
             )}
           </div>
 
-          {coverageItems.length > 0 && (
+          {hasCoverageChips && (
             <div className="flex flex-wrap gap-2">
+              {company.coversAllGovernorates ? (
+                <Badge
+                  variant="secondary"
+                  className="rounded-full bg-primary/10 text-primary hover:bg-primary/15"
+                >
+                  {tCompanies("allGovernorates")}
+                </Badge>
+              ) : null}
+
               {coverageItems.map((item) => (
                 <Badge
                   key={item.id}

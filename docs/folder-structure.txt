@@ -11,15 +11,21 @@ watfil-website/
 │   │   │   ├── products/
 │   │   │   │   ├── page.js
 │   │   │   │   ├── loading.js
+│   │   │   │   ├── error.js
 │   │   │   │   └── [slug]/
 │   │   │   │       ├── page.js
 │   │   │   │       └── loading.js
 │   │   │   ├── companies/
 │   │   │   │   ├── page.js
 │   │   │   │   ├── loading.js
+│   │   │   │   ├── error.js
 │   │   │   │   └── [slug]/
 │   │   │   │       ├── page.js
-│   │   │   │       └── loading.js
+│   │   │   │       ├── loading.js
+│   │   │   │       └── products/
+│   │   │   │           └── [productId]/
+│   │   │   │               ├── page.js     # Company product offer
+│   │   │   │               └── loading.js
 │   │   │   ├── categories/
 │   │   │   │   ├── page.js
 │   │   │   │   └── [slug]/
@@ -34,6 +40,8 @@ watfil-website/
 │   │   │   │   ├── page.js
 │   │   │   │   └── [slug]/
 │   │   │   │       └── page.js
+│   │   │   ├── join-us/
+│   │   │   │   └── page.js                 # Company join request
 │   │   │   └── about/
 │   │   │       └── page.js
 │   │   └── (auth)/
@@ -47,8 +55,11 @@ watfil-website/
 │   │       └── reset-password/
 │   │           └── page.js
 │   ├── api/
-│   │   └── health/
-│   │       └── route.js
+│   │   ├── health/
+│   │   │   └── route.js
+│   │   └── backend/
+│   │       └── [...path]/
+│   │           └── route.js                # BFF proxy to backend
 │   ├── providers.jsx
 │   ├── sitemap.js
 │   ├── robots.js
@@ -56,45 +67,60 @@ watfil-website/
 ├── features/
 │   ├── home/
 │   │   ├── components/
-│   │   │   └── HomePage.jsx
+│   │   │   ├── hero/                       # HeroSection, WaterBackdrop, …
+│   │   │   ├── categories/
+│   │   │   ├── products/
+│   │   │   ├── companies/
+│   │   │   ├── stats/
+│   │   │   ├── why/
+│   │   │   ├── blogs/
+│   │   │   └── index.js
 │   │   ├── api/
+│   │   │   └── get-statistics.js
+│   │   ├── data/                           # categories.js, why.js
 │   │   ├── hooks/
 │   │   ├── services/
-│   │   ├── types.js
 │   │   └── index.js
 │   ├── products/
 │   │   ├── components/
-│   │   │   ├── ProductsPage.jsx
-│   │   │   └── ProductDetailsPage.jsx
-│   │   ├── api/
+│   │   │   ├── ProductsFilters.jsx
+│   │   │   ├── ProductsFiltersSheet.jsx
+│   │   │   ├── ProductsSearch.jsx
+│   │   │   └── details/                   # ProductHero, tabs, similar, …
+│   │   ├── api/                            # get-products, get-product, …
 │   │   ├── hooks/
 │   │   ├── schemas/
 │   │   ├── services/
-│   │   ├── types.js
+│   │   ├── utils/                          # slug + params resolvers
 │   │   └── index.js
 │   ├── companies/
 │   │   ├── components/
-│   │   │   ├── CompaniesPage.jsx
-│   │   │   └── CompanyDetailsPage.jsx
-│   │   ├── api/
+│   │   │   ├── CompaniesSearch.jsx
+│   │   │   ├── CompaniesGovernorateSelect.jsx
+│   │   │   ├── GovernorateTabs.jsx
+│   │   │   ├── JoinCompanyCTA.jsx
+│   │   │   ├── join/                       # JoinUsPage, JoinUsForm
+│   │   │   └── store/                      # CompanyStorePage, ratings, …
+│   │   ├── api/                            # companies, join, like, rate, …
+│   │   ├── context/
+│   │   │   └── company-brand-context.jsx
 │   │   ├── hooks/
 │   │   ├── schemas/
 │   │   ├── services/
+│   │   ├── utils/
 │   │   ├── types.js
 │   │   └── index.js
 │   ├── blog/
-│   │   ├── components/
-│   │   │   ├── BlogPage.jsx
-│   │   │   └── BlogPostPage.jsx
-│   │   ├── api/
+│   │   ├── api/                            # get-articles, get-featured-articles
 │   │   ├── hooks/
 │   │   ├── services/
-│   │   └── index.js
+│   │   └── utils/
 │   ├── categories/
 │   │   ├── components/
 │   │   │   ├── CategoriesPage.jsx
 │   │   │   └── CategoryDetailsPage.jsx
 │   │   ├── api/
+│   │   ├── services/
 │   │   └── index.js
 │   ├── search/
 │   │   ├── components/
@@ -102,29 +128,45 @@ watfil-website/
 │   │   └── index.js
 │   ├── wishlist/
 │   │   ├── components/
-│   │   │   └── WishlistPage.jsx
+│   │   │   ├── WishlistPage.jsx
+│   │   │   └── ProductLikeButton.jsx
+│   │   ├── api/
+│   │   ├── hooks/
+│   │   ├── services/
+│   │   ├── types.js
 │   │   └── index.js
 │   ├── compare/
 │   │   ├── components/
 │   │   │   └── ComparePage.jsx
+│   │   ├── flags.js
 │   │   └── index.js
+│   ├── cart/
+│   │   ├── components/                     # MiniCart, CartHost, …
+│   │   ├── hooks/
+│   │   │   └── use-add-to-cart.js
+│   │   └── index.js
+│   ├── checkout/
+│   │   └── utils/                          # build-order-payload, idempotency
 │   ├── auth/
 │   │   ├── components/
+│   │   │   ├── AuthDialog.jsx
+│   │   │   ├── AuthBootstrap.jsx
+│   │   │   ├── AuthQueryOpener.jsx
 │   │   │   ├── LoginPage.jsx
 │   │   │   ├── RegisterPage.jsx
 │   │   │   ├── ForgotPasswordPage.jsx
-│   │   │   └── ResetPasswordPage.jsx
+│   │   │   ├── ResetPasswordPage.jsx
+│   │   │   └── steps/                      # Phone, Otp, Password, Register
+│   │   ├── api/
+│   │   │   └── customer-auth.js
+│   │   ├── hooks/
+│   │   │   └── use-require-auth.js
 │   │   └── index.js
 │   └── reviews/
 │       ├── components/
 │       └── index.js
 ├── components/
-│   ├── ui/
-│   │   ├── badge.jsx
-│   │   ├── button.jsx
-│   │   ├── sheet.jsx
-│   │   ├── Slider.jsx
-│   │   └── Spinner.jsx
+│   ├── ui/                                 # button, badge, sheet, dialog, …
 │   ├── layout/
 │   │   ├── Footer.jsx
 │   │   └── navbar/
@@ -137,9 +179,7 @@ watfil-website/
 │   │       ├── NavbarAuth.jsx
 │   │       ├── MobileMenu.jsx
 │   │       └── MobileDrawer.jsx
-│   ├── common/
-│   │   ├── Card.jsx
-│   │   └── NavLink.jsx
+│   ├── common/                             # ProductCard, PageHeader, …
 │   ├── skeletons/
 │   │   ├── index.js
 │   │   └── PageSkeleton.jsx
@@ -156,7 +196,10 @@ watfil-website/
 │   ├── api/
 │   │   ├── client.js
 │   │   ├── fetcher.js
+│   │   ├── request.js
 │   │   └── endpoints.js
+│   ├── auth/
+│   │   └── customer-token.js
 │   ├── seo/
 │   │   ├── metadata.js
 │   │   ├── openGraph.js
@@ -165,16 +208,22 @@ watfil-website/
 │   │   └── index.js
 │   ├── constants/
 │   │   └── constantData.js
+│   ├── media/
+│   │   └── placeholders.js
 │   ├── validations/
 │   │   └── index.js
 │   ├── utils/
-│   │   └── helperFun.js
-│   └── utils.js                        # cn() helper
+│   │   ├── helperFun.js
+│   │   └── format-date.js
+│   └── utils.js                            # cn() helper
 ├── stores/
 │   ├── index.js
+│   ├── auth-store.js
+│   ├── auth-dialog-store.js
 │   ├── cart-store.js
 │   ├── compare-store.js
-│   ├── wishlist-store.js
+│   ├── liked-companies-store.js
+│   ├── wishlist-count-store.js
 │   └── ui-store.js
 ├── hooks/
 │   ├── index.js
@@ -189,12 +238,18 @@ watfil-website/
 ├── styles/
 │   └── globals.css
 ├── assets/
-│   └── watfil-logo.png
+│   ├── watfil-logo.png
+│   └── carousel/                           # hero slides
 ├── public/
-│   └── favicon.ico
+│   ├── favicon.ico
+│   └── images/                             # placeholders (product/company/blog)
 ├── docs/
-│   └── folder-structure.txt
-├── proxy.ts                            # Next.js 16 (replaces middleware.js)
+│   ├── folder-structure.txt
+│   ├── WATAFL_COMPANY_JOIN_REQUESTS.md
+│   ├── WATAFL_CUSTOMER_RATINGS.md
+│   ├── FRONTEND_ENDPOINTS_BUSINESS_GUIDE_AR 8.md
+│   └── Watafl_Company_Join_Requests.postman_collection 1.json
+├── proxy.ts                                # Next.js 16 (replaces middleware.js)
 ├── next.config.mjs
 ├── postcss.config.mjs
 ├── jsconfig.json

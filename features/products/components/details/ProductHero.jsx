@@ -196,7 +196,7 @@ export default function ProductHero({
           )}
 
           {isCatalog && product.offeringCompaniesCount > 0 && (
-            <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 sm:gap-4 sm:rounded-3xl sm:p-5">
+            <div className="flex items-center gap-3 p-4 sm:gap-4 sm:p-5">
               <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary sm:size-12 sm:rounded-2xl">
                 <Building2 className="size-5" aria-hidden />
               </div>
@@ -214,7 +214,7 @@ export default function ProductHero({
           )}
 
           {company && (
-            <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 sm:gap-4 sm:rounded-3xl sm:p-5">
+            <div className="flex items-center gap-3  p-4 sm:gap-4  sm:p-5">
               <div
                 className={cn(
                   "size-10 shrink-0 overflow-hidden rounded-xl border border-border/60 sm:size-12 sm:rounded-2xl",

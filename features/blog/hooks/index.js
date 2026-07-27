@@ -1,1 +1,1 @@
-// Blog feature hooks
+export { useBlogQuery } from "./use-blog-query";

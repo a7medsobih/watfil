@@ -21,12 +21,24 @@ function buildQueryParams(params = {}) {
     query.search = params.search;
   }
 
-  if (params.category != null && params.category !== "") {
-    query.category = params.category;
+  if (params.category_slug != null && params.category_slug !== "") {
+    query.category_slug = params.category_slug;
   }
 
-  if (params.tag != null && params.tag !== "") {
-    query.tag = params.tag;
+  if (params.tag_slug != null && params.tag_slug !== "") {
+    query.tag_slug = params.tag_slug;
+  }
+
+  if (params.blog_category_id != null && params.blog_category_id !== "") {
+    query.blog_category_id = params.blog_category_id;
+  }
+
+  if (params.company_id != null && params.company_id !== "") {
+    query.company_id = params.company_id;
+  }
+
+  if (params.product_id != null && params.product_id !== "") {
+    query.product_id = params.product_id;
   }
 
   return query;

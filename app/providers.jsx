@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/sonner";
 import AuthBootstrap from "@/features/auth/components/AuthBootstrap";
 import AuthDialog from "@/features/auth/components/AuthDialog";
 import AuthQueryOpener from "@/features/auth/components/AuthQueryOpener";
+import { CartHost } from "@/features/cart";
 
 export function Providers({ children }) {
   return (
@@ -19,6 +20,7 @@ export function Providers({ children }) {
       {children}
       <AuthBootstrap />
       <AuthDialog />
+      <CartHost />
       <Suspense fallback={null}>
         <AuthQueryOpener />
       </Suspense>

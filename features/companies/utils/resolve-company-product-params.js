@@ -9,15 +9,36 @@
 export function buildCompanyProductHref(
   companySlug,
   productId,
-  { source = "catalog" } = {},
+  { source = "catalog", governorate } = {},
 ) {
   const base = `/companies/${encodeURIComponent(String(companySlug))}/products/${encodeURIComponent(String(productId))}`;
   const query = new URLSearchParams();
 
   if (source) query.set("source", String(source));
+  if (governorate != null && governorate !== "") {
+    query.set("governorate", String(governorate));
+  }
 
   const qs = query.toString();
   return qs ? `${base}?${qs}` : base;
+}
+
+/**
+ * Resolves governorate query for company product pages.
+ *
+ * @param {Record<string, string | string[] | undefined>} [searchParams]
+ * @param {{ defaultGovernorateId?: string | number | null }} [options]
+ */
+export function resolveCompanyProductGovernorate(
+  searchParams = {},
+  options = {},
+) {
+  const value = searchParams?.governorate;
+  const raw = Array.isArray(value) ? value[0] : value;
+
+  if (raw != null && raw !== "") return raw;
+
+  return options.defaultGovernorateId ?? null;
 }
 
 /**

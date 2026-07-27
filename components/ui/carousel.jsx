@@ -54,15 +54,20 @@ function Carousel({
 
   const handleKeyDown = React.useCallback(
     (event) => {
+      const isRtl = opts?.direction === "rtl";
+
       if (event.key === "ArrowLeft") {
         event.preventDefault();
-        scrollPrev();
+        // RTL: left key advances to next; LTR: left key goes to previous.
+        if (isRtl) scrollNext();
+        else scrollPrev();
       } else if (event.key === "ArrowRight") {
         event.preventDefault();
-        scrollNext();
+        if (isRtl) scrollPrev();
+        else scrollNext();
       }
     },
-    [scrollPrev, scrollNext],
+    [opts?.direction, scrollPrev, scrollNext],
   );
 
   React.useEffect(() => {

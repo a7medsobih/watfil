@@ -231,8 +231,15 @@ export function mapCompany(company, locale = "ar") {
     rating: toNumberOrNull(company.average_rating),
     reviews: Number(company.ratings_count ?? 0),
     likes: Number(company.likes_count ?? 0),
+    viewsCount: Number(company.views_count ?? 0),
     governorate: mapGovernorate(company.governorate, locale),
     coverage,
+    coversAllGovernorates: Boolean(company.covers_all_governorates),
+    isListingAd: Boolean(company.is_listing_ad),
+    listingAdPosition:
+      company.listing_ad_position != null
+        ? Number(company.listing_ad_position)
+        : null,
     verified: Boolean(company.is_verified ?? company.verified),
   };
 }

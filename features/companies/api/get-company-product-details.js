@@ -57,14 +57,28 @@ export const getCompanyProductDetails = cache(
       const product = mapProduct(payload, locale);
       if (!product) return null;
 
+      const sellingCompanyId = Number(companyId);
+
+      // Prefer explicit company_product_id from API (required by POST /customer/orders).
+      // Fall back to payload.id which is the company-product row for source=company,
+      // and often the catalog pivot id when the details endpoint scopes by company.
+      const companyProductId = Number(
+        payload?.company_product_id ??
+          payload?.company_product?.id ??
+          product.companyProductId ??
+          payload?.id ??
+          product.id,
+      );
+
       return {
         ...product,
         source: payload?.source ?? resolvedSource,
         likeSource: payload?.source ?? resolvedSource,
-        companyId:
-          resolvedSource === "company"
-            ? Number(companyId)
-            : (product.companyId ?? null),
+        // Always the company the customer is buying from (route company).
+        companyId: sellingCompanyId,
+        companyProductId: Number.isFinite(companyProductId)
+          ? companyProductId
+          : null,
       };
     } catch (error) {
       if (error?.status === 404) return null;

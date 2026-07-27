@@ -40,6 +40,7 @@ export default function ProductOfferingCompanies({
               key={offering.id}
               offering={offering}
               locale={locale}
+              selectedGovernorateId={selectedGovernorateId}
               labels={{
                 verified: labels.verified,
                 installment: labels.installment,

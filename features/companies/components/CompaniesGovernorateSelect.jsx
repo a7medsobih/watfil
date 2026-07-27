@@ -21,6 +21,7 @@ export default function CompaniesGovernorateSelect({
   ariaLabel,
   label,
   allLabel,
+  allowAll = true,
   className,
 }) {
   const { update } = useCompaniesQuery();
@@ -46,7 +47,10 @@ export default function CompaniesGovernorateSelect({
         value={value}
         onValueChange={(next) => {
           update({
-            governorate_id: next === ALL_OPTION ? null : next,
+            governorate_id:
+              allowAll && next === ALL_OPTION
+                ? null
+                : next,
           });
         }}
       >
@@ -58,7 +62,7 @@ export default function CompaniesGovernorateSelect({
           <SelectValue placeholder={ariaLabel} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={ALL_OPTION}>{allLabel}</SelectItem>
+          {allowAll ? <SelectItem value={ALL_OPTION}>{allLabel}</SelectItem> : null}
           {governorates.map((governorate) => (
             <SelectItem key={governorate.id} value={String(governorate.id)}>
               {governorate.name}

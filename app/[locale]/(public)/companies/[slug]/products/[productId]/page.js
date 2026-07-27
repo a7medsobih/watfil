@@ -1,16 +1,22 @@
+import { Suspense } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 
 import {
   getCompany,
   getCompanyProductDetails,
+  getGovernorates,
 } from "@/features/companies/api";
 import { CompanyBrandSetter } from "@/features/companies/context/company-brand-context";
 import {
   buildCompanyProductHref,
+  resolveCompanyProductGovernorate,
   resolveCompanyProductSource,
 } from "@/features/companies/utils/resolve-company-product-params";
 import CompanyOfferDetailsPage from "@/features/products/components/details/CompanyOfferDetailsPage";
+import SimilarProductsSection, {
+  SimilarProductsSkeleton,
+} from "@/features/products/components/details/SimilarProductsSection";
 import { buildMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata({ params, searchParams }) {
@@ -77,6 +83,15 @@ export default async function CompanyProductDetailsRoute({
 
   if (!product) notFound();
 
+  const governorates = await getGovernorates({ locale });
+  const defaultGovernorateId = governorates[0]?.id ?? null;
+  const governorateId = resolveCompanyProductGovernorate(resolvedSearchParams, {
+    defaultGovernorateId:
+      company.governorate?.id ??
+      company.coverage?.items?.[0]?.id ??
+      defaultGovernorateId,
+  });
+
   return (
     <>
       <CompanyBrandSetter
@@ -97,7 +112,19 @@ export default async function CompanyProductDetailsRoute({
           { label: company.name, href: `/companies/${company.slug}` },
           { label: product.name },
         ]}
-      />
+      >
+        <Suspense fallback={<SimilarProductsSkeleton locale={locale} />}>
+          <SimilarProductsSection
+            mode="company"
+            productId={productId}
+            companyId={company.id}
+            companySlug={company.slug}
+            governorateId={governorateId}
+            source={source}
+            locale={locale}
+          />
+        </Suspense>
+      </CompanyOfferDetailsPage>
     </>
   );
 }

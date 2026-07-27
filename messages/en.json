@@ -24,6 +24,7 @@
         "register": "Create account",
         "menu": "Menu",
         "primary": "Primary",
+        "cart": "Cart",
         "language": "Language",
         "theme": "Theme",
         "themeLight": "Light",
@@ -196,13 +197,18 @@
         "purchase": {
             "title": "Purchase information",
             "subtitle": "Complete your order with the certified company.",
-            "goToCompany": "Go to company page"
+            "goToCompany": "Go to company page",
+            "addToCart": "Add to cart",
+            "adding": "Adding…"
         },
         "companies": "Discover companies in your governorate",
         "companiesSubtitle": "Compare benefits and offers, then pick the best fit near you.",
         "companiesEmptyTitle": "No companies in this governorate",
         "companiesEmpty": "Try another governorate to find companies for this product.",
         "related": "Related products",
+        "relatedFromCompany": "More products from this company",
+        "relatedEmptyTitle": "No similar products",
+        "relatedEmpty": "We could not find similar products right now. Browse other products or try again later.",
         "filterByGov": "Choose governorate",
         "verified": "Verified",
         "price": "Price"
@@ -275,6 +281,7 @@
         "count": "{count} companies",
         "searchPlaceholder": "Search filters, brands, categories…",
         "governoratesLabel": "Governorate",
+        "governorateHint": "Choose the governorate you want to view available companies in.",
         "allGovernorates": "All governorates",
         "emptyTitle": "No companies here yet",
         "empty": "No matching companies. Try another governorate or adjust your search."
@@ -292,7 +299,18 @@
         "title": "Blog",
         "subtitle": "Expert advice and practical guides for cleaner water.",
         "latest": "Latest articles",
-        "readTime": "min read"
+        "readTime": "min read",
+        "allCategories": "All",
+        "searchPlaceholder": "Search articles…",
+        "searchResults": "Results for \"{query}\"",
+        "count": "{count} articles",
+        "emptyTitle": "No articles yet",
+        "empty": "Check back soon for new guides and tips.",
+        "viewAll": "View all articles",
+        "inCategory": "Articles in {category}",
+        "tableOfContents": "Table of contents",
+        "relatedArticles": "More to read",
+        "tags": "Tags"
     },
     "auth": {
         "welcome": {
@@ -454,5 +472,171 @@
         "company": "Company",
         "support": "Support",
         "rights": "All rights reserved."
+    },
+    "cart": {
+        "title": "Company cart",
+        "companyLabel": "Company",
+        "checkout": "Checkout",
+        "increase": "Increase quantity",
+        "decrease": "Decrease quantity",
+        "remove": "Remove item",
+        "summary": {
+            "total": "Total",
+            "meta": "{products} products · {quantity} total qty"
+        },
+        "empty": {
+            "title": "Your cart is empty",
+            "description": "Add products from one company to start your order.",
+            "browse": "Browse products"
+        },
+        "conflict": {
+            "title": "You have items from another company",
+            "description": "You can continue your current order, or clear the cart and add the new product. Nothing is lost without your confirmation.",
+            "currentCompany": "Current cart",
+            "newCompany": "New product from",
+            "keepCurrent": "Continue current order",
+            "replace": "Clear cart and add new product"
+        },
+        "toast": {
+            "added": "Product added to cart.",
+            "missingCompany": "Couldn’t identify the company. Re-open the product page and try again.",
+            "missingProduct": "Couldn’t identify the product. Re-open the product page and try again.",
+            "installmentSingle": "Installment allows one product only. Finish the current order or switch to cash to add more.",
+            "installmentBlocked": "This product can’t be added while installment is selected."
+        }
+    },
+    "checkout": {
+        "title": "Checkout",
+        "subtitle": "Review your items and place the order with the certified company. After-sales continues in the Watfil app.",
+        "submit": "Place order",
+        "submitting": "Placing order…",
+        "payment": {
+            "title": "Payment method",
+            "hint": "Choose cash or installment based on company rules.",
+            "cash": "Cash",
+            "cashHint": "You can add more than one product.",
+            "installment": "Installment",
+            "installmentHint": "One product only per system rules.",
+            "installmentDisabled": "Installment needs a single installment-eligible product in the cart.",
+            "choosePlan": "Choose an installment plan",
+            "months": "Months",
+            "monthsValue": "{count} months",
+            "downPayment": "Down payment",
+            "monthly": "Monthly installment"
+        },
+        "governorate": {
+            "label": "Governorate",
+            "hint": "Optional — helps the company reach you.",
+            "placeholder": "Select governorate"
+        },
+        "notes": {
+            "label": "Notes",
+            "hint": "Extra details for the company (address, preferred time…).",
+            "placeholder": "Write your notes here…"
+        },
+        "summary": {
+            "title": "Order summary",
+            "company": "Company",
+            "qty": "Qty: {count}",
+            "items": "Total quantity",
+            "payment": "Payment",
+            "total": "Total"
+        },
+        "empty": {
+            "title": "Nothing to checkout",
+            "description": "Add products to a single company cart, then come back here.",
+            "browse": "Browse products"
+        },
+        "errors": {
+            "empty": "Your cart is empty.",
+            "auth": "Sign in to place your order.",
+            "invalidCompany": "Couldn’t identify the selling company. Clear the cart and add the product again from the company page.",
+            "notLinked": "Your account is not linked to {company}. Confirm company_id matches Postman, or link the customer to the company from the company/admin panel, then try again.",
+            "installmentSingle": "Installment supports one product only.",
+            "installmentPlan": "Choose an installment plan to continue.",
+            "generic": "Couldn’t create the order. Please try again."
+        }
+    },
+    "orderSuccess": {
+        "title": "Your order was received",
+        "subtitle": "The company team will contact you soon to confirm the order.",
+        "subtitleWithCompany": "{company} will contact you soon to confirm the order.",
+        "orderNumber": "Order number: {id}",
+        "timeline": {
+            "title": "What happens next?",
+            "subtitle": "A simple look at your journey after ordering.",
+            "steps": {
+                "received": "Order received",
+                "review": "Order review",
+                "contact": "We’ll contact you",
+                "installation": "Installation",
+                "maintenance": "Ongoing maintenance"
+            },
+            "hints": {
+                "received": "Your order reached the company successfully.",
+                "review": "The company reviews products and details.",
+                "contact": "The company team contacts you to confirm.",
+                "installation": "Installation is scheduled with you.",
+                "maintenance": "Track maintenance and warranty in the app."
+            }
+        },
+        "app": {
+            "title": "Continue your journey with the Watfil app",
+            "description": "Use the app for everything after purchase.",
+            "benefits": {
+                "track": "Track your order",
+                "installation": "Installation status",
+                "maintenance": "Periodic maintenance",
+                "filters": "Filter replacements",
+                "warranty": "Warranty tracking",
+                "notifications": "Notifications"
+            }
+        },
+        "cta": {
+            "browse": "Browse more products",
+            "home": "Back to home"
+        }
+    },
+    "downloadApp": {
+        "badge": "Watfil App",
+        "getItOn": "Get it on",
+        "downloadOn": "Download on the",
+        "comingSoon": "Coming Soon",
+        "qrHint": "Scan to download",
+        "mockupSubtitle": "All your after-purchase services in one place",
+        "mockupCta": "Open the app",
+        "home": {
+            "title": "Complete your journey with the Watfil app",
+            "description": "Track orders, installation, maintenance, warranty, and notifications — right from your phone."
+        },
+        "company": {
+            "title": "Complete your journey with the Watfil app",
+            "description": "Installation, maintenance, filter changes, and warranty — all inside the app after purchase."
+        },
+        "benefits": {
+            "track": "Track orders",
+            "installation": "Installation status",
+            "maintenance": "Periodic maintenance",
+            "filters": "Filter changes",
+            "warranty": "Warranty",
+            "notifications": "Notifications"
+        }
+    },
+    "storeShare": {
+        "eyebrow": "Company store",
+        "subtitle": "Open this store in the Watfil app, or download the app to continue.",
+        "metaDescription": "Visit {name} on Watfil — open in the app or download from Google Play.",
+        "openingApp": "Opening the app…",
+        "installHint": "App not installed? Download Watfil to open this store.",
+        "getItOn": "Get it on",
+        "app": {
+            "title": "Continue in the Watfil app",
+            "description": "Browse this company store, products, and after-purchase services on your phone."
+        },
+        "unavailable": {
+            "title": "Store unavailable",
+            "description": "This company store is not available right now. It may be hidden, suspended, or the link is invalid.",
+            "home": "Back to home"
+        }
     }
 }

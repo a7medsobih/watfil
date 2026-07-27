@@ -4,6 +4,7 @@ import NavbarActions from "./NavbarActions";
 import NavbarAuth from "./NavbarAuth";
 import NavbarBrand from "./NavbarBrand";
 import NavbarLinks from "./NavbarLinks";
+import { MiniCartTrigger } from "@/features/cart";
 
 export default function Navbar() {
   return (
@@ -15,6 +16,7 @@ export default function Navbar() {
           <div className="flex-1" />
           <NavbarActions />
           <NavbarAuth />
+          <MiniCartTrigger className="md:hidden" />
           <MobileMenu />
         </div>
         <MobileDrawer />

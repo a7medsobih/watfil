@@ -1,4 +1,4 @@
-import { ArrowRight, Eye } from "lucide-react";
+import { ArrowRight, Clock, Eye } from "lucide-react";
 
 import MediaImage from "@/components/common/MediaImage";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,7 @@ export default function BlogCard({
     article,
     locale = "en",
     readMoreLabel,
+    readTimeLabel,
     className = "",
 }) {
     return (
@@ -36,8 +37,18 @@ export default function BlogCard({
                 </div>
 
                 <div className="flex flex-1 flex-col p-6">
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                         <span>{formatDate(article.publishedAt, locale)}</span>
+
+                        {article.readingTimeMinutes > 0 && readTimeLabel && (
+                            <>
+                                <span>•</span>
+                                <span className="flex items-center gap-1">
+                                    <Clock className="h-3.5 w-3.5" />
+                                    {article.readingTimeMinutes} {readTimeLabel}
+                                </span>
+                            </>
+                        )}
 
                         {article.viewsCount > 0 && (
                             <>

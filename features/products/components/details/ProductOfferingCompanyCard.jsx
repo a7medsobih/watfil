@@ -30,6 +30,7 @@ export default function ProductOfferingCompanyCard({
   locale = "ar",
   className,
   labels = {},
+  selectedGovernorateId = null,
 }) {
   const t = useTranslations("product");
 
@@ -47,8 +48,9 @@ export default function ProductOfferingCompanyCard({
 
   const buyHref = product?.id
     ? buildCompanyProductHref(company.slug, product.id, {
-        source: product.source ?? product.likeSource ?? "catalog",
-      })
+      source: product.source ?? product.likeSource ?? "catalog",
+      governorate: selectedGovernorateId,
+    })
     : `/companies/${company.slug}`;
 
   const companyHref = `/companies/${company.slug}`;
