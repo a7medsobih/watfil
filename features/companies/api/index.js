@@ -4,6 +4,7 @@ export { getTopRatedCompanies } from "./get-top-rated-companies";
 export { getCompany } from "./get-company";
 export { getCompanyPersonalization } from "./get-company-personalization";
 export { getCompanyProducts } from "./get-company-products";
+export { getCompanyBillboards } from "./get-company-billboards";
 export { getCompanySimilarProducts } from "./get-company-similar-products";
 export { getCompanyProductDetails } from "./get-company-product-details";
 export { getPublicStore } from "./get-public-store";

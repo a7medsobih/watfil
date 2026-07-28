@@ -1,0 +1,315 @@
+{
+  "info": {
+    "name": "Watafl — Billboards",
+    "_postman_id": "watafl-billboards",
+    "description": "# Watafl — Billboards\n\nإعلانات صورة في متاجر الشركات مربوطة بمنتج مورد.\n\n**Docs:** `docs/WATAFL_BILLBOARDS.md`\n\n**Base:** `{{base_url}}`\n\n## ترتيب الاختبار\n1. Auth Admin\n2. Lookups (supplier + product + governorate companies)\n3. Create all_stores + selected_stores\n4. Public store billboards\n5. Toggle / delete\n",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://127.0.0.1:8000/api", "type": "string" },
+    { "key": "admin_email", "value": "admin@watafl.com", "type": "string" },
+    { "key": "admin_password", "value": "Admin@1234", "type": "string" },
+    { "key": "admin_token", "value": "", "type": "string" },
+    { "key": "supplier_id", "value": "1", "type": "string" },
+    { "key": "supplier_product_id", "value": "1", "type": "string" },
+    { "key": "governorate_id", "value": "1", "type": "string" },
+    { "key": "company_id", "value": "1", "type": "string" },
+    { "key": "billboard_id", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "0 — Auth Admin",
+      "item": [
+        {
+          "name": "POST Super Admin Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login 200', function () { pm.response.to.have.status(200); });",
+                  "var res = pm.response.json();",
+                  "if (res.token) pm.collectionVariables.set('admin_token', res.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{admin_email}}\",\n  \"password\": \"{{admin_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/super-admin/login",
+              "host": ["{{base_url}}"],
+              "path": ["super-admin", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1 — Lookups",
+      "item": [
+        {
+          "name": "GET Suppliers",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "var list = res.data || [];",
+                  "if (list[0] && list[0].id) pm.collectionVariables.set('supplier_id', String(list[0].id));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/super-admin/suppliers",
+              "host": ["{{base_url}}"],
+              "path": ["super-admin", "suppliers"]
+            }
+          }
+        },
+        {
+          "name": "GET Supplier Products by Supplier",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "var list = res.data || [];",
+                  "if (list[0] && list[0].id) pm.collectionVariables.set('supplier_product_id', String(list[0].id));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/super-admin/supplier-products?supplier_id={{supplier_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["super-admin", "supplier-products"],
+              "query": [{ "key": "supplier_id", "value": "{{supplier_id}}" }]
+            }
+          }
+        },
+        {
+          "name": "GET Companies for Targeting",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "var list = res.data || [];",
+                  "if (list[0] && list[0].id) pm.collectionVariables.set('company_id', String(list[0].id));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/super-admin/billboards/companies-for-targeting?governorate_id={{governorate_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["super-admin", "billboards", "companies-for-targeting"],
+              "query": [{ "key": "governorate_id", "value": "{{governorate_id}}" }]
+            },
+            "description": "## GET /super-admin/billboards/companies-for-targeting\n\nشركات نشطة تطابق المحافظة (HQ أو coverage)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 — Admin · Billboards CRUD",
+      "item": [
+        {
+          "name": "GET List Billboards",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/super-admin/billboards?per_page=20",
+              "host": ["{{base_url}}"],
+              "path": ["super-admin", "billboards"],
+              "query": [
+                { "key": "per_page", "value": "20" },
+                { "key": "is_active", "value": "1", "disabled": true },
+                { "key": "audience", "value": "all_stores", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST Create Billboard (all_stores)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Created 201', function () { pm.response.to.have.status(201); });",
+                  "var res = pm.response.json();",
+                  "if (res.data && res.data.id) pm.collectionVariables.set('billboard_id', String(res.data.id));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "supplier_id", "value": "{{supplier_id}}", "type": "text" },
+                { "key": "supplier_product_id", "value": "{{supplier_product_id}}", "type": "text" },
+                { "key": "audience", "value": "all_stores", "type": "text" },
+                { "key": "is_active", "value": "1", "type": "text" },
+                { "key": "sort_order", "value": "1", "type": "text" },
+                { "key": "image", "type": "file", "src": [], "description": "اختر صورة" }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/super-admin/billboards",
+              "host": ["{{base_url}}"],
+              "path": ["super-admin", "billboards"]
+            }
+          }
+        },
+        {
+          "name": "POST Create Billboard (selected_stores)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "supplier_id", "value": "{{supplier_id}}", "type": "text" },
+                { "key": "supplier_product_id", "value": "{{supplier_product_id}}", "type": "text" },
+                { "key": "audience", "value": "selected_stores", "type": "text" },
+                { "key": "governorate_id", "value": "{{governorate_id}}", "type": "text" },
+                { "key": "company_ids", "value": "[{{company_id}}]", "type": "text", "description": "JSON array string أو كرر الحقل" },
+                { "key": "is_active", "value": "1", "type": "text" },
+                { "key": "sort_order", "value": "2", "type": "text" },
+                { "key": "image", "type": "file", "src": [] }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/super-admin/billboards",
+              "host": ["{{base_url}}"],
+              "path": ["super-admin", "billboards"]
+            },
+            "description": "company_ids كـ JSON string في multipart، أو أضف عدة حقول company_ids[]"
+          }
+        },
+        {
+          "name": "GET Show Billboard",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/super-admin/billboards/{{billboard_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["super-admin", "billboards", "{{billboard_id}}"]
+            }
+          }
+        },
+        {
+          "name": "PATCH Toggle Status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/super-admin/billboards/{{billboard_id}}/toggle-status",
+              "host": ["{{base_url}}"],
+              "path": ["super-admin", "billboards", "{{billboard_id}}", "toggle-status"]
+            }
+          }
+        },
+        {
+          "name": "DELETE Billboard",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{admin_token}}", "type": "string" }]
+            },
+            "method": "DELETE",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/super-admin/billboards/{{billboard_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["super-admin", "billboards", "{{billboard_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 — Public · Company Store",
+      "item": [
+        {
+          "name": "GET Company Billboards",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/public/companies/{{company_id}}/billboards",
+              "host": ["{{base_url}}"],
+              "path": ["public", "companies", "{{company_id}}", "billboards"]
+            },
+            "description": "## GET /public/companies/{id}/billboards\n\nنشطة فقط + تطابق الاستهداف.\n\nعلى الضغط: افتح `target.path` → `/public/products/{id}`"
+          }
+        }
+      ]
+    }
+  ]
+}

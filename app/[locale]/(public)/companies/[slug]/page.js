@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 
 import {
   getCompany,
+  getCompanyBillboards,
   getCompanyProducts,
   getTopRatedCompanies,
 } from "@/features/companies/api";
@@ -12,6 +13,7 @@ import CompanyStorePage from "@/features/companies/components/store/CompanyStore
 import PersonalizedCompanyActions, {
   CompanyLikeFallback,
 } from "@/features/companies/components/store/PersonalizedCompanyActions";
+import { buildHeroSlides } from "@/features/companies/utils/build-hero-slides";
 import { buildMetadata } from "@/lib/seo/metadata";
 
 /** ISR: company details refresh every 5 minutes. */
@@ -81,10 +83,19 @@ export default async function CompanyStoreRoute({ params, searchParams }) {
     redirect(`/${locale}/companies/${encodeURIComponent(company.slug)}${qs}`);
   }
 
-  const { products, meta } = await getCompanyProducts(company.id, {
-    page,
-    per_page: 15,
-    locale,
+  // Billboards only after company profile succeeded; failures → [].
+  const [billboards, { products, meta }] = await Promise.all([
+    getCompanyBillboards(company.id),
+    getCompanyProducts(company.id, {
+      page,
+      per_page: 15,
+      locale,
+    }),
+  ]);
+
+  const heroSlides = buildHeroSlides({
+    billboards,
+    gallery: company.gallery,
   });
 
   return (
@@ -103,6 +114,7 @@ export default async function CompanyStoreRoute({ params, searchParams }) {
           products,
           productsCount: meta.total || company.productsCount,
         }}
+        heroSlides={heroSlides}
         productsMeta={meta}
         paginationLabels={{
           previous: t("pagination.previous"),

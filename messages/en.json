@@ -230,6 +230,8 @@
         "serviceLocations": "Service locations",
         "products": "Products",
         "gallery": "Gallery",
+        "sponsored": "Sponsored",
+        "sponsoredProduct": "View featured product from {name}",
         "contact": "Contact",
         "reviews": "reviews",
         "likes": "likes",

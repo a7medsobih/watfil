@@ -22,9 +22,11 @@ const CompanyHeroGallery = dynamic(
  * Composes the public company storefront.
  * Info card overlaps the lower half of the hero slider.
  * Products come from paginated GET /public/companies/{id}/products.
+ * Hero slides come from buildHeroSlides (billboards preferred over gallery).
  */
 export default function CompanyStorePage({
   company,
+  heroSlides = [],
   productsMeta = null,
   paginationLabels = {},
   likeSlot = null,
@@ -37,14 +39,14 @@ export default function CompanyStorePage({
 
   if (!view) return null;
 
-  const hasGallery = (view.gallery?.length ?? 0) > 0;
+  const hasHero = (heroSlides?.length ?? 0) > 0;
 
   return (
     <div className="pb-16">
-      <div className={cn(hasGallery && "relative")}>
-        {hasGallery && (
+      <div className={cn(hasHero && "relative")}>
+        {hasHero && (
           <CompanyHeroGallery
-            images={view.gallery}
+            slides={heroSlides}
             companyName={view.name}
           />
         )}
@@ -52,14 +54,14 @@ export default function CompanyStorePage({
         <div
           className={cn(
             "container",
-            hasGallery
+            hasHero
               ? "relative z-10 -mt-14 space-y-8 sm:-mt-20 sm:space-y-10 md:-mt-24"
               : "space-y-8 pt-6 sm:space-y-10 sm:pt-8",
           )}
         >
           <CompanyInfoCard
             company={view}
-            className={hasGallery ? "shadow-elegant" : undefined}
+            className={hasHero ? "shadow-elegant" : undefined}
             likeSlot={likeSlot}
           />
           <CompanyStoreTabs

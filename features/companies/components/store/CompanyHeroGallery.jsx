@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 import "swiper/css";
@@ -15,15 +17,19 @@ import "swiper/css/pagination";
 import styles from "./CompanyHeroGallery.module.css";
 
 /**
- * Full-bleed company gallery hero (Swiper).
+ * Full-bleed company hero carousel (Swiper).
+ * Consumes normalized `slides` from buildHeroSlides — gallery or billboards.
  * Fixed-height slides + object-cover for mixed image aspect ratios.
  */
 export default function CompanyHeroGallery({
+  slides: slidesProp,
+  /** @deprecated Prefer `slides` from buildHeroSlides */
   images = [],
   companyName = "",
   className,
 }) {
   const locale = useLocale();
+  const t = useTranslations("company");
   const dir = locale === "ar" ? "rtl" : "ltr";
   const uid = useId().replace(/:/g, "");
   const prevClass = `company-hero-prev-${uid}`;
@@ -33,7 +39,9 @@ export default function CompanyHeroGallery({
   const swiperRef = useRef(null);
   const [swiperReady, setSwiperReady] = useState(false);
 
-  const slides = (images ?? []).filter((item) => item?.url);
+  const slides = (Array.isArray(slidesProp) ? slidesProp : images).filter(
+    (item) => item?.url,
+  );
   const multi = slides.length > 1;
 
   useEffect(() => {
@@ -114,23 +122,54 @@ export default function CompanyHeroGallery({
         }}
         className={cn(styles.companyHeroSwiper, "w-full")}
       >
-        {slides.map((image, index) => (
-          <SwiperSlide key={image.id ?? image.url}>
-            <div className="relative h-[240px] w-full overflow-hidden bg-muted sm:h-[340px] md:h-[440px] lg:h-[500px]">
-              <img
-                src={image.url}
-                alt={`${companyName} — ${index + 1}`}
-                loading={index === 0 ? "eager" : "lazy"}
-                decoding="async"
-                className="h-full w-full object-cover"
-              />
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/70 via-background/10 to-transparent"
-              />
-            </div>
-          </SwiperSlide>
-        ))}
+        {slides.map((slide, index) => {
+          const isBillboard = slide.kind === "billboard";
+          const href = isBillboard ? slide.href : null;
+
+          return (
+            <SwiperSlide key={slide.id ?? slide.url}>
+              <div className="relative h-[240px] w-full overflow-hidden bg-muted sm:h-[340px] md:h-[440px] lg:h-[500px]">
+                {href ? (
+                  <Link
+                    href={href}
+                    className="absolute inset-0 z-[1] block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+                    aria-label={t("sponsoredProduct", { name: companyName })}
+                  >
+                    <img
+                      src={slide.url}
+                      alt={`${t("sponsored")} — ${companyName}`}
+                      loading={index === 0 ? "eager" : "lazy"}
+                      decoding="async"
+                      className="h-full w-full object-cover"
+                    />
+                  </Link>
+                ) : (
+                  <img
+                    src={slide.url}
+                    alt={`${companyName} — ${index + 1}`}
+                    loading={index === 0 ? "eager" : "lazy"}
+                    decoding="async"
+                    className="h-full w-full object-cover"
+                  />
+                )}
+
+                {isBillboard ? (
+                  <Badge
+                    variant="secondary"
+                    className="pointer-events-none absolute top-3 start-3 z-[2] border-border/40 bg-card/90 text-[11px] font-medium text-foreground shadow-soft backdrop-blur-sm sm:top-4 sm:start-4"
+                  >
+                    {t("sponsored")}
+                  </Badge>
+                ) : null}
+
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-background/70 via-background/10 to-transparent"
+                />
+              </div>
+            </SwiperSlide>
+          );
+        })}
       </Swiper>
     </section>
   );

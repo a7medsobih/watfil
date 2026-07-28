@@ -69,7 +69,7 @@ export default function StoreShareHero({
         aria-hidden
       >
         <div className="absolute inset-0 gradient-water opacity-80" />
-        <div className="absolute inset-0 bg-linear-to-t from-background via-background/40 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-background/55 via-background/15 to-transparent" />
         <div className="absolute inset-0 flex items-center justify-center">
           <ImageIcon
             className="size-14 text-muted-foreground/40 sm:size-16"
@@ -122,7 +122,7 @@ export default function StoreShareHero({
 
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-linear-to-t from-background via-background/35 to-background/10"
+        className="pointer-events-none absolute inset-0 bg-linear-to-t from-background/60 via-background/15 to-transparent"
       />
 
       {multi ? (

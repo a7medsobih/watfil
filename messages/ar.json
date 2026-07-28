@@ -230,6 +230,8 @@
         "serviceLocations": "أماكن الخدمة",
         "products": "المنتجات",
         "gallery": "المعرض",
+        "sponsored": "إعلان",
+        "sponsoredProduct": "عرض المنتج المميز من {name}",
         "contact": "تواصل",
         "reviews": "تقييم",
         "likes": "إعجاب",
