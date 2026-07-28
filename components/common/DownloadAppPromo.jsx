@@ -5,12 +5,17 @@ import { useTranslations } from "next-intl";
 import DownloadAppSection from "@/components/common/DownloadAppSection";
 
 /**
- * Localized DownloadAppSection for home / company placements.
- * @param {'home'|'company'} placement
+ * Localized DownloadAppSection for home / company / products placements.
+ * @param {'home'|'company'|'products'} placement
  */
 export default function DownloadAppPromo({ placement = "home", className }) {
   const t = useTranslations("downloadApp");
-  const key = placement === "company" ? "company" : "home";
+  const key =
+    placement === "company"
+      ? "company"
+      : placement === "products"
+        ? "products"
+        : "home";
 
   const benefits = [
     t("benefits.track"),

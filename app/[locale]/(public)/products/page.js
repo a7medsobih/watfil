@@ -3,51 +3,137 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Package } from "lucide-react";
 
 import AppPagination from "@/components/common/AppPagination";
+import DownloadAppPromo from "@/components/common/DownloadAppPromo";
 import EmptyState from "@/components/common/EmptyState";
 import PageHeader from "@/components/common/PageHeader";
 import ProductCard from "@/components/common/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Link } from "@/i18n/navigation";
-import { getCategories } from "@/features/categories/api";
+import {
+  collectStageOptions,
+  DEFAULT_FILTER_STAGES,
+  hasActiveProductFilters,
+} from "@/features/filters";
 import { getGovernorates } from "@/features/companies/api";
+import ProductsActiveFilters from "@/features/products/components/ProductsActiveFilters";
 import ProductsFilters from "@/features/products/components/ProductsFilters";
 import ProductsFiltersSheet from "@/features/products/components/ProductsFiltersSheet";
 import ProductsSearch from "@/features/products/components/ProductsSearch";
+import ProductsSort from "@/features/products/components/ProductsSort";
 import { getProducts } from "@/features/products/api";
 import {
   buildProductsHref,
   resolveProductsParams,
 } from "@/features/products/utils/resolve-products-params";
-import DownloadAppPromo from "@/components/common/DownloadAppPromo";
+import {
+  getChildCategories,
+  getParentCategories,
+  getProductTypes,
+  isFiltersProductType,
+} from "@/features/taxonomy";
+import { Link } from "@/i18n/navigation";
+
+function attachTaxonomyDisplay(products, { parentCategories = [], productTypes = [] } = {}) {
+  const parentsById = new Map(
+    parentCategories.map((category) => [String(category.id), category.name]),
+  );
+  const typesById = new Map(
+    productTypes.map((type) => [String(type.id), type]),
+  );
+
+  return products.map((product) => {
+    const typeFromLookup = typesById.get(String(product.productTypeId));
+    const productType =
+      typeFromLookup &&
+      (!product.productType?.label ||
+        product.productType.label === product.productTypeKey)
+        ? typeFromLookup
+        : product.productType;
+
+    return {
+      ...product,
+      productType: productType ?? product.productType,
+      parentCategoryName:
+        product.parentCategoryName ??
+        parentsById.get(String(product.parentCategoryId)) ??
+        null,
+    };
+  });
+}
 
 export default async function Page({ searchParams }) {
   const locale = await getLocale();
   const t = await getTranslations();
   const params = resolveProductsParams(await searchParams);
 
-  const [categories, governorates, { products, meta }] = await Promise.all([
-    getCategories(),
+  const [productTypes, governorates] = await Promise.all([
+    getProductTypes({ locale }),
     getGovernorates({ locale }),
-    getProducts({
-      ...params,
-      min_price: null,
-      max_price: null,
-    }),
   ]);
 
-  const hasActiveFilters = Boolean(
-    params.search || params.category_id || params.governorate_id,
+  const selectedType = productTypes.find(
+    (type) => String(type.id) === String(params.product_type_id),
   );
+
+  const [parentCategories, childCategories, { products: rawProducts, meta }] =
+    await Promise.all([
+      params.product_type_id
+        ? getParentCategories(params.product_type_id, { locale })
+        : Promise.resolve([]),
+      params.parent_category_id
+        ? getChildCategories(params.parent_category_id, {
+            locale,
+            product_type_id: params.product_type_id,
+          })
+        : Promise.resolve([]),
+      getProducts(params),
+    ]);
+
+  const products = attachTaxonomyDisplay(rawProducts, {
+    parentCategories,
+    productTypes,
+  });
+
+  const stageOptions = isFiltersProductType(selectedType)
+    ? (() => {
+        const stages = collectStageOptions(parentCategories, childCategories);
+        return stages.length > 0 ? stages : [...DEFAULT_FILTER_STAGES];
+      })()
+    : [];
+
+  const hasFilters = hasActiveProductFilters(params);
 
   const filterLabels = {
     filters: t("products.filters"),
+    productType: t("products.productType"),
+    parentCategory: t("products.parentCategory"),
     category: t("products.category"),
+    stages: t("products.stages"),
+    price: t("products.price"),
     governorate: t("products.governorate"),
     governorateHint: t("products.governorateHint"),
     allGovernorates: t("products.allGovernorates"),
     all: t("products.all"),
     reset: t("products.resetFilters"),
+  };
+
+  const activeFilterLabels = {
+    ...filterLabels,
+    search: t("products.search"),
+    clearAll: t("products.clearAll"),
+    removeFilter: t("products.removeFilter"),
+    sort: t("products.sortLabel"),
+    sortPriceAsc: t("products.sort.priceAsc"),
+    sortPriceDesc: t("products.sort.priceDesc"),
+    sortPopular: t("products.sort.popular"),
+  };
+
+  const sortLabels = {
+    sortLabel: t("products.sortLabel"),
+    newest: t("products.sort.newest"),
+    priceAsc: t("products.sort.priceAsc"),
+    priceDesc: t("products.sort.priceDesc"),
+    popular: t("products.sort.popular"),
   };
 
   return (
@@ -60,7 +146,9 @@ export default async function Page({ searchParams }) {
           { label: t("nav.products") },
         ]}
         actions={
-          <Suspense fallback={<Skeleton className="h-11 w-full max-w-md rounded-full" />}>
+          <Suspense
+            fallback={<Skeleton className="h-11 w-full max-w-md rounded-full" />}
+          >
             <ProductsSearch placeholder={t("products.searchPlaceholder")} />
           </Suspense>
         }
@@ -73,9 +161,13 @@ export default async function Page({ searchParams }) {
           </p>
           <Suspense fallback={<Skeleton className="h-10 w-36 rounded-xl" />}>
             <ProductsFiltersSheet
-              categories={categories}
+              productTypes={productTypes}
+              parentCategories={parentCategories}
+              childCategories={childCategories}
               governorates={governorates}
+              stageOptions={stageOptions}
               labels={filterLabels}
+              locale={locale}
             />
           </Suspense>
         </div>
@@ -86,14 +178,38 @@ export default async function Page({ searchParams }) {
               fallback={<Skeleton className="h-[420px] w-full rounded-3xl" />}
             >
               <ProductsFilters
-                categories={categories}
+                productTypes={productTypes}
+                parentCategories={parentCategories}
+                childCategories={childCategories}
                 governorates={governorates}
+                stageOptions={stageOptions}
                 labels={filterLabels}
+                locale={locale}
               />
             </Suspense>
           </div>
 
           <div>
+            <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+              <p className="hidden text-sm text-muted-foreground lg:block">
+                {t("products.count", { count: meta.total })}
+              </p>
+              <Suspense fallback={<Skeleton className="h-9 w-40 rounded-full" />}>
+                <ProductsSort labels={sortLabels} className="ms-auto" />
+              </Suspense>
+            </div>
+
+            <Suspense fallback={null}>
+              <ProductsActiveFilters
+                productTypes={productTypes}
+                parentCategories={parentCategories}
+                childCategories={childCategories}
+                governorates={governorates}
+                labels={activeFilterLabels}
+                locale={locale}
+              />
+            </Suspense>
+
             {products.length > 0 ? (
               <>
                 <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
@@ -118,11 +234,8 @@ export default async function Page({ searchParams }) {
                   }}
                   hrefBuilder={(page) =>
                     buildProductsHref({
-                      search: params.search,
-                      category_id: params.category_id,
-                      governorate_id: params.governorate_id,
+                      ...params,
                       page,
-                      per_page: params.per_page,
                     })
                   }
                 />
@@ -133,7 +246,7 @@ export default async function Page({ searchParams }) {
                 title={t("products.emptyTitle")}
                 description={t("products.empty")}
                 action={
-                  hasActiveFilters ? (
+                  hasFilters ? (
                     <Button variant="outline" asChild>
                       <Link href="/products">{t("products.resetFilters")}</Link>
                     </Button>
@@ -144,10 +257,10 @@ export default async function Page({ searchParams }) {
           </div>
         </div>
       </section>
-      <section className="pb-10 ">
+
+      <section className="pb-10">
         <DownloadAppPromo placement="products" />
       </section>
-
     </>
   );
 }

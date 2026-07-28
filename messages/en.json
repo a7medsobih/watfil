@@ -89,14 +89,22 @@
         "title": "All products",
         "subtitle": "Browse Watfil products, then choose a certified company near you to buy.",
         "count": "{count} products",
+        "search": "Search",
         "searchPlaceholder": "Search by name, description, or SKU…",
         "filters": "Filters",
+        "sortLabel": "Sort",
         "sort": {
+            "newest": "Newest",
             "new": "Newest",
             "popular": "Popular",
-            "rating": "Top rated"
+            "rating": "Top rated",
+            "priceAsc": "Price: Low to High",
+            "priceDesc": "Price: High to Low"
         },
+        "productType": "Product type",
+        "parentCategory": "Main category",
         "category": "Category",
+        "stages": "Number of stages",
         "brand": "Brand",
         "governorate": "Governorate",
         "price": "Price",
@@ -107,6 +115,8 @@
         "allGovernorates": "All governorates",
         "governorateHint": "Shows products available from companies serving this governorate.",
         "resetFilters": "Reset filters",
+        "clearAll": "Clear all",
+        "removeFilter": "Remove filter",
         "emptyTitle": "No products found",
         "empty": "Try adjusting your search or filters."
     },
@@ -618,6 +628,10 @@
             "title": "Complete your journey with the Watfil app",
             "description": "Installation, maintenance, filter changes, and warranty — all inside the app after purchase."
         },
+        "products": {
+            "title": "Browse and manage everything in the Watfil app",
+            "description": "Save products, follow offers from certified companies, and handle installation and maintenance after purchase."
+        },
         "benefits": {
             "track": "Track orders",
             "installation": "Installation status",
@@ -634,12 +648,22 @@
         "openingApp": "Opening the app…",
         "installHint": "App not installed? Download Watfil to open this store.",
         "getItOn": "Get it on",
+        "taxNumber": "Tax number",
+        "about": "About",
+        "aboutTitle": "About Company",
+        "openInApp": "Open in App",
+        "downloadApp": "Download App",
+        "viewStore": "View Store on Website",
+        "cta": {
+            "title": "Open this store in the Watfil App",
+            "description": "A clearer, faster experience in the app — or download it if you don’t have it yet."
+        },
         "app": {
             "title": "Continue in the Watfil app",
             "description": "Browse this company store, products, and after-purchase services on your phone."
         },
         "unavailable": {
-            "title": "Store unavailable",
+            "title": "Store Not Available",
             "description": "This company store is not available right now. It may be hidden, suspended, or the link is invalid.",
             "home": "Back to home"
         }

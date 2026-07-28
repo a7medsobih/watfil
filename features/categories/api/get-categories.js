@@ -1,17 +1,13 @@
-import { fetchFromAPI } from "@/lib/api/fetcher";
-import { endpoints } from "@/lib/api/endpoints";
-import { cacheTags, revalidate } from "@/lib/cache";
-import { mapCategories } from "@/features/categories/services/category.mapper";
+import { getTaxonomyCategories } from "@/features/taxonomy/api";
 
 /**
- * Fetches public product categories.
+ * Backwards-compatible categories list.
+ * Prefer taxonomy helpers when cascading by product type / parent.
+ *
+ * @param {object} [params]
+ * @param {{ locale?: string }} [options]
  * @returns {Promise<object[]>}
  */
-export async function getCategories() {
-  const response = await fetchFromAPI(endpoints.categories.list, {
-    revalidate: revalidate.long,
-    tags: [cacheTags.categories],
-  });
-
-  return mapCategories(response?.data ?? []);
+export async function getCategories(params = {}, options = {}) {
+  return getTaxonomyCategories(params, options);
 }

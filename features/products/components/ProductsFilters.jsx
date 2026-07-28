@@ -1,6 +1,6 @@
 "use client";
 
-import { useId } from "react";
+import { useId, useMemo } from "react";
 import { SlidersHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -11,40 +11,55 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DEFAULT_FILTER_STAGES,
+  FilterChipGroup,
+  FilterGroup,
+  FilterRadioOption,
+  PRICE_MAX,
+  PRICE_MIN,
+  PriceRangeFilter,
+  collectStageOptions,
+} from "@/features/filters";
 import { useProductsQuery } from "@/features/products/hooks/use-products-query";
+import { isFiltersProductType } from "@/features/taxonomy";
 import { cn } from "@/lib/utils";
 
 const ALL_OPTION = "all";
 
-function FilterGroup({ label, children }) {
-  return (
-    <div className="border-t border-border/60 pt-5 first:border-t-0 first:pt-0">
-      <h3 className="mb-3 text-sm font-semibold text-foreground">{label}</h3>
-      {children}
-    </div>
-  );
-}
-
 /**
- * Catalog products filters — category + governorate (companies service areas).
+ * Catalog products filters — taxonomy cascade + price + governorate.
  */
 export default function ProductsFilters({
-  categories = [],
+  productTypes = [],
+  parentCategories = [],
+  childCategories = [],
   governorates = [],
+  stageOptions,
   labels,
+  locale = "ar",
   className,
   showHeader = true,
 }) {
-  const { params, update, reset } = useProductsQuery();
+  const { params, update, reset } = useProductsQuery({ productTypes });
+  const typeGroupName = `product-type-${useId()}`;
+  const parentGroupName = `parent-category-${useId()}`;
   const categoryGroupName = `category-${useId()}`;
 
-  const selectedCategory = params.category_id
-    ? String(params.category_id)
-    : ALL_OPTION;
+  const selectedType = productTypes.find(
+    (type) => String(type.id) === String(params.product_type_id),
+  );
+  const showStages = isFiltersProductType(selectedType);
 
-  const selectedGovernorate = params.governorate_id
-    ? String(params.governorate_id)
-    : ALL_OPTION;
+  const stages = useMemo(() => {
+    if (Array.isArray(stageOptions) && stageOptions.length > 0) {
+      return stageOptions;
+    }
+    const fromTaxonomy = collectStageOptions(parentCategories, childCategories);
+    return fromTaxonomy.length > 0 ? fromTaxonomy : [...DEFAULT_FILTER_STAGES];
+  }, [stageOptions, parentCategories, childCategories]);
+
+  const currencyLabel = locale === "ar" ? "ج.م" : "EGP";
 
   return (
     <aside
@@ -61,85 +76,113 @@ export default function ProductsFilters({
       )}
 
       <div className="space-y-5">
-        <FilterGroup label={labels.category}>
-          <div>
-            <label
-              className={cn(
-                "flex cursor-pointer items-center gap-3 rounded-2xl border px-3 py-2 text-sm transition-colors",
-                selectedCategory === "all"
-                  ? "border-primary/30 text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground",
-              )}
-            >
-              <span
-                className={cn(
-                  "grid size-4 place-items-center rounded-full border",
-                  selectedCategory === "all"
-                    ? "border-primary"
-                    : "border-border",
-                )}
-              >
-                <span
-                  className={cn(
-                    "size-2 rounded-full bg-primary transition-opacity",
-                    selectedCategory === "all" ? "opacity-100" : "opacity-0",
-                  )}
-                />
-              </span>
-              <input
-                type="radio"
-                name={categoryGroupName}
-                className="sr-only"
-                checked={selectedCategory === "all"}
-                onChange={() => update({ category_id: null })}
+        {productTypes.length > 0 && (
+          <FilterGroup label={labels.productType}>
+            <div>
+              <FilterRadioOption
+                name={typeGroupName}
+                checked={!params.product_type_id}
+                onChange={() => update({ product_type_id: null })}
+                label={labels.all}
               />
-              <span>{labels.all}</span>
-            </label>
+              {productTypes.map((type) => (
+                <FilterRadioOption
+                  key={type.id}
+                  name={typeGroupName}
+                  checked={String(params.product_type_id) === String(type.id)}
+                  onChange={() => update({ product_type_id: type.id })}
+                  label={type.label}
+                />
+              ))}
+            </div>
+          </FilterGroup>
+        )}
 
-            {categories.map((category) => {
-              const isActive = selectedCategory === String(category.id);
-
-              return (
-                <label
+        {params.product_type_id && parentCategories.length > 0 && (
+          <FilterGroup label={labels.parentCategory}>
+            <div>
+              <FilterRadioOption
+                name={parentGroupName}
+                checked={!params.parent_category_id}
+                onChange={() => update({ parent_category_id: null })}
+                label={labels.all}
+              />
+              {parentCategories.map((category) => (
+                <FilterRadioOption
                   key={category.id}
-                  className={cn(
-                    "flex cursor-pointer items-center gap-3 rounded-2xl border px-3 py-2.5 text-sm transition-colors",
-                    isActive
-                      ? "border-primary/30 text-foreground"
-                      : "border-transparent text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "grid size-4 place-items-center rounded-full border",
-                      isActive ? "border-primary" : "border-border",
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        "size-2 rounded-full bg-primary transition-opacity",
-                        isActive ? "opacity-100" : "opacity-0",
-                      )}
-                    />
-                  </span>
-                  <input
-                    type="radio"
-                    name={categoryGroupName}
-                    className="sr-only"
-                    checked={isActive}
-                    onChange={() => update({ category_id: category.id })}
-                  />
-                  <span className="capitalize">{category.name}</span>
-                </label>
-              );
-            })}
-          </div>
+                  name={parentGroupName}
+                  checked={
+                    String(params.parent_category_id) === String(category.id)
+                  }
+                  onChange={() => update({ parent_category_id: category.id })}
+                  label={category.name}
+                />
+              ))}
+            </div>
+          </FilterGroup>
+        )}
+
+        {params.parent_category_id && childCategories.length > 0 && (
+          <FilterGroup label={labels.category}>
+            <div>
+              <FilterRadioOption
+                name={categoryGroupName}
+                checked={!params.category_id}
+                onChange={() => update({ category_id: null })}
+                label={labels.all}
+              />
+              {childCategories.map((category) => (
+                <FilterRadioOption
+                  key={category.id}
+                  name={categoryGroupName}
+                  checked={String(params.category_id) === String(category.id)}
+                  onChange={() => update({ category_id: category.id })}
+                  label={category.name}
+                />
+              ))}
+            </div>
+          </FilterGroup>
+        )}
+
+        {showStages && (
+          <FilterGroup label={labels.stages}>
+            <FilterChipGroup
+              options={stages.map((stage) => ({
+                id: stage,
+                label: String(stage),
+              }))}
+              value={params.number_of_stages}
+              onChange={(value) =>
+                update({
+                  number_of_stages: value == null ? null : value,
+                })
+              }
+              allLabel={labels.all}
+              getOptionValue={(option) => option.id}
+              getOptionLabel={(option) => option.label}
+            />
+          </FilterGroup>
+        )}
+
+        <FilterGroup label={labels.price}>
+          <PriceRangeFilter
+            min={PRICE_MIN}
+            max={PRICE_MAX}
+            minValue={params.min_price}
+            maxValue={params.max_price}
+            currencyLabel={currencyLabel}
+            onChange={(range) => update(range)}
+          />
         </FilterGroup>
 
         {governorates.length > 0 && (
           <FilterGroup label={labels.governorate}>
             <Select
-              value={selectedGovernorate}
+              value={
+                params.governorate_id
+                  ? String(params.governorate_id)
+                  : ALL_OPTION
+              }
               onValueChange={(value) =>
                 update({
                   governorate_id: value === ALL_OPTION ? null : value,

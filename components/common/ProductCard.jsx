@@ -189,11 +189,30 @@ export default function ProductCard({
       </div>
 
       <div className="flex flex-1 flex-col p-5">
-        {product.category && (
-          <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            {product.category.name}
-          </span>
-        )}
+        {(product.productType?.label ||
+          product.category?.name ||
+          product.parentCategoryName) && (
+            <div className="mb-2 flex flex-wrap gap-1.5">
+              {product.productType?.label ? (
+                <Badge
+                  variant="secondary"
+                  className="rounded-full bg-primary/10 text-primary"
+                >
+                  {product.productType.label}
+                </Badge>
+              ) : null}
+              {product.parentCategoryName ? (
+                <Badge variant="outline" className="rounded-full">
+                  {product.parentCategoryName}
+                </Badge>
+              ) : null}
+              {product.category?.name ? (
+                <Badge variant="ghost" className="rounded-full">
+                  {product.category.name}
+                </Badge>
+              ) : null}
+            </div>
+          )}
 
         <h3 className="my-2 line-clamp-2 text-base font-semibold leading-snug transition-colors group-hover:text-primary">
           {product.name}
@@ -245,10 +264,21 @@ export default function ProductCard({
 
         <div className="mt-auto pt-5">
           {isCatalogVariant ? (
-            <div className="border-t border-border/60 pt-4">
-              <span className="inline-flex text-sm font-semibold text-primary">
-                {t("viewDetails")}
-              </span>
+            <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1 border-t border-border/60 pt-4">
+              {product.cashPrice > 0 ? (
+                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                  <span className="text-xl font-bold text-primary">
+                    {product.cashPrice.toLocaleString()}
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    {locale === "ar" ? "ج.م" : "EGP"}
+                  </span>
+                </div>
+              ) : (
+                <span className="text-sm font-semibold text-primary">
+                  {t("viewDetails")}
+                </span>
+              )}
             </div>
           ) : (
             <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 border-t border-border/60 pt-4">

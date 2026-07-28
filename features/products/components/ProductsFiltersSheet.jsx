@@ -16,9 +16,13 @@ import ProductsFilters from "@/features/products/components/ProductsFilters";
  * Mobile/tablet filters trigger + sheet. Reuses ProductsFilters.
  */
 export default function ProductsFiltersSheet({
-  categories,
+  productTypes,
+  parentCategories,
+  childCategories,
   governorates,
+  stageOptions,
   labels,
+  locale,
 }) {
   return (
     <Sheet>
@@ -39,9 +43,13 @@ export default function ProductsFiltersSheet({
 
         <div className="p-4">
           <ProductsFilters
-            categories={categories}
+            productTypes={productTypes}
+            parentCategories={parentCategories}
+            childCategories={childCategories}
             governorates={governorates}
+            stageOptions={stageOptions}
             labels={labels}
+            locale={locale}
             showHeader={false}
             className="border-0 p-0 shadow-none lg:static"
           />

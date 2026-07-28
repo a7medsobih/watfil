@@ -1,12 +1,34 @@
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import ThemeToggle from "@/components/ThemeToggle";
+import { MiniCartTrigger } from "@/features/cart";
+
 import MobileDrawer from "./MobileDrawer";
 import MobileMenu from "./MobileMenu";
 import NavbarActions from "./NavbarActions";
 import NavbarAuth from "./NavbarAuth";
 import NavbarBrand from "./NavbarBrand";
 import NavbarLinks from "./NavbarLinks";
-import { MiniCartTrigger } from "@/features/cart";
 
-export default function Navbar() {
+/**
+ * @param {{ variant?: "default" | "minimal" }} props
+ * `minimal` — logo + language + theme only (store share landing).
+ */
+export default function Navbar({ variant = "default" }) {
+  if (variant === "minimal") {
+    return (
+      <header className="sticky top-0 z-50 w-full">
+        <div className="glass-strong border-b border-border/60">
+          <div className="container flex h-16 items-center gap-3 md:h-18">
+            <NavbarBrand />
+            <div className="flex-1" />
+            <LanguageSwitcher />
+            <ThemeToggle />
+          </div>
+        </div>
+      </header>
+    );
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full">
       <div className="glass-strong border-b border-border/60">

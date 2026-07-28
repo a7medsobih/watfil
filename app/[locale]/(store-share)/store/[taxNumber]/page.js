@@ -1,8 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 
-import {
-  getPublicStore,
-} from "@/features/companies/api";
+import { getPublicStore } from "@/features/companies/api";
 import StoreSharePage, {
   StoreShareNotAvailable,
 } from "@/features/companies/components/share/StoreSharePage";

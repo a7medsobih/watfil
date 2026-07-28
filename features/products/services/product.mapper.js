@@ -155,6 +155,21 @@ export function mapProduct(product, locale = "ar") {
       : null;
 
   const category = mapCategory(product.category, locale);
+  const flatProductType =
+    typeof product.product_type === "string"
+      ? {
+          id: product.product_type_id ?? null,
+          name: product.product_type,
+          nameAr: "",
+          label:
+            locale === "en"
+              ? product.product_type
+              : product.product_type,
+          key: String(product.product_type).toLowerCase(),
+        }
+      : mapProductType(product.product_type, locale);
+
+  const productType = category?.productType ?? flatProductType ?? null;
 
   return {
     id: product.id,
@@ -164,9 +179,24 @@ export function mapProduct(product, locale = "ar") {
     image: product.image || PRODUCT_IMAGE_PLACEHOLDER,
     description: product.description ?? null,
     category,
+    categoryId: product.category_id ?? category?.id ?? null,
+    parentCategoryId:
+      product.parent_category_id ?? category?.parentCategoryId ?? null,
+    productTypeId:
+      product.product_type_id ?? category?.productTypeId ?? productType?.id ?? null,
+    /** Raw API product_type key (e.g. "filters"). */
+    productTypeKey:
+      (typeof product.product_type === "string"
+        ? product.product_type
+        : product.product_type?.name) ??
+      productType?.name ??
+      null,
     supplier: mapSupplier(product.supplier),
-    productType: category?.productType ?? null,
-    numberOfStages: category?.numberOfStages ?? null,
+    productType,
+    numberOfStages:
+      product.number_of_stages != null
+        ? Number(product.number_of_stages)
+        : (category?.numberOfStages ?? null),
     source,
     companyId: product.company_id ?? product.company?.id ?? null,
     /** Prefer explicit company_product_id for POST /customer/orders items. */

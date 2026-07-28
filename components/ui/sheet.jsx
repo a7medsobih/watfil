@@ -11,12 +11,24 @@ function Sheet({ ...props }) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />;
 }
 
-function SheetTrigger({ ...props }) {
-  return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...props} />;
+function SheetTrigger({ className, ...props }) {
+  return (
+    <SheetPrimitive.Trigger
+      data-slot="sheet-trigger"
+      className={cn("cursor-pointer disabled:cursor-not-allowed", className)}
+      {...props}
+    />
+  );
 }
 
-function SheetClose({ ...props }) {
-  return <SheetPrimitive.Close data-slot="sheet-close" {...props} />;
+function SheetClose({ className, ...props }) {
+  return (
+    <SheetPrimitive.Close
+      data-slot="sheet-close"
+      className={cn("cursor-pointer disabled:cursor-not-allowed", className)}
+      {...props}
+    />
+  );
 }
 
 function SheetPortal({ ...props }) {
