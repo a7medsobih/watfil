@@ -2,51 +2,68 @@
 
 import { useEffect } from "react";
 
-import { getLikedProducts } from "@/features/wishlist/api";
+import { fetchAllLikedIds } from "@/features/wishlist/api";
 import {
   clearCustomerTokenCookie,
   setCustomerTokenCookie,
 } from "@/lib/auth/customer-token";
 import { useAuthStore } from "@/stores/auth-store";
-import { useWishlistCountStore } from "@/stores/wishlist-count-store";
+import { useLikesStore } from "@/stores/likes-store";
 
 /**
  * Marks auth store hydrated, syncs token cookie for RSC fetches,
- * refreshes /me, and seeds wishlist navbar count.
+ * refreshes /me, and hydrates the unified likes store from GET /customer/likes.
  */
 export default function AuthBootstrap() {
   const token = useAuthStore((state) => state.token);
-  const isHydrated = useAuthStore((state) => state.isHydrated);
-  const setHydrated = useAuthStore((state) => state.setHydrated);
+  const isAuthHydrated = useAuthStore((state) => state.isHydrated);
+  const setAuthHydrated = useAuthStore((state) => state.setHydrated);
   const refreshMe = useAuthStore((state) => state.refreshMe);
-  const setWishlistCount = useWishlistCountStore((state) => state.setCount);
-  const resetWishlistCount = useWishlistCountStore((state) => state.reset);
+  const hydrateLikes = useLikesStore((state) => state.hydrate);
+  const clearLikes = useLikesStore((state) => state.clear);
+  const setLikesHydrated = useLikesStore((state) => state.setHydrated);
 
   useEffect(() => {
-    setHydrated(true);
-  }, [setHydrated]);
+    setAuthHydrated(true);
+  }, [setAuthHydrated]);
 
   useEffect(() => {
-    if (!isHydrated) return;
+    if (!isAuthHydrated) return;
+
+    let cancelled = false;
 
     if (!token) {
       clearCustomerTokenCookie();
-      resetWishlistCount();
-      return;
+      clearLikes();
+      setLikesHydrated(true);
+      return undefined;
     }
 
     setCustomerTokenCookie(token);
     refreshMe().catch(() => {});
 
-    getLikedProducts(token)
-      .then((result) => {
-        const total = result?.meta?.total;
-        setWishlistCount(
-          total != null ? total : (result?.products?.length ?? 0),
-        );
+    // Avoid flicker after login: keep previous hydrated state while refreshing IDs.
+    fetchAllLikedIds(token)
+      .then((ids) => {
+        if (cancelled) return;
+        hydrateLikes(ids);
       })
-      .catch(() => {});
-  }, [isHydrated, token, refreshMe, setWishlistCount, resetWishlistCount]);
+      .catch(() => {
+        if (cancelled) return;
+        setLikesHydrated(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    isAuthHydrated,
+    token,
+    refreshMe,
+    hydrateLikes,
+    clearLikes,
+    setLikesHydrated,
+  ]);
 
   return null;
 }

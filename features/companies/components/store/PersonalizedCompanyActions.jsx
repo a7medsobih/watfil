@@ -1,8 +1,9 @@
 import { getCompanyPersonalization } from "@/features/companies/api/get-company-personalization";
 import CompanyLikeCluster from "@/features/companies/components/store/CompanyLikeCluster";
+import { CompanyPersonalizationHydrator } from "@/features/companies/context/company-personalization-context";
 
 /**
- * Suspense island: company like without blocking the ISR shell.
+ * Suspense island: company like + my_rating without blocking the ISR shell.
  */
 export default async function PersonalizedCompanyActions({
   slugOrId,
@@ -11,11 +12,14 @@ export default async function PersonalizedCompanyActions({
   const { isLiked, myRating } = await getCompanyPersonalization(slugOrId);
 
   return (
-    <CompanyLikeCluster
-      company={{ ...company, isLiked, myRating }}
-      initialLiked={isLiked}
-      initialLikesCount={company.likes ?? 0}
-    />
+    <>
+      <CompanyPersonalizationHydrator myRating={myRating} isLiked={isLiked} />
+      <CompanyLikeCluster
+        company={{ ...company, isLiked, myRating }}
+        initialLiked={isLiked}
+        initialLikesCount={company.likes ?? 0}
+      />
+    </>
   );
 }
 

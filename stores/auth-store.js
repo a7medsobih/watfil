@@ -10,6 +10,7 @@ import {
   clearCustomerTokenCookie,
   setCustomerTokenCookie,
 } from "@/lib/auth/customer-token";
+import { useLikesStore } from "@/stores/likes-store";
 
 /**
  * Customer auth session (token + profile).
@@ -37,6 +38,7 @@ export const useAuthStore = create(
 
       clearSession: () => {
         clearCustomerTokenCookie();
+        useLikesStore.getState().clear();
         set({ token: null, user: null });
       },
 
@@ -65,6 +67,7 @@ export const useAuthStore = create(
         } catch (error) {
           if (error?.status === 401 || error?.status === 403) {
             clearCustomerTokenCookie();
+            useLikesStore.getState().clear();
             set({ token: null, user: null });
           }
           throw error;
@@ -79,6 +82,7 @@ export const useAuthStore = create(
           // Clear local session even if the API call fails.
         } finally {
           clearCustomerTokenCookie();
+          useLikesStore.getState().clear();
           set({ token: null, user: null });
         }
       },

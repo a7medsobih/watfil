@@ -15,27 +15,18 @@ export default function NavbarBrand() {
     return (
       <Link
         href={`/companies/${brand.slug}`}
-        className="group flex min-w-0 shrink-0 items-center gap-2.5"
+        className="group flex min-w-0 shrink-0 items-center gap-2"
       >
         {brand.hasLogo && brand.logo ? (
           <img
             src={brand.logo}
             alt={brand.name}
-            width={40}
-            height={40}
-            className="size-10 rounded-xl object-cover"
+            width={36}
+            height={36}
+            className="size-8 shrink-0 rounded-lg object-cover sm:size-9 sm:rounded-xl"
           />
-        ) : (
-          <Image
-            src={logo}
-            alt={t("brand.name")}
-            width={140}
-            height={40}
-            priority
-            className="h-9 w-auto"
-          />
-        )}
-        <span className="max-w-36 truncate text-sm font-bold tracking-tight sm:max-w-56 sm:text-base">
+        ) : null}
+        <span className="max-w-[9rem] truncate text-sm font-bold tracking-tight sm:max-w-[14rem] sm:text-base">
           {brand.name}
         </span>
       </Link>

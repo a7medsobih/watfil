@@ -1,11 +1,10 @@
 import { Suspense } from "react";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 
 import {
   getCompany,
   getCompanyBillboards,
-  getCompanyProducts,
   getTopRatedCompanies,
 } from "@/features/companies/api";
 import { CompanyBrandSetter } from "@/features/companies/context/company-brand-context";
@@ -69,7 +68,6 @@ export async function generateMetadata({ params }) {
 export default async function CompanyStoreRoute({ params, searchParams }) {
   const { slug } = await params;
   const locale = await getLocale();
-  const t = await getTranslations();
   const resolvedSearchParams = await searchParams;
   const page = readPage(resolvedSearchParams);
 
@@ -84,14 +82,7 @@ export default async function CompanyStoreRoute({ params, searchParams }) {
   }
 
   // Billboards only after company profile succeeded; failures → [].
-  const [billboards, { products, meta }] = await Promise.all([
-    getCompanyBillboards(company.id),
-    getCompanyProducts(company.id, {
-      page,
-      per_page: 15,
-      locale,
-    }),
-  ]);
+  const billboards = await getCompanyBillboards(company.id);
 
   const heroSlides = buildHeroSlides({
     billboards,
@@ -109,17 +100,8 @@ export default async function CompanyStoreRoute({ params, searchParams }) {
         }}
       />
       <CompanyStorePage
-        company={{
-          ...company,
-          products,
-          productsCount: meta.total || company.productsCount,
-        }}
+        company={company}
         heroSlides={heroSlides}
-        productsMeta={meta}
-        paginationLabels={{
-          previous: t("pagination.previous"),
-          next: t("pagination.next"),
-        }}
         likeSlot={
           <Suspense fallback={<CompanyLikeFallback />}>
             <PersonalizedCompanyActions

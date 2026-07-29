@@ -351,7 +351,7 @@
 @utility container {
   width: 100%;
   margin-inline: auto;
-  padding-inline: 1rem;
+  padding-inline: 0.5rem;
 }
 
 /* @media (min-width: 640px) {
@@ -503,7 +503,7 @@
   color: var(--muted-foreground);
 }
 
-.article-content > * + * {
+.article-content>*+* {
   margin-top: 1.25rem;
 }
 
@@ -550,7 +550,7 @@
   padding-inline-start: 1.25rem;
 }
 
-.article-content li + li {
+.article-content li+li {
   margin-top: 0.5rem;
 }
 

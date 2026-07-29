@@ -125,7 +125,8 @@ function RatingCard({ item, locale, labels }) {
 }
 
 /**
- * Company ratings list + create/update/delete form (customer ratings API).
+ * Company ratings: public reviews first, then create/update/delete form.
+ * Matches customer company rating API (not product ratings).
  */
 export default function CompanyRatingsPanel({
   companyId,
@@ -142,6 +143,7 @@ export default function CompanyRatingsPanel({
   const router = useRouter();
   const isAuthenticated = useIsAuthenticated();
   const token = useAuthStore((state) => state.token);
+  const user = useAuthStore((state) => state.user);
   const { openLogin } = useRequireAuth("login");
 
   const [ratings, setRatings] = useState(initialRatings);
@@ -152,6 +154,15 @@ export default function CompanyRatingsPanel({
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
   const [sort, setSort] = useState("newest");
+
+  const ownRating = useMemo(() => {
+    const userId = user?.id;
+    if (userId == null) return null;
+    return (
+      ratings.find((item) => item.customer?.id != null && Number(item.customer.id) === Number(userId)) ??
+      null
+    );
+  }, [ratings, user?.id]);
 
   useEffect(() => {
     setRatings(initialRatings);
@@ -166,6 +177,19 @@ export default function CompanyRatingsPanel({
     initialAverage,
     initialCount,
   ]);
+
+  // Prefer explicit my_rating; fall back to matching the logged-in customer in ratings[].
+  useEffect(() => {
+    if (initialMyRating != null) return;
+    if (ownRating?.rating == null) return;
+    setMyRating(ownRating.rating);
+    setDraftRating(ownRating.rating);
+  }, [initialMyRating, ownRating]);
+
+  // Prefill optional comment from the customer's existing review.
+  useEffect(() => {
+    setComment(ownRating?.comment ?? "");
+  }, [companyId, ownRating?.id, ownRating?.comment]);
 
   const labels = useMemo(
     () => ({
@@ -220,20 +244,21 @@ export default function CompanyRatingsPanel({
 
     setLoading(true);
     try {
+      const trimmed = comment.trim();
       const response = await rateCompany(
         companyId,
         {
           rating: draftRating,
-          comment: comment.trim() ? comment.trim() : null,
+          // Send comment key so empty clears; API only updates when key is present.
+          comment: trimmed.length > 0 ? trimmed : null,
         },
         token,
       );
       applySummary(response?.data ?? response);
       toast.success(t("ratings.toast.saved"));
-      setComment("");
       router.refresh();
-    } catch {
-      toast.error(t("ratings.toast.error"));
+    } catch (error) {
+      toast.error(error?.message || t("ratings.toast.error"));
     } finally {
       setLoading(false);
     }
@@ -253,8 +278,8 @@ export default function CompanyRatingsPanel({
       setComment("");
       toast(t("ratings.toast.deleted"));
       router.refresh();
-    } catch {
-      toast.error(t("ratings.toast.error"));
+    } catch (error) {
+      toast.error(error?.message || t("ratings.toast.error"));
     } finally {
       setLoading(false);
     }
@@ -262,6 +287,7 @@ export default function CompanyRatingsPanel({
 
   return (
     <div className="space-y-6">
+      {/* Summary */}
       <div className="rounded-3xl border border-border/60 bg-card p-5 sm:p-6">
         <div className="flex flex-wrap items-center gap-4">
           <div>
@@ -282,67 +308,9 @@ export default function CompanyRatingsPanel({
             )}
           </div>
         </div>
-
-        <div className="mt-6 space-y-4 border-t border-border/60 pt-5">
-          <h3 className="text-base font-semibold">
-            {myRating != null ? t("ratings.editTitle") : t("ratings.addTitle")}
-          </h3>
-
-          {!isAuthenticated ? (
-            <div className="flex flex-wrap items-center gap-3">
-              <p className="text-sm text-muted-foreground">
-                {t("ratings.loginRequired")}
-              </p>
-              <Button type="button" variant="outline" onClick={openLogin}>
-                {t("ratings.signIn")}
-              </Button>
-            </div>
-          ) : (
-            <>
-              <Stars
-                value={draftRating}
-                interactive
-                size="lg"
-                onSelect={setDraftRating}
-              />
-
-              <textarea
-                value={comment}
-                onChange={(event) => setComment(event.target.value)}
-                maxLength={1000}
-                rows={3}
-                placeholder={t("ratings.commentPlaceholder")}
-                className="w-full resize-y rounded-2xl border border-border/60 bg-background px-4 py-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-              />
-
-              <div className="flex flex-wrap gap-2">
-                <Button type="button" disabled={loading} onClick={submit}>
-                  {loading ? (
-                    <span
-                      className="size-2 animate-pulse rounded-full bg-current"
-                      aria-hidden
-                    />
-                  ) : null}
-                  {myRating != null ? t("ratings.update") : t("ratings.submit")}
-                </Button>
-
-                {myRating != null && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={loading}
-                    onClick={remove}
-                  >
-                    <Trash2 aria-hidden />
-                    {t("ratings.delete")}
-                  </Button>
-                )}
-              </div>
-            </>
-          )}
-        </div>
       </div>
 
+      {/* Customer reviews first */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h3 className="text-base font-semibold">
           {t("ratings.customerReviews")}
@@ -385,6 +353,66 @@ export default function CompanyRatingsPanel({
           description={t("ratings.empty")}
         />
       )}
+
+      {/* Write / edit rating at the bottom */}
+      <div className="rounded-3xl border border-border/60 bg-card p-5 sm:p-6">
+        <h3 className="text-base font-semibold">
+          {myRating != null ? t("ratings.editTitle") : t("ratings.addTitle")}
+        </h3>
+
+        {!isAuthenticated ? (
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <p className="text-sm text-muted-foreground">
+              {t("ratings.loginRequired")}
+            </p>
+            <Button type="button" variant="outline" onClick={openLogin}>
+              {t("ratings.signIn")}
+            </Button>
+          </div>
+        ) : (
+          <div className="mt-4 space-y-4">
+            <Stars
+              value={draftRating}
+              interactive
+              size="lg"
+              onSelect={setDraftRating}
+            />
+
+            <textarea
+              value={comment}
+              onChange={(event) => setComment(event.target.value)}
+              maxLength={1000}
+              rows={3}
+              placeholder={t("ratings.commentPlaceholder")}
+              className="w-full resize-y rounded-2xl border border-border/60 bg-background px-4 py-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+            />
+
+            <div className="flex flex-wrap gap-2">
+              <Button type="button" disabled={loading} onClick={submit}>
+                {loading ? (
+                  <span
+                    className="size-2 animate-pulse rounded-full bg-current"
+                    aria-hidden
+                  />
+                ) : null}
+                {myRating != null ? t("ratings.update") : t("ratings.submit")}
+              </Button>
+
+              {myRating != null && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={loading}
+                  onClick={remove}
+                >
+                  <Trash2 aria-hidden />
+                  {t("ratings.delete")}
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,12 +1,30 @@
 import { getTranslations } from "next-intl/server";
-import { Suspense } from "react";
 
 import PageHeader from "@/components/common/PageHeader";
-import { ProductCardSkeletonGrid } from "@/components/skeletons";
+import { getCustomerLikes } from "@/features/wishlist/api";
 import { WishlistPage } from "@/features/wishlist";
+import { getCustomerTokenFromCookies } from "@/lib/auth/customer-token";
+
+const PRODUCTS_PER_PAGE = 12;
+const COMPANIES_PER_PAGE = 12;
 
 export default async function Page() {
   const t = await getTranslations();
+  const token = await getCustomerTokenFromCookies();
+
+  let initialData = null;
+  if (token) {
+    try {
+      initialData = await getCustomerLikes(token, {
+        products_page: 1,
+        products_per_page: PRODUCTS_PER_PAGE,
+        companies_page: 1,
+        companies_per_page: COMPANIES_PER_PAGE,
+      });
+    } catch {
+      initialData = null;
+    }
+  }
 
   return (
     <>
@@ -20,9 +38,12 @@ export default async function Page() {
       />
 
       <section className="container pb-16 pt-2 sm:pt-4">
-        <Suspense fallback={<ProductCardSkeletonGrid count={8} />}>
-          <WishlistPage />
-        </Suspense>
+        <WishlistPage
+          initialData={initialData}
+          initialAuthenticated={Boolean(token)}
+          productsPerPage={PRODUCTS_PER_PAGE}
+          companiesPerPage={COMPANIES_PER_PAGE}
+        />
       </section>
     </>
   );

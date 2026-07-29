@@ -10,12 +10,12 @@ import { Button } from "@/components/ui/button";
 import { COMPARE_UI_ENABLED } from "@/features/compare";
 import { MiniCartTrigger } from "@/features/cart";
 import { Link } from "@/i18n/navigation";
-import { useCompareStore, useWishlistCountStore } from "@/stores";
+import { useCompareStore, useWishlistCount } from "@/stores";
 
 export default function NavbarActions() {
   const t = useTranslations();
   const compareCount = useCompareStore((state) => state.items.length);
-  const wishlistCount = useWishlistCountStore((state) => state.count);
+  const wishlistCount = useWishlistCount();
 
   return (
     <div className="hidden items-center gap-1 md:flex">

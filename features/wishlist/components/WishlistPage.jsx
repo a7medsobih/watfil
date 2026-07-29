@@ -2,8 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { Building2, Heart, Package } from "lucide-react";
 
+import AppPagination from "@/components/common/AppPagination";
 import CampanyCard from "@/components/common/CampanyCard";
 import EmptyState from "@/components/common/EmptyState";
 import ProductCard from "@/components/common/ProductCard";
@@ -15,92 +17,240 @@ import {
 } from "@/components/skeletons/ProductCardSkeleton";
 import { Button } from "@/components/ui/button";
 import { useRequireAuth } from "@/features/auth";
-import { getLikedProducts } from "@/features/wishlist/api";
+import { unlikeCompany } from "@/features/companies/api";
+import { getCustomerLikes } from "@/features/wishlist/api";
+import { Link } from "@/i18n/navigation";
 import { useAuthStore, useIsAuthenticated } from "@/stores/auth-store";
-import { useLikedCompaniesStore } from "@/stores/liked-companies-store";
-import { useWishlistCountStore } from "@/stores/wishlist-count-store";
+import { useLikesStore } from "@/stores/likes-store";
 import { cn } from "@/lib/utils";
 
+const EMPTY_META = { total: 0, currentPage: 1, lastPage: 1, perPage: 12 };
+
+function normalizeInitial(initialData, productsPerPage, companiesPerPage) {
+  return {
+    products: initialData?.products ?? [],
+    companies: initialData?.companies ?? [],
+    productsMeta: {
+      ...EMPTY_META,
+      perPage: productsPerPage,
+      ...(initialData?.meta?.products ?? {}),
+    },
+    companiesMeta: {
+      ...EMPTY_META,
+      perPage: companiesPerPage,
+      ...(initialData?.meta?.companies ?? {}),
+    },
+  };
+}
+
 /**
- * Wishlist with Products | Companies sections.
+ * Wishlist with Products | Companies tabs and independent pagination.
+ * First page is provided by the Server Component; further pages fetch client-side.
  */
-export default function WishlistPage() {
+export default function WishlistPage({
+  initialData = null,
+  initialAuthenticated = false,
+  productsPerPage = 12,
+  companiesPerPage = 12,
+}) {
   const t = useTranslations("wishlist");
   const tNav = useTranslations("nav");
+  const tPagination = useTranslations("pagination");
   const locale = useLocale();
   const isAuthenticated = useIsAuthenticated();
-  const isHydrated = useAuthStore((state) => state.isHydrated);
+  const isAuthHydrated = useAuthStore((state) => state.isHydrated);
   const token = useAuthStore((state) => state.token);
   const { openLogin } = useRequireAuth("login");
-  const setWishlistCount = useWishlistCountStore((state) => state.setCount);
-  const likedCompanies = useLikedCompaniesStore((state) => state.items);
-  const removeLikedCompany = useLikedCompaniesStore((state) => state.remove);
+  const setProductLiked = useLikesStore((state) => state.setProductLiked);
+  const setCompanyLiked = useLikesStore((state) => state.setCompanyLiked);
+
+  const seeded = normalizeInitial(
+    initialData,
+    productsPerPage,
+    companiesPerPage,
+  );
 
   const [tab, setTab] = useState("products");
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState(seeded.products);
+  const [companies, setCompanies] = useState(seeded.companies);
+  const [productsMeta, setProductsMeta] = useState(seeded.productsMeta);
+  const [companiesMeta, setCompaniesMeta] = useState(seeded.companiesMeta);
+  const [productsPage, setProductsPage] = useState(
+    seeded.productsMeta.currentPage || 1,
+  );
+  const [companiesPage, setCompaniesPage] = useState(
+    seeded.companiesMeta.currentPage || 1,
+  );
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const removedRef = useRef(new Map());
+  const removedProductsRef = useRef(new Map());
+  const removedCompaniesRef = useRef(new Map());
+  const skipInitialFetchRef = useRef(Boolean(initialData));
 
-  const loadProducts = useCallback(async () => {
-    if (!token) {
-      setProducts([]);
-      setLoading(false);
-      return;
-    }
+  const loadPage = useCallback(
+    async ({
+      nextProductsPage = productsPage,
+      nextCompaniesPage = companiesPage,
+    } = {}) => {
+      if (!token) {
+        setProducts([]);
+        setCompanies([]);
+        setLoading(false);
+        return;
+      }
 
-    setLoading(true);
-    setError(null);
+      setLoading(true);
+      setError(null);
 
-    try {
-      const result = await getLikedProducts(token);
-      removedRef.current.clear();
-      setProducts(result.products);
-      const total = result?.meta?.total;
-      setWishlistCount(
-        total != null ? total : (result?.products?.length ?? 0),
-      );
-    } catch {
-      setError(t("loadError"));
-      setProducts([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [token, t, setWishlistCount]);
+      try {
+        const result = await getCustomerLikes(token, {
+          products_page: nextProductsPage,
+          products_per_page: productsPerPage,
+          companies_page: nextCompaniesPage,
+          companies_per_page: companiesPerPage,
+        });
+
+        removedProductsRef.current.clear();
+        removedCompaniesRef.current.clear();
+        setProducts(result.products);
+        setCompanies(result.companies);
+        setProductsMeta(result.meta.products);
+        setCompaniesMeta(result.meta.companies);
+        setProductsPage(result.meta.products.currentPage || nextProductsPage);
+        setCompaniesPage(result.meta.companies.currentPage || nextCompaniesPage);
+
+        // Keep the unified store in sync for visible items.
+        for (const product of result.products) {
+          if (product?.id != null) setProductLiked(product.id, true);
+        }
+        for (const company of result.companies) {
+          if (company?.id != null) setCompanyLiked(company.id, true);
+        }
+      } catch {
+        setError(t("loadError"));
+      } finally {
+        setLoading(false);
+      }
+    },
+    [
+      token,
+      productsPage,
+      companiesPage,
+      productsPerPage,
+      companiesPerPage,
+      t,
+      setProductLiked,
+      setCompanyLiked,
+    ],
+  );
 
   useEffect(() => {
-    if (!isHydrated) return;
+    if (!isAuthHydrated) return;
 
     if (!isAuthenticated) {
       setProducts([]);
+      setCompanies([]);
       setLoading(false);
       return;
     }
 
-    loadProducts();
-  }, [isHydrated, isAuthenticated, loadProducts]);
-
-  const handleLikeChange = (product) => (next) => {
-    if (!next.liked) {
-      removedRef.current.set(product.id, product);
-      setProducts((current) =>
-        current.filter((entry) => entry.id !== product.id),
-      );
+    if (skipInitialFetchRef.current) {
+      skipInitialFetchRef.current = false;
+      // Seed store from SSR payload.
+      for (const product of seeded.products) {
+        if (product?.id != null) setProductLiked(product.id, true);
+      }
+      for (const company of seeded.companies) {
+        if (company?.id != null) setCompanyLiked(company.id, true);
+      }
       return;
     }
 
-    const stashed = removedRef.current.get(product.id);
+    loadPage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-fetch when auth settles / token changes
+  }, [isAuthHydrated, isAuthenticated, token]);
+
+  const handleProductsPageChange = (page) => {
+    setProductsPage(page);
+    loadPage({ nextProductsPage: page, nextCompaniesPage: companiesPage });
+  };
+
+  const handleCompaniesPageChange = (page) => {
+    setCompaniesPage(page);
+    loadPage({ nextProductsPage: productsPage, nextCompaniesPage: page });
+  };
+
+  const handleProductLikeChange = (product) => (next) => {
+    if (!next.liked) {
+      removedProductsRef.current.set(product.id, product);
+      setProducts((current) =>
+        current.filter((entry) => entry.id !== product.id),
+      );
+      setProductsMeta((meta) => ({
+        ...meta,
+        total: Math.max(0, (meta.total || 0) - 1),
+      }));
+      return;
+    }
+
+    const stashed = removedProductsRef.current.get(product.id);
     if (!stashed) return;
 
-    removedRef.current.delete(product.id);
+    removedProductsRef.current.delete(product.id);
     setProducts((current) =>
       current.some((entry) => entry.id === product.id)
         ? current
         : [...current, stashed],
     );
+    setProductsMeta((meta) => ({
+      ...meta,
+      total: (meta.total || 0) + 1,
+    }));
   };
 
-  if (!isHydrated || loading) {
+  const handleUnlikeCompany = async (company) => {
+    if (!company?.id || !token) return;
+
+    const previous = company;
+    removedCompaniesRef.current.set(company.id, previous);
+    setCompanies((current) =>
+      current.filter((entry) => String(entry.id) !== String(company.id)),
+    );
+    setCompaniesMeta((meta) => ({
+      ...meta,
+      total: Math.max(0, (meta.total || 0) - 1),
+    }));
+    setCompanyLiked(company.id, false);
+
+    try {
+      await unlikeCompany(company.id, token);
+      toast(t("toast.unliked"), {
+        className: "!border-primary/30 !bg-primary !text-primary-foreground",
+      });
+    } catch {
+      removedCompaniesRef.current.delete(company.id);
+      setCompanies((current) =>
+        current.some((entry) => String(entry.id) === String(company.id))
+          ? current
+          : [previous, ...current],
+      );
+      setCompaniesMeta((meta) => ({
+        ...meta,
+        total: (meta.total || 0) + 1,
+      }));
+      setCompanyLiked(company.id, true);
+      toast.error(t("toast.error"), {
+        className:
+          "!border-destructive/30 !bg-destructive !text-destructive-foreground",
+      });
+    }
+  };
+
+  const showAuthGate =
+    isAuthHydrated && !isAuthenticated && !initialAuthenticated;
+  const showInitialLoading = !isAuthHydrated && !initialData;
+
+  if (showInitialLoading) {
     return tab === "companies" ? (
       <CompanyCardSkeletonGrid count={6} />
     ) : (
@@ -108,7 +258,7 @@ export default function WishlistPage() {
     );
   }
 
-  if (!isAuthenticated) {
+  if (showAuthGate) {
     return (
       <EmptyState
         icon={<Heart className="size-7 sm:size-8" aria-hidden />}
@@ -123,14 +273,14 @@ export default function WishlistPage() {
     );
   }
 
-  if (error) {
+  if (error && !products.length && !companies.length) {
     return (
       <EmptyState
         icon={<Package className="size-7 sm:size-8" aria-hidden />}
         title={t("loadError")}
         description={t("loadErrorDescription")}
         action={
-          <Button type="button" variant="outline" onClick={loadProducts}>
+          <Button type="button" variant="outline" onClick={() => loadPage()}>
             {t("retry")}
           </Button>
         }
@@ -146,11 +296,15 @@ export default function WishlistPage() {
         className="flex h-auto flex-wrap gap-1.5 rounded-full bg-muted p-1.5"
       >
         {[
-          { key: "products", label: t("tabs.products"), count: products.length },
+          {
+            key: "products",
+            label: t("tabs.products"),
+            count: productsMeta.total ?? products.length,
+          },
           {
             key: "companies",
             label: t("tabs.companies"),
-            count: likedCompanies.length,
+            count: companiesMeta.total ?? companies.length,
           },
         ].map((item) => {
           const isActive = tab === item.key;
@@ -177,53 +331,96 @@ export default function WishlistPage() {
         })}
       </div>
 
-      {tab === "products" ? (
+      {loading ? (
+        tab === "companies" ? (
+          <CompanyCardSkeletonGrid count={6} />
+        ) : (
+          <ProductCardSkeletonGrid count={8} />
+        )
+      ) : tab === "products" ? (
         products.length > 0 ? (
-          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-            {products.map((product) => (
-              <ProductCard
-                key={`${product.likeSource}-${product.companyId ?? "catalog"}-${product.id}`}
-                product={product}
-                locale={locale}
-                variant={
-                  product.likeSource === "company" || product.source === "company"
-                    ? "company"
-                    : "catalog"
-                }
-                companySlug={product.companySlug ?? null}
-                onLikeChange={handleLikeChange(product)}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              {products.map((product) => (
+                <ProductCard
+                  key={`${product.likeSource}-${product.companyId ?? "catalog"}-${product.id}`}
+                  product={product}
+                  locale={locale}
+                  variant={
+                    product.likeSource === "company" ||
+                    product.source === "company"
+                      ? "company"
+                      : "catalog"
+                  }
+                  companySlug={product.companySlug ?? null}
+                  onLikeChange={handleProductLikeChange(product)}
+                />
+              ))}
+            </div>
+            <AppPagination
+              currentPage={productsMeta.currentPage || productsPage}
+              lastPage={productsMeta.lastPage || 1}
+              total={productsMeta.total}
+              perPage={productsMeta.perPage || productsPerPage}
+              onPageChange={handleProductsPageChange}
+              labels={{
+                previous: tPagination("previous"),
+                next: tPagination("next"),
+              }}
+            />
+          </>
         ) : (
           <EmptyState
             icon={<Heart className="size-7 sm:size-8" aria-hidden />}
             title={t("emptyTitle")}
             description={t("empty")}
+            action={
+              <Button type="button" asChild>
+                <Link href="/products">{t("emptyProductsCta")}</Link>
+              </Button>
+            }
           />
         )
-      ) : likedCompanies.length > 0 ? (
-        <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {likedCompanies.map((company) => (
-            <div key={company.id} className="relative">
-              <CampanyCard company={company} />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="absolute end-3 top-3 z-[2] bg-card/90 backdrop-blur-sm"
-                onClick={() => removeLikedCompany(company.id)}
-              >
-                {t("unlike")}
-              </Button>
-            </div>
-          ))}
-        </div>
+      ) : companies.length > 0 ? (
+        <>
+          <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {companies.map((company) => (
+              <div key={company.id} className="relative">
+                <CampanyCard company={company} />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="absolute end-3 top-3 z-[2] bg-card/90 backdrop-blur-sm"
+                  onClick={() => handleUnlikeCompany(company)}
+                >
+                  {t("unlike")}
+                </Button>
+              </div>
+            ))}
+          </div>
+          <AppPagination
+            currentPage={companiesMeta.currentPage || companiesPage}
+            lastPage={companiesMeta.lastPage || 1}
+            total={companiesMeta.total}
+            perPage={companiesMeta.perPage || companiesPerPage}
+            onPageChange={handleCompaniesPageChange}
+            labels={{
+              previous: tPagination("previous"),
+              next: tPagination("next"),
+            }}
+          />
+        </>
       ) : (
         <EmptyState
           icon={<Building2 className="size-7 sm:size-8" aria-hidden />}
           title={t("emptyCompaniesTitle")}
           description={t("emptyCompanies")}
+          action={
+            <Button type="button" asChild>
+              <Link href="/companies">{t("emptyCompaniesCta")}</Link>
+            </Button>
+          }
         />
       )}
     </div>

@@ -103,6 +103,11 @@ async function proxyRequest(request, context) {
 
   const method = request.method.toUpperCase();
   const isMutation = method !== "GET" && method !== "HEAD";
+  const joinedPath = segments.join("/");
+  // Personalized customer likes must never be cached (even if a caller
+  // forgets cache: 'no-store' on the upstream fetchFromAPI options).
+  const isCustomerLikes = joinedPath === "customer/likes" ||
+    joinedPath.startsWith("customer/likes/");
 
   const init = {
     method,
@@ -111,6 +116,11 @@ async function proxyRequest(request, context) {
     // (browser/proxy traffic is often personalized).
     cache: "no-store",
   };
+
+  // Explicit guard for likes endpoints (documentation + future-proofing).
+  if (isCustomerLikes) {
+    init.cache = "no-store";
+  }
 
   if (isMutation) {
     init.body = await request.text();

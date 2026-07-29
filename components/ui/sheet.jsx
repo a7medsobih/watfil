@@ -96,7 +96,7 @@ function SheetHeader({ className, ...props }) {
   return (
     <div
       data-slot="sheet-header"
-      className={cn("flex flex-col gap-0.5 p-4", className)}
+      className={cn("flex flex-col w-fit gap-0.5 p-4", className)}
       {...props}
     />
   );

@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { executePendingLikeIntent } from "@/features/wishlist/hooks";
 import { useAuthDialogStore } from "@/stores/auth-dialog-store";
 import { useAuthStore } from "@/stores/auth-store";
 
@@ -30,6 +31,9 @@ export default function AuthDialog() {
   const intent = useAuthDialogStore((state) => state.intent);
   const setAuthDialogOpen = useAuthDialogStore((state) => state.setAuthDialogOpen);
   const closeAuthDialog = useAuthDialogStore((state) => state.closeAuthDialog);
+  const clearPendingLikeIntent = useAuthDialogStore(
+    (state) => state.clearPendingLikeIntent,
+  );
   const applyAuthResponse = useAuthStore((state) => state.applyAuthResponse);
 
   const [step, setStep] = useState("phone");
@@ -84,10 +88,30 @@ export default function AuthDialog() {
     }
   }, [step, intent, phone, t]);
 
-  const handleAuthenticated = (response) => {
-    applyAuthResponse(response);
+  const handleOpenChange = (open) => {
+    setAuthDialogOpen(open);
+    if (!open) {
+      // Dismissed without auth — drop pending like intent.
+      if (!useAuthStore.getState().token) {
+        clearPendingLikeIntent();
+      }
+    }
+  };
+
+  const handleAuthenticated = async (response) => {
+    const { token } = applyAuthResponse(response);
     toast.success(t("toast.success"));
+
+    const pending = useAuthDialogStore.getState().pendingLikeIntent;
+    clearPendingLikeIntent();
     closeAuthDialog();
+
+    if (pending && token) {
+      const ok = await executePendingLikeIntent(pending, token);
+      if (!ok) {
+        toast.error(t("errors.generic"));
+      }
+    }
   };
 
   const startOtpCountdown = () => {
@@ -95,7 +119,7 @@ export default function AuthDialog() {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setAuthDialogOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent
         className="max-h-[min(90dvh,720px)] gap-5 overflow-y-auto p-5 sm:max-w-md sm:p-6"
         showCloseButton

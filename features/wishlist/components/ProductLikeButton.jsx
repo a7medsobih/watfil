@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Icon-only like control (matches compare button layout).
- * Optimistic UI lives in the client; the API runs in the background.
+ * Optimistic UI lives in the unified likes store.
  *
  * @param {object} props
  * @param {string|number} props.productId
@@ -31,7 +31,7 @@ export default function ProductLikeButton({
   className,
 }) {
   const t = useTranslations("wishlist");
-  const { liked, toggleLike, loading } = useProductLike({
+  const { liked, toggleLike, loading, isLikesLoading } = useProductLike({
     productId,
     source,
     companyId,
@@ -40,6 +40,8 @@ export default function ProductLikeButton({
     onChange,
   });
 
+  const showLoading = loading || isLikesLoading;
+
   return (
     <Button
       type="button"
@@ -47,6 +49,7 @@ export default function ProductLikeButton({
       size="icon-sm"
       aria-label={liked ? t("unlike") : t("like")}
       aria-pressed={liked}
+      aria-busy={showLoading}
       disabled={loading}
       className={cn(
         "relative z-[2] border-border/60 bg-card/75 shadow-sm backdrop-blur-sm hover:border-primary/30 hover:bg-card",
@@ -58,10 +61,11 @@ export default function ProductLikeButton({
       onClick={(event) => {
         event.preventDefault();
         event.stopPropagation();
+        if (isLikesLoading) return;
         toggleLike();
       }}
     >
-      {loading ? (
+      {showLoading ? (
         <Heart className="h-4 w-4 animate-pulse opacity-50" aria-hidden />
       ) : (
         <Heart className={cn("h-4 w-4", liked && "fill-current")} aria-hidden />
