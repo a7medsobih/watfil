@@ -1,7 +1,7 @@
 // src/app/[locale]/(public)/companies/[slug]/page.js
 import { Suspense } from "react";
 import { getLocale } from "next-intl/server";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 import { ProductCardSkeletonGrid } from "@/components/skeletons/ProductCardSkeleton";
 import {
@@ -18,10 +18,7 @@ import PersonalizedCompanyActions, {
   CompanyLikeFallback,
 } from "@/features/companies/components/store/PersonalizedCompanyActions";
 import { buildHeroSlides } from "@/features/companies/utils/build-hero-slides";
-import {
-  buildCompanyStoreHref,
-  resolveCompanyStoreParams,
-} from "@/features/companies/utils/resolve-company-store-params";
+import { resolveCompanyStoreParams } from "@/features/companies/utils/resolve-company-store-params";
 import { EXPERIENCE } from "@/features/experience/constants";
 import {
   getChildCategories,
@@ -34,7 +31,7 @@ import { buildMetadata } from "@/lib/seo/metadata";
 export const revalidate = 300;
 
 /**
- * Pre-render top-rated companies; remaining slugs via on-demand ISR.
+ * Pre-render top-rated companies by id; remaining via on-demand ISR.
  */
 export async function generateStaticParams() {
   try {
@@ -43,9 +40,9 @@ export async function generateStaticParams() {
       min_ratings: 1,
     });
     return (companies || [])
-      .map((company) => company.slug)
-      .filter(Boolean)
-      .map((slug) => ({ slug }));
+      .map((company) => company.id)
+      .filter((id) => id != null && id !== "")
+      .map((id) => ({ slug: String(id) }));
   } catch {
     return [];
   }
@@ -67,7 +64,7 @@ export async function generateMetadata({ params }) {
   return buildMetadata({
     title: company.name,
     description: company.about || undefined,
-    path: `/companies/${company.slug}`,
+    path: `/companies/${company.id}`,
     locale,
     images: company.hasLogo ? [{ url: company.logo }] : undefined,
   });
@@ -88,7 +85,6 @@ function StoreProductsSkeleton() {
 
 async function CompanyStoreProducts({
   companyId,
-  companySlug,
   searchParams,
   locale,
 }) {
@@ -105,9 +101,9 @@ async function CompanyStoreProducts({
       : Promise.resolve([]),
     storeParams.parent_category_id
       ? getChildCategories(storeParams.parent_category_id, {
-        locale,
-        product_type_id: storeParams.product_type_id,
-      })
+          locale,
+          product_type_id: storeParams.product_type_id,
+        })
       : Promise.resolve([]),
   ]);
 
@@ -122,8 +118,8 @@ async function CompanyStoreProducts({
     const typeFromLookup = typesById.get(String(product.productTypeId));
     const productType =
       typeFromLookup &&
-        (!product.productType?.label ||
-          product.productType.label === product.productTypeKey)
+      (!product.productType?.label ||
+        product.productType.label === product.productTypeKey)
         ? typeFromLookup
         : product.productType;
 
@@ -139,7 +135,7 @@ async function CompanyStoreProducts({
 
   return (
     <CompanyStoreProductsSection
-      companySlug={companySlug}
+      companySlug={String(companyId)}
       products={products}
       meta={meta}
       storeParams={storeParams}
@@ -159,11 +155,6 @@ export default async function CompanyStoreRoute({ params, searchParams }) {
   const company = await getCompany(slug, locale);
 
   if (!company) notFound();
-
-  const incoming = decodeURIComponent(String(slug));
-  if (incoming !== company.slug) {
-    redirect(`/${locale}${buildCompanyStoreHref(company.slug, storeParams)}`);
-  }
 
   const isCampaign = storeParams.experience === EXPERIENCE.CAMPAIGN;
 
@@ -200,7 +191,7 @@ export default async function CompanyStoreRoute({ params, searchParams }) {
     <>
       <CompanyBrandSetter
         brand={{
-          slug: company.slug,
+          slug: String(company.id),
           name: company.name,
           logo: company.logo,
           hasLogo: company.hasLogo,
@@ -212,7 +203,7 @@ export default async function CompanyStoreRoute({ params, searchParams }) {
         likeSlot={
           <Suspense fallback={<CompanyLikeFallback />}>
             <PersonalizedCompanyActions
-              slugOrId={company.slug}
+              slugOrId={company.id}
               company={company}
             />
           </Suspense>
@@ -221,7 +212,6 @@ export default async function CompanyStoreRoute({ params, searchParams }) {
           <Suspense key={storeKey} fallback={<StoreProductsSkeleton />}>
             <CompanyStoreProducts
               companyId={company.id}
-              companySlug={company.slug}
               searchParams={resolvedSearchParams}
               locale={locale}
             />

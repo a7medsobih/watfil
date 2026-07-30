@@ -47,13 +47,13 @@ export default function ProductOfferingCompanyCard({
     product.originalPrice > product.cashPrice;
 
   const buyHref = product?.id
-    ? buildCompanyProductHref(company.slug, product.id, {
+    ? buildCompanyProductHref(company.id, product.id, {
       source: product.source ?? product.likeSource ?? "catalog",
       governorate: selectedGovernorateId,
     })
-    : `/companies/${company.slug}`;
+    : `/companies/${company.id}`;
 
-  const companyHref = `/companies/${company.slug}`;
+  const companyHref = `/companies/${company.id}`;
 
   const benefitChips = [];
 

@@ -1,10 +1,8 @@
 import { getProduct } from "@/features/products/api";
 import { buildCatalogProductHref } from "@/features/products/utils/resolve-product-detail-params";
-import { buildProductSlug } from "@/features/products/utils/product-slug";
 
 /**
- * Resolves the SEO catalog product href for a billboard.
- * Billboard ads always target Watfil catalog products via `supplier_product_id`.
+ * Resolves the catalog product href for a billboard (id-based path).
  *
  * @param {object} billboard
  * @param {{ governorate?: string|number|null, locale?: string }} [options]
@@ -22,28 +20,11 @@ async function resolveBillboardHref(
 
   if (productId == null || productId === "") return null;
 
-  // Prefer live catalog product (canonical SEO slug).
   const catalogProduct = await getProduct(productId, locale);
-  if (catalogProduct?.slug) {
+  if (catalogProduct?.id != null) {
     return buildCatalogProductHref(catalogProduct, { governorate });
   }
 
-  // Fallback from embedded billboard product payload (sku + id → slug).
-  const embedded = billboard?.product;
-  if (embedded) {
-    const embeddedSlug =
-      embedded.slug ||
-      buildProductSlug({
-        id: embedded.id ?? productId,
-        sku: embedded.sku,
-      });
-
-    if (embeddedSlug) {
-      return buildCatalogProductHref(embeddedSlug, { governorate });
-    }
-  }
-
-  // Last resort: id path — product detail route resolves id → canonical slug.
   return buildCatalogProductHref(String(productId), { governorate });
 }
 

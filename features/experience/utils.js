@@ -55,13 +55,13 @@ export function withExperience(href, experience) {
 /**
  * Builds a company profile href that stays inside the current experience.
  *
- * @param {string} companySlug
+ * @param {string|number} companyId
  * @param {"website"|"campaign"} [experience]
  */
 export function buildCompanyExperienceHref(
-  companySlug,
+  companyId,
   experience = EXPERIENCE.WEBSITE,
 ) {
-  const base = `/companies/${encodeURIComponent(String(companySlug))}`;
+  const base = `/companies/${encodeURIComponent(String(companyId))}`;
   return withExperience(base, experience);
 }

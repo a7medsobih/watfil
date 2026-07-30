@@ -1,21 +1,18 @@
 import { fetchFromAPI } from "@/lib/api/fetcher";
 import { endpoints } from "@/lib/api/endpoints";
 import { getCustomerTokenFromCookies } from "@/lib/auth/customer-token";
-import { resolveProductIdFromParam } from "@/features/products/utils/product-slug";
+import { toProductRouteId } from "@/features/products/utils/product-slug";
 
 /**
  * Personalized product fields (`is_liked`) for Suspense islands.
  * Always `no-store` — safe to call only inside a Suspense boundary.
  *
- * @param {string|number} slugOrId
+ * @param {string|number} id
  * @returns {Promise<{ isLiked: boolean }>}
  */
-export async function getProductPersonalization(slugOrId) {
+export async function getProductPersonalization(id) {
   const empty = { isLiked: false };
-
-  if (slugOrId == null || slugOrId === "") return empty;
-
-  const productId = resolveProductIdFromParam(slugOrId);
+  const productId = toProductRouteId(id);
   if (!productId) return empty;
 
   const token = await getCustomerTokenFromCookies();

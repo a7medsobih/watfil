@@ -1,5 +1,5 @@
-import { buildCompanySlug } from "@/features/companies/utils/company-slug";
-import { buildProductSlug } from "@/features/products/utils/product-slug";
+import { toCompanyRouteId } from "@/features/companies/utils/company-slug";
+import { toProductRouteId } from "@/features/products/utils/product-slug";
 import { IMAGE_PLACEHOLDERS } from "@/lib/media/placeholders";
 
 const PRODUCT_IMAGE_PLACEHOLDER = IMAGE_PLACEHOLDERS.product;
@@ -119,9 +119,7 @@ function mapOfferingCompany(company, locale = "ar") {
 
   return {
     id: company.id,
-    slug: company.slug
-      ? String(company.slug)
-      : buildCompanySlug(name, company.id),
+    slug: toCompanyRouteId(company.id),
     name,
     logo: hasLogo ? company.logo : COMPANY_LOGO_PLACEHOLDER,
     hasLogo,
@@ -173,7 +171,7 @@ export function mapProduct(product, locale = "ar") {
 
   return {
     id: product.id,
-    slug: buildProductSlug(product),
+    slug: toProductRouteId(product),
     sku: product.sku ?? null,
     name: product.name ?? "",
     image: product.image || PRODUCT_IMAGE_PLACEHOLDER,

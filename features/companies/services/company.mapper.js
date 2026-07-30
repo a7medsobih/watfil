@@ -1,6 +1,6 @@
 import { mapProduct } from "@/features/products/services/product.mapper";
 import { LIKE_SOURCE } from "@/features/wishlist/types";
-import { buildCompanySlug } from "@/features/companies/utils/company-slug";
+import { toCompanyRouteId } from "@/features/companies/utils/company-slug";
 import { mapGovernorate } from "@/features/companies/services/governorate.mapper";
 import { IMAGE_PLACEHOLDERS } from "@/lib/media/placeholders";
 
@@ -201,9 +201,8 @@ export function mapCompany(company, locale = "ar") {
 
   return {
     id: company.id,
-    slug: company.slug
-      ? String(company.slug)
-      : buildCompanySlug(name, company.id),
+    // Temporary: route key is numeric id until backend supports slug.
+    slug: toCompanyRouteId(company.id),
     name,
     logo: hasLogo ? company.logo : COMPANY_LOGO_PLACEHOLDER,
     hasLogo,

@@ -27,7 +27,7 @@ export default function CampanyCard({ company, className }) {
         className,
       )}
     >
-      <Link href={`/companies/${company.slug}`} className="block">
+      <Link href={`/companies/${company.id}`} className="block">
         <div
           className={cn(
             "relative h-44 overflow-hidden",

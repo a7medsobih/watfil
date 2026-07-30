@@ -67,13 +67,13 @@ export default function StoreSharePage({ store }) {
   if (!store) return null;
 
   const playStoreUrl = store.playStoreUrl || WATFIL_PLAY_STORE_URL;
-  const companyKey = store.companySlug || store.companyId;
+  const companyKey = store.companyId || store.companySlug;
   const companyHref = companyKey
     ? buildCompanyExperienceHref(companyKey, EXPERIENCE.CAMPAIGN)
     : null;
 
   const brand = {
-    slug: String(companyKey || store.taxNumber || ""),
+    slug: String(store.companyId || companyKey || store.taxNumber || ""),
     name: store.name,
     logo: store.logo,
     hasLogo: store.hasLogo,

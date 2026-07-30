@@ -1,5 +1,3 @@
-import { buildProductSlug } from "@/features/products/utils/product-slug";
-
 /**
  * Resolves product-detail query params (governorate filter for offering companies).
  *
@@ -21,15 +19,15 @@ export function resolveProductDetailParams(searchParams = {}, options = {}) {
 }
 
 /**
- * Low-level product detail href from an already-resolved SEO slug.
+ * Product detail href from a product id.
  *
- * @param {string|number} slug
+ * @param {string|number} productId
  * @param {{ governorate?: string|number|null }} [params]
  */
-export function buildProductDetailHref(slug, { governorate } = {}) {
-  if (slug == null || slug === "") return null;
+export function buildProductDetailHref(productId, { governorate } = {}) {
+  if (productId == null || productId === "") return null;
 
-  const base = `/products/${encodeURIComponent(String(slug))}`;
+  const base = `/products/${encodeURIComponent(String(productId))}`;
   const query = new URLSearchParams();
 
   if (governorate != null && governorate !== "") {
@@ -41,29 +39,24 @@ export function buildProductDetailHref(slug, { governorate } = {}) {
 }
 
 /**
- * Single source of truth for catalog product URLs across the site.
- * Always uses the SEO product slug (never raw id/sku in the path).
+ * Catalog product URLs — temporary: path uses numeric id (API contract).
  *
- * @param {object|string|number|null|undefined} productOrSlug
- *   Product model (`slug` / `id`+`sku`) or a precomputed slug string.
+ * @param {object|string|number|null|undefined} productOrId
  * @param {{ governorate?: string|number|null }} [params]
  * @returns {string|null}
  */
-export function buildCatalogProductHref(productOrSlug, { governorate } = {}) {
-  if (productOrSlug == null || productOrSlug === "") return null;
+export function buildCatalogProductHref(productOrId, { governorate } = {}) {
+  if (productOrId == null || productOrId === "") return null;
 
-  let slug = null;
+  let productId = null;
 
-  if (typeof productOrSlug === "string" || typeof productOrSlug === "number") {
-    slug = String(productOrSlug);
+  if (typeof productOrId === "string" || typeof productOrId === "number") {
+    productId = String(productOrId);
   } else {
-    slug =
-      productOrSlug.slug ||
-      buildProductSlug(productOrSlug) ||
-      null;
+    productId = productOrId.id != null ? String(productOrId.id) : null;
   }
 
-  if (!slug) return null;
+  if (!productId) return null;
 
-  return buildProductDetailHref(slug, { governorate });
+  return buildProductDetailHref(productId, { governorate });
 }

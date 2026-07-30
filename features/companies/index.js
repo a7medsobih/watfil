@@ -29,9 +29,7 @@ export {
   useCompanyBrand,
 } from "./context/company-brand-context";
 export {
-  buildCompanySlug,
-  resolveCompanyIdFromParam,
-  slugifyCompanyName,
+  toCompanyRouteId,
 } from "./utils/company-slug";
 export {
   buildCompanyProductHref,

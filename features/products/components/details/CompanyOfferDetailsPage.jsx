@@ -128,7 +128,7 @@ export default function CompanyOfferDetailsPage({
                 {t("purchase.addToCart")}
               </Button>
               <Button size="lg" variant="outline" className="w-full" asChild>
-                <Link href={`/companies/${company.slug}`}>
+                <Link href={`/companies/${company.id}`}>
                   {t("purchase.goToCompany")}
                 </Link>
               </Button>

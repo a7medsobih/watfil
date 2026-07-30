@@ -3,7 +3,6 @@
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
-import { resolveCompanyIdFromParam } from "@/features/companies/utils/company-slug";
 import { useCartStore } from "@/stores/cart-store";
 
 /**
@@ -15,10 +14,6 @@ function resolveSellingCompanyId(company) {
 
   const fromId = Number(company.id);
   if (Number.isFinite(fromId) && fromId > 0) return fromId;
-
-  const fromSlug = resolveCompanyIdFromParam(company.slug);
-  const parsed = Number(fromSlug);
-  if (Number.isFinite(parsed) && parsed > 0) return parsed;
 
   return null;
 }

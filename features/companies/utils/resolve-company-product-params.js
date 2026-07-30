@@ -2,16 +2,16 @@
  * Builds a company product-details href.
  * GET /public/companies/{id}/product-details?source=&product_id=
  *
- * @param {string} companySlug
+ * @param {string|number} companyId
  * @param {string|number} productId
  * @param {{ source?: string, governorate?: string|number|null, experience?: string|null }} [options]
  */
 export function buildCompanyProductHref(
-  companySlug,
+  companyId,
   productId,
   { source = "catalog", governorate, experience } = {},
 ) {
-  const base = `/companies/${encodeURIComponent(String(companySlug))}/products/${encodeURIComponent(String(productId))}`;
+  const base = `/companies/${encodeURIComponent(String(companyId))}/products/${encodeURIComponent(String(productId))}`;
   const query = new URLSearchParams();
 
   if (source) query.set("source", String(source));

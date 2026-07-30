@@ -26,11 +26,8 @@ export function mapLikedProduct(item) {
     nested.company?.id ??
     null;
 
-  const companySlug =
-    item.company?.slug ??
-    nested.company?.slug ??
-    item.company_slug ??
-    null;
+  // Temporary: company route key is numeric id (same value used as companySlug prop).
+  const companySlug = companyId != null ? String(companyId) : null;
 
   return {
     ...product,

@@ -24,7 +24,7 @@ function normalizeCompany(company) {
   return {
     id,
     name: company.name ?? "",
-    slug: company.slug ?? String(id),
+    slug: String(id),
     logo: company.logo ?? null,
     hasLogo: Boolean(company.hasLogo ?? company.logo),
   };

@@ -24,15 +24,15 @@ import { buildMetadata } from "@/lib/seo/metadata";
 export const revalidate = 300;
 
 /**
- * Pre-render the top products; remaining slugs are generated on-demand (ISR).
+ * Pre-render top products by id; remaining via on-demand ISR.
  */
 export async function generateStaticParams() {
   try {
     const { products } = await getProducts({ page: 1, per_page: 50 });
     return (products || [])
-      .map((product) => product.slug)
-      .filter(Boolean)
-      .map((slug) => ({ slug }));
+      .map((product) => product.id)
+      .filter((id) => id != null && id !== "")
+      .map((id) => ({ slug: String(id) }));
   } catch {
     return [];
   }
@@ -54,7 +54,7 @@ export async function generateMetadata({ params }) {
   return buildMetadata({
     title: product.name,
     description: product.description || undefined,
-    path: `/products/${product.slug}`,
+    path: `/products/${product.id}`,
     locale,
     images: product.image ? [{ url: product.image }] : undefined,
   });
@@ -87,18 +87,15 @@ export default async function ProductDetailRoute({ params, searchParams }) {
     allowAll: false,
   });
 
-  const incoming = decodeURIComponent(String(slug));
-  const needsSlugFix = incoming !== product.slug;
-  const needsGovernorateFix = needsGovernorateUrlSeed({
-    rawId: rawGovernorate,
-    selectedId: selectedGovernorateId,
-    allowAll: false,
-  });
-
-  // Safety net — happy path is seeded by proxy.ts (no flash / second skeleton).
-  if (needsSlugFix || needsGovernorateFix) {
+  if (
+    needsGovernorateUrlSeed({
+      rawId: rawGovernorate,
+      selectedId: selectedGovernorateId,
+      allowAll: false,
+    })
+  ) {
     i18nRedirect({
-      href: buildCatalogProductHref(product.slug, {
+      href: buildCatalogProductHref(product.id, {
         governorate: selectedGovernorateId,
       }),
       locale,

@@ -46,15 +46,15 @@ export function resolveCompanyStoreParams(searchParams = {}) {
 }
 
 /**
- * Builds a /companies/{slug} href from store filter state.
+ * Builds a /companies/{id} href from store filter state.
  * Omits defaults and empty values. Keeps parent_category_id for UI cascade.
  * Preserves `experience=campaign` for Campaign Experience navigation.
  *
- * @param {string} companySlug
+ * @param {string|number} companyId
  * @param {object} [params]
  */
-export function buildCompanyStoreHref(companySlug, params = {}) {
-  const base = `/companies/${encodeURIComponent(String(companySlug))}`;
+export function buildCompanyStoreHref(companyId, params = {}) {
+  const base = `/companies/${encodeURIComponent(String(companyId))}`;
   const query = new URLSearchParams();
 
   if (params.search) query.set("search", String(params.search));
@@ -113,15 +113,15 @@ export function buildCompanyStoreHref(companySlug, params = {}) {
 export function hasActiveCompanyStoreFilters(params = {}) {
   return Boolean(
     params.search ||
-      params.product_type_id ||
-      params.parent_category_id ||
-      params.category_id ||
-      params.source ||
-      (params.min_price != null &&
-        params.min_price !== "" &&
-        Number(params.min_price) > PRICE_MIN) ||
-      (params.max_price != null &&
-        params.max_price !== "" &&
-        Number(params.max_price) < PRICE_MAX),
+    params.product_type_id ||
+    params.parent_category_id ||
+    params.category_id ||
+    params.source ||
+    (params.min_price != null &&
+      params.min_price !== "" &&
+      Number(params.min_price) > PRICE_MIN) ||
+    (params.max_price != null &&
+      params.max_price !== "" &&
+      Number(params.max_price) < PRICE_MAX),
   );
 }

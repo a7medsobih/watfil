@@ -39,7 +39,7 @@ export async function generateMetadata({ params, searchParams }) {
   const [company, product] = await Promise.all([
     getCompany(slug, locale),
     getCompanyProductDetails({
-      companySlugOrId: slug,
+      companyId: slug,
       productId,
       source,
       locale,
@@ -57,7 +57,7 @@ export async function generateMetadata({ params, searchParams }) {
   return buildMetadata({
     title: company ? `${product.name} · ${company.name}` : product.name,
     description: product.description || undefined,
-    path: buildCompanyProductHref(company?.slug ?? slug, product.id, {
+    path: buildCompanyProductHref(company?.id ?? slug, product.id, {
       source,
     }),
     locale,
@@ -80,20 +80,8 @@ export default async function CompanyProductDetailsRoute({
   const company = await getCompany(slug, locale);
   if (!company) notFound();
 
-  const incomingSlug = decodeURIComponent(String(slug));
-  if (incomingSlug !== company.slug) {
-    i18nRedirect({
-      href: buildCompanyProductHref(company.slug, productId, {
-        source,
-        experience: isCampaign ? EXPERIENCE.CAMPAIGN : undefined,
-        governorate: resolveCompanyProductGovernorate(resolvedSearchParams),
-      }),
-      locale,
-    });
-  }
-
   const product = await getCompanyProductDetails({
-    companySlugOrId: company.id,
+    companyId: company.id,
     productId,
     source,
     locale,
@@ -126,7 +114,7 @@ export default async function CompanyProductDetailsRoute({
     })
   ) {
     i18nRedirect({
-      href: buildCompanyProductHref(company.slug, productId, {
+      href: buildCompanyProductHref(company.id, productId, {
         source,
         experience: isCampaign ? EXPERIENCE.CAMPAIGN : undefined,
         governorate: selectedGovernorateId,
@@ -141,7 +129,7 @@ export default async function CompanyProductDetailsRoute({
     <>
       <CompanyBrandSetter
         brand={{
-          slug: company.slug,
+          slug: String(company.id),
           name: company.name,
           logo: company.logo,
           hasLogo: company.hasLogo,
@@ -157,7 +145,7 @@ export default async function CompanyProductDetailsRoute({
                 {
                   label: company.name,
                   href: buildCompanyExperienceHref(
-                    company.slug,
+                    company.id,
                     EXPERIENCE.CAMPAIGN,
                   ),
                 },
@@ -166,7 +154,7 @@ export default async function CompanyProductDetailsRoute({
             : [
                 { label: t("nav.home"), href: "/" },
                 { label: t("nav.companies"), href: "/companies" },
-                { label: company.name, href: `/companies/${company.slug}` },
+                { label: company.name, href: `/companies/${company.id}` },
                 { label: product.name },
               ]
         }
@@ -176,7 +164,7 @@ export default async function CompanyProductDetailsRoute({
             mode="company"
             productId={productId}
             companyId={company.id}
-            companySlug={company.slug}
+            companySlug={String(company.id)}
             governorateId={governorateId}
             source={source}
             locale={locale}

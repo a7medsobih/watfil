@@ -55,7 +55,7 @@ export default function ProductDetailsPage({
         likeSlot={
           <Suspense fallback={<ProductLikeFallback className="size-10" />}>
             <PersonalizedProductLike
-              slugOrId={product.slug}
+              slugOrId={product.id}
               productId={product.id}
               source={likeSource}
               companyId={likeCompanyId}
@@ -69,7 +69,7 @@ export default function ProductDetailsPage({
 
       {showOfferingCompanies && (
         <ProductOfferingCompanies
-          productSlug={product.slug}
+          productSlug={product.id}
           offerings={offerings}
           governorates={governorates}
           selectedGovernorateId={selectedGovernorateId}
