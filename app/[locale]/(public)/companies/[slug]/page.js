@@ -1,18 +1,33 @@
+// src/app/[locale]/(public)/companies/[slug]/page.js
 import { Suspense } from "react";
 import { getLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 
+import { ProductCardSkeletonGrid } from "@/components/skeletons/ProductCardSkeleton";
 import {
   getCompany,
   getCompanyBillboards,
+  getCompanyProducts,
+  getGovernorates,
   getTopRatedCompanies,
 } from "@/features/companies/api";
 import { CompanyBrandSetter } from "@/features/companies/context/company-brand-context";
 import CompanyStorePage from "@/features/companies/components/store/CompanyStorePage";
+import CompanyStoreProductsSection from "@/features/companies/components/store/CompanyStoreProductsSection";
 import PersonalizedCompanyActions, {
   CompanyLikeFallback,
 } from "@/features/companies/components/store/PersonalizedCompanyActions";
 import { buildHeroSlides } from "@/features/companies/utils/build-hero-slides";
+import {
+  buildCompanyStoreHref,
+  resolveCompanyStoreParams,
+} from "@/features/companies/utils/resolve-company-store-params";
+import { EXPERIENCE } from "@/features/experience/constants";
+import {
+  getChildCategories,
+  getParentCategories,
+  getProductTypes,
+} from "@/features/taxonomy";
 import { buildMetadata } from "@/lib/seo/metadata";
 
 /** ISR: company details refresh every 5 minutes. */
@@ -34,13 +49,6 @@ export async function generateStaticParams() {
   } catch {
     return [];
   }
-}
-
-function readPage(searchParams) {
-  const value = searchParams?.page;
-  const raw = Array.isArray(value) ? value[0] : value;
-  const page = Number(raw ?? 1);
-  return Number.isFinite(page) && page > 0 ? page : 1;
 }
 
 export async function generateMetadata({ params }) {
@@ -65,11 +73,88 @@ export async function generateMetadata({ params }) {
   });
 }
 
+function StoreProductsSkeleton() {
+  return (
+    <section className="space-y-4" aria-busy="true">
+      <div className="h-8 w-40 animate-pulse rounded-lg bg-muted" />
+      <div className="h-4 w-28 animate-pulse rounded bg-muted" />
+      <ProductCardSkeletonGrid
+        count={8}
+        className="grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
+      />
+    </section>
+  );
+}
+
+async function CompanyStoreProducts({
+  companyId,
+  companySlug,
+  searchParams,
+  locale,
+}) {
+  const storeParams = resolveCompanyStoreParams(searchParams);
+
+  const [productTypes, { products: rawProducts, meta }] = await Promise.all([
+    getProductTypes({ locale }),
+    getCompanyProducts(companyId, { ...storeParams, locale }),
+  ]);
+
+  const [parentCategories, childCategories] = await Promise.all([
+    storeParams.product_type_id
+      ? getParentCategories(storeParams.product_type_id, { locale })
+      : Promise.resolve([]),
+    storeParams.parent_category_id
+      ? getChildCategories(storeParams.parent_category_id, {
+        locale,
+        product_type_id: storeParams.product_type_id,
+      })
+      : Promise.resolve([]),
+  ]);
+
+  const typesById = new Map(
+    productTypes.map((type) => [String(type.id), type]),
+  );
+  const parentsById = new Map(
+    parentCategories.map((category) => [String(category.id), category.name]),
+  );
+
+  const products = rawProducts.map((product) => {
+    const typeFromLookup = typesById.get(String(product.productTypeId));
+    const productType =
+      typeFromLookup &&
+        (!product.productType?.label ||
+          product.productType.label === product.productTypeKey)
+        ? typeFromLookup
+        : product.productType;
+
+    return {
+      ...product,
+      productType: productType ?? product.productType,
+      parentCategoryName:
+        product.parentCategoryName ??
+        parentsById.get(String(product.parentCategoryId)) ??
+        null,
+    };
+  });
+
+  return (
+    <CompanyStoreProductsSection
+      companySlug={companySlug}
+      products={products}
+      meta={meta}
+      storeParams={storeParams}
+      productTypes={productTypes}
+      parentCategories={parentCategories}
+      childCategories={childCategories}
+    />
+  );
+}
+
 export default async function CompanyStoreRoute({ params, searchParams }) {
   const { slug } = await params;
   const locale = await getLocale();
   const resolvedSearchParams = await searchParams;
-  const page = readPage(resolvedSearchParams);
+  const storeParams = resolveCompanyStoreParams(resolvedSearchParams);
 
   const company = await getCompany(slug, locale);
 
@@ -77,17 +162,39 @@ export default async function CompanyStoreRoute({ params, searchParams }) {
 
   const incoming = decodeURIComponent(String(slug));
   if (incoming !== company.slug) {
-    const qs = page > 1 ? `?page=${page}` : "";
-    redirect(`/${locale}/companies/${encodeURIComponent(company.slug)}${qs}`);
+    redirect(`/${locale}${buildCompanyStoreHref(company.slug, storeParams)}`);
   }
 
-  // Billboards only after company profile succeeded; failures → [].
-  const billboards = await getCompanyBillboards(company.id);
+  const isCampaign = storeParams.experience === EXPERIENCE.CAMPAIGN;
 
-  const heroSlides = buildHeroSlides({
+  // Campaign: skip billboard ads, keep company gallery as the hero.
+  const [billboards, governorates] = await Promise.all([
+    isCampaign ? Promise.resolve([]) : getCompanyBillboards(company.id),
+    getGovernorates({ locale }),
+  ]);
+
+  const defaultGovernorateId =
+    company.governorate?.id ?? governorates[0]?.id ?? null;
+
+  const heroSlides = await buildHeroSlides({
     billboards,
     gallery: company.gallery,
+    governorate: defaultGovernorateId,
+    locale,
   });
+
+  const storeKey = [
+    storeParams.page,
+    storeParams.per_page,
+    storeParams.search,
+    storeParams.product_type_id,
+    storeParams.parent_category_id,
+    storeParams.category_id,
+    storeParams.min_price,
+    storeParams.max_price,
+    storeParams.source,
+    storeParams.experience,
+  ].join("|");
 
   return (
     <>
@@ -107,6 +214,16 @@ export default async function CompanyStoreRoute({ params, searchParams }) {
             <PersonalizedCompanyActions
               slugOrId={company.slug}
               company={company}
+            />
+          </Suspense>
+        }
+        storeSlot={
+          <Suspense key={storeKey} fallback={<StoreProductsSkeleton />}>
+            <CompanyStoreProducts
+              companyId={company.id}
+              companySlug={company.slug}
+              searchParams={resolvedSearchParams}
+              locale={locale}
             />
           </Suspense>
         }

@@ -9,7 +9,6 @@ export default function CategoryCard({ name, count, Icon }) {
       </div>
       <div>
         <div className="text-sm font-semibold">{name}</div>
-        <div className="mt-0.5 text-xs text-muted-foreground">{count}</div>
       </div>
     </div>
   );

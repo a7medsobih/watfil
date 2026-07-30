@@ -1,9 +1,14 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useTransition } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { applyFilterCascade } from "@/features/filters";
+import {
+  GOVERNORATE_ALL,
+  setGovernoratePreferenceClient,
+} from "@/features/governorate";
+import { useListQueryContext } from "@/features/products/context/list-query-context";
 import {
   buildProductsHref,
   resolveProductsParams,
@@ -12,12 +17,15 @@ import { useRouter } from "@/i18n/navigation";
 
 /**
  * Products list URL state (searchParams as single source of truth).
+ * When inside ListQueryProvider, returns the provided company/catalog query instead.
  *
  * @param {{ productTypes?: object[] }} [options]
  */
 export function useProductsQuery(options = {}) {
+  const ctx = useListQueryContext();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
   const { productTypes = [] } = options;
 
   const params = useMemo(() => {
@@ -30,14 +38,32 @@ export function useProductsQuery(options = {}) {
 
       if (resetPage) next.page = 1;
 
-      router.push(buildProductsHref(next));
+      if (Object.prototype.hasOwnProperty.call(patch, "governorate_id")) {
+        if (
+          next.governorate_id == null ||
+          next.governorate_id === "" ||
+          next.governorate_id === "all"
+        ) {
+          setGovernoratePreferenceClient(GOVERNORATE_ALL);
+        } else {
+          setGovernoratePreferenceClient(next.governorate_id);
+        }
+      }
+
+      startTransition(() => {
+        router.push(buildProductsHref(next));
+      });
     },
     [params, productTypes, router],
   );
 
   const reset = useCallback(() => {
-    router.push("/products");
+    startTransition(() => {
+      router.push("/products");
+    });
   }, [router]);
 
-  return { params, update, reset };
+  const fallback = { params, update, reset, isPending };
+
+  return ctx ?? fallback;
 }

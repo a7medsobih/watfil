@@ -1,9 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Sparkles } from "lucide-react";
 
-import EmptyState from "@/components/common/EmptyState";
 import SectionCarousel from "@/components/common/SectionCarousel";
 import { Badge } from "@/components/ui/badge";
 import { resolveLucideIcon } from "@/features/companies/utils/resolve-lucide-icon";
@@ -50,9 +48,12 @@ function ServiceCard({ service, index, emptyDescription }) {
 
 /**
  * Competitive services section — Embla carousel on mobile, grid from md+.
+ * Hidden entirely when the API returns no services.
  */
 export default function CompanyServicesSection({ services = [], className }) {
   const t = useTranslations("company");
+
+  if (!services.length) return null;
 
   return (
     <section className={cn("space-y-4", className)}>
@@ -65,35 +66,25 @@ export default function CompanyServicesSection({ services = [], className }) {
             {t("servicesSubtitle")}
           </p>
         </div>
-        {services.length > 0 ? (
-          <Badge variant="secondary" className="rounded-full">
-            {services.length} {t("tabs.services")}
-          </Badge>
-        ) : null}
+        <Badge variant="secondary" className="rounded-full">
+          {services.length} {t("tabs.services")}
+        </Badge>
       </div>
 
-      {services.length > 0 ? (
-        <SectionCarousel
-          ariaLabel={t("tabs.services")}
-          gridClassName="md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-          itemClassName="basis-[85%] sm:basis-[48%]"
-        >
-          {services.map((service, index) => (
-            <ServiceCard
-              key={service.id}
-              service={service}
-              index={index}
-              emptyDescription={t("servicesEmpty")}
-            />
-          ))}
-        </SectionCarousel>
-      ) : (
-        <EmptyState
-          icon={<Sparkles className="size-7 sm:size-8" aria-hidden />}
-          title={t("tabs.services")}
-          description={t("servicesEmpty")}
-        />
-      )}
+      <SectionCarousel
+        ariaLabel={t("tabs.services")}
+        gridClassName="md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        itemClassName="basis-[85%] sm:basis-[48%]"
+      >
+        {services.map((service, index) => (
+          <ServiceCard
+            key={service.id}
+            service={service}
+            index={index}
+            emptyDescription={t("servicesEmpty")}
+          />
+        ))}
+      </SectionCarousel>
     </section>
   );
 }

@@ -1,3 +1,4 @@
+// src/app/[locale]/(store-share)/store/[taxNumber]/page.js
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { getPublicStore } from "@/features/companies/api";

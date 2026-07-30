@@ -1,15 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import dynamic from "next/dynamic";
-import { useLocale, useTranslations } from "next-intl";
-import { Package } from "lucide-react";
+import { useLocale } from "next-intl";
 
-import EmptyState from "@/components/common/EmptyState";
-import ProductCard from "@/components/common/ProductCard";
 import CompanyInfoCard from "@/features/companies/components/store/CompanyInfoCard";
+import CompanyRatingsSection from "@/features/companies/components/store/CompanyRatingsSection";
 import CompanyServicesSection from "@/features/companies/components/store/CompanyServicesSection";
-import CompanyStoreTabs from "@/features/companies/components/store/CompanyStoreTabs";
+import CompanyTeamSection from "@/features/companies/components/store/CompanyTeamSection";
 import { CompanyPersonalizationProvider } from "@/features/companies/context/company-personalization-context";
 import { cn } from "@/lib/utils";
 
@@ -25,117 +23,116 @@ const CompanyHeroGallery = dynamic(
 
 /**
  * Composes the public company storefront.
- * Info card overlaps the lower half of the hero slider.
- * Products come from paginated GET /public/companies/{id}/products.
- * Hero slides come from buildHeroSlides (billboards preferred over gallery).
+ * Order: Hero → Info → Services → Store → Ratings → Team.
+ * Campaign experience hides billboard ads only — gallery hero still shows when present.
  */
 export default function CompanyStorePage({
   company,
   heroSlides = [],
   likeSlot = null,
+  storeSlot = null,
 }) {
-  const t = useTranslations("company");
   const locale = useLocale();
-  const [view, setView] = useState(company);
+  const [personalization, setPersonalization] = useState({
+    companyId: company?.id ?? null,
+    myRating: undefined,
+    isLiked: undefined,
+    rating: undefined,
+    reviews: undefined,
+  });
 
-  useEffect(() => {
-    setView((prev) => ({
-      ...company,
-      // Keep personalized fields across ISR shell refreshes until hydrator runs.
-      myRating: prev?.id === company?.id ? (prev.myRating ?? company.myRating) : company.myRating,
-      isLiked: prev?.id === company?.id ? (prev.isLiked ?? company.isLiked) : company.isLiked,
-    }));
-  }, [company]);
+  // Keep personalized fields across ISR shell refreshes until hydrator runs.
+  if (company?.id !== personalization.companyId) {
+    setPersonalization({
+      companyId: company?.id ?? null,
+      myRating: undefined,
+      isLiked: undefined,
+      rating: undefined,
+      reviews: undefined,
+    });
+  }
 
   const applyPersonalization = useCallback((data) => {
     if (!data) return;
-    setView((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        ...(data.myRating !== undefined ? { myRating: data.myRating } : {}),
-        ...(data.isLiked !== undefined ? { isLiked: data.isLiked } : {}),
-      };
-    });
+    setPersonalization((prev) => ({
+      ...prev,
+      ...(data.myRating !== undefined ? { myRating: data.myRating } : {}),
+      ...(data.isLiked !== undefined ? { isLiked: data.isLiked } : {}),
+    }));
   }, []);
 
-  if (!view) return null;
+  if (!company) return null;
 
-  const hasHero = (heroSlides?.length ?? 0) > 0;
+  const view = {
+    ...company,
+    myRating:
+      personalization.myRating !== undefined
+        ? personalization.myRating
+        : company.myRating,
+    isLiked:
+      personalization.isLiked !== undefined
+        ? personalization.isLiked
+        : company.isLiked,
+    rating:
+      personalization.rating !== undefined
+        ? personalization.rating
+        : company.rating,
+    reviews:
+      personalization.reviews !== undefined
+        ? personalization.reviews
+        : company.reviews,
+  };
+
+  const showHero = (heroSlides?.length ?? 0) > 0;
   const services = view.services ?? [];
-  const products = view.products ?? [];
+  const team = view.team ?? [];
 
   return (
     <CompanyPersonalizationProvider onUpdate={applyPersonalization}>
       <div className="pb-16">
-        <div className={cn(hasHero && "relative")}>
-          {hasHero && (
-            <CompanyHeroGallery
-              slides={heroSlides}
-              companyName={view.name}
-            />
+        <div className={cn(showHero && "relative")}>
+          {showHero && (
+            <CompanyHeroGallery slides={heroSlides} companyName={view.name} />
           )}
 
           <div
             className={cn(
               "container",
-              hasHero
+              showHero
                 ? "relative z-10 -mt-14 space-y-8 sm:-mt-20 sm:space-y-10 md:-mt-24"
                 : "space-y-8 pt-6 sm:space-y-10 sm:pt-8",
             )}
           >
             <CompanyInfoCard
               company={view}
-              className={hasHero ? "shadow-elegant" : undefined}
+              className={showHero ? "shadow-elegant" : undefined}
               likeSlot={likeSlot}
             />
 
             <CompanyServicesSection services={services} />
 
-            <section className="space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <h2 className="text-xl font-bold tracking-tight sm:text-2xl">
-                    {t("tabs.store")}
-                  </h2>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {t("productsSubtitle", { count: products.length })}
-                  </p>
-                </div>
-              </div>
+            {storeSlot}
 
-              {products.length > 0 ? (
-                <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                  {products.map((product) => (
-                    <ProductCard
-                      key={`${product.source ?? "product"}-${product.id}-${product.sku ?? ""}`}
-                      product={product}
-                      locale={locale}
-                      variant="company"
-                      companySlug={view.slug}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <EmptyState
-                  icon={<Package className="size-7 sm:size-8" aria-hidden />}
-                  title={t("emptyProductsTitle")}
-                  description={t("emptyProducts")}
-                />
-              )}
-            </section>
-
-            <CompanyStoreTabs
-              company={view}
-              onRatingSummaryChange={(summary) => {
-                setView((prev) => ({
+            <CompanyRatingsSection
+              companyId={view.id}
+              ratings={view.ratings ?? []}
+              myRating={view.myRating}
+              averageRating={view.rating}
+              ratingsCount={view.reviews ?? 0}
+              viewsCount={view.viewsCount ?? 0}
+              likesCount={view.likes ?? 0}
+              locale={locale}
+              onSummaryChange={(summary) => {
+                setPersonalization((prev) => ({
                   ...prev,
+                  myRating: summary.myRating,
                   rating: summary.rating,
                   reviews: summary.reviews,
-                  myRating: summary.myRating,
                 }));
               }}
             />
+
+            <CompanyTeamSection team={team} />
           </div>
         </div>
       </div>

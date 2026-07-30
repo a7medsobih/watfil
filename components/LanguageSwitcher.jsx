@@ -1,6 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 import { Globe } from "lucide-react";
 
@@ -17,6 +18,7 @@ export default function LanguageSwitcher({ variant = "icon", className }) {
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
   const nextLocale =
@@ -27,8 +29,11 @@ export default function LanguageSwitcher({ variant = "icon", className }) {
   function switchLocale() {
     if (!nextLocale) return;
 
+    const qs = searchParams.toString();
+    const href = qs ? `${pathname}?${qs}` : pathname;
+
     startTransition(() => {
-      router.replace(pathname, { locale: nextLocale });
+      router.replace(href, { locale: nextLocale });
     });
   }
 

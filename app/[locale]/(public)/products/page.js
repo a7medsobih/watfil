@@ -15,6 +15,12 @@ import {
   hasActiveProductFilters,
 } from "@/features/filters";
 import { getGovernorates } from "@/features/companies/api";
+import {
+  getGovernoratePreferenceFromCookies,
+  isGovernorateAll,
+  needsGovernorateUrlSeed,
+  pickGovernorateId,
+} from "@/features/governorate";
 import ProductsActiveFilters from "@/features/products/components/ProductsActiveFilters";
 import ProductsFilters from "@/features/products/components/ProductsFilters";
 import ProductsFiltersSheet from "@/features/products/components/ProductsFiltersSheet";
@@ -31,7 +37,7 @@ import {
   getProductTypes,
   isFiltersProductType,
 } from "@/features/taxonomy";
-import { Link } from "@/i18n/navigation";
+import { Link, redirect as i18nRedirect } from "@/i18n/navigation";
 
 function attachTaxonomyDisplay(products, { parentCategories = [], productTypes = [] } = {}) {
   const parentsById = new Map(
@@ -64,29 +70,63 @@ function attachTaxonomyDisplay(products, { parentCategories = [], productTypes =
 export default async function Page({ searchParams }) {
   const locale = await getLocale();
   const t = await getTranslations();
-  const params = resolveProductsParams(await searchParams);
+  const resolvedSearchParams = await searchParams;
+  const params = resolveProductsParams(resolvedSearchParams);
 
-  const [productTypes, governorates] = await Promise.all([
+  const [productTypes, governorates, preferredId] = await Promise.all([
     getProductTypes({ locale }),
     getGovernorates({ locale }),
+    getGovernoratePreferenceFromCookies(),
   ]);
 
+  // Proxy seeds missing governorate_id; this corrects invalid ids only.
+  // Cookie "all" keeps the list unscoped (explicit user choice).
+  const selectedGovernorateId = isGovernorateAll(preferredId) && !params.governorate_id
+    ? null
+    : pickGovernorateId({
+        rawId: params.governorate_id,
+        governorates,
+        preferredId,
+        allowAll: true,
+      });
+
+  if (
+    needsGovernorateUrlSeed({
+      rawId: params.governorate_id,
+      selectedId: selectedGovernorateId,
+      allowAll: true,
+    })
+  ) {
+    i18nRedirect({
+      href: buildProductsHref({
+        ...params,
+        governorate_id: selectedGovernorateId,
+      }),
+      locale,
+    });
+  }
+
+  const listParams = {
+    ...params,
+    governorate_id: selectedGovernorateId,
+  };
+
   const selectedType = productTypes.find(
-    (type) => String(type.id) === String(params.product_type_id),
+    (type) => String(type.id) === String(listParams.product_type_id),
   );
 
   const [parentCategories, childCategories, { products: rawProducts, meta }] =
     await Promise.all([
-      params.product_type_id
-        ? getParentCategories(params.product_type_id, { locale })
+      listParams.product_type_id
+        ? getParentCategories(listParams.product_type_id, { locale })
         : Promise.resolve([]),
-      params.parent_category_id
-        ? getChildCategories(params.parent_category_id, {
+      listParams.parent_category_id
+        ? getChildCategories(listParams.parent_category_id, {
             locale,
-            product_type_id: params.product_type_id,
+            product_type_id: listParams.product_type_id,
           })
         : Promise.resolve([]),
-      getProducts(params),
+      getProducts(listParams),
     ]);
 
   const products = attachTaxonomyDisplay(rawProducts, {
@@ -101,7 +141,9 @@ export default async function Page({ searchParams }) {
       })()
     : [];
 
-  const hasFilters = hasActiveProductFilters(params);
+  const hasFilters = hasActiveProductFilters(listParams);
+  const catalogGovernorateId =
+    selectedGovernorateId ?? governorates[0]?.id ?? null;
 
   const filterLabels = {
     filters: t("products.filters"),
@@ -219,6 +261,7 @@ export default async function Page({ searchParams }) {
                       product={product}
                       locale={locale}
                       variant="catalog"
+                      governorate={catalogGovernorateId}
                     />
                   ))}
                 </div>
@@ -234,7 +277,7 @@ export default async function Page({ searchParams }) {
                   }}
                   hrefBuilder={(page) =>
                     buildProductsHref({
-                      ...params,
+                      ...listParams,
                       page,
                     })
                   }

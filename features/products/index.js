@@ -15,6 +15,7 @@ export { resolveProductsParams } from "./utils/resolve-products-params";
 export {
   resolveProductDetailParams,
   buildProductDetailHref,
+  buildCatalogProductHref,
 } from "./utils/resolve-product-detail-params";
 export {
   buildProductSlug,

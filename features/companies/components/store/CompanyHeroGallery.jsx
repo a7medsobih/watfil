@@ -132,12 +132,14 @@ export default function CompanyHeroGallery({
                 {href ? (
                   <Link
                     href={href}
-                    className="absolute inset-0 z-[1] block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
-                    aria-label={t("sponsoredProduct", { name: companyName })}
+                    className="absolute inset-0 z-[1] block cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+                    aria-label={t("sponsoredProduct", {
+                      name: slide.productName || companyName,
+                    })}
                   >
                     <img
                       src={slide.url}
-                      alt={`${t("sponsored")} — ${companyName}`}
+                      alt={`${t("sponsored")} — ${slide.productName || companyName}`}
                       loading={index === 0 ? "eager" : "lazy"}
                       decoding="async"
                       className="h-full w-full object-cover"

@@ -7,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { setGovernoratePreferenceClient } from "@/features/governorate";
 import { useRouter } from "@/i18n/navigation";
 import { buildProductDetailHref } from "@/features/products/utils/resolve-product-detail-params";
 
@@ -45,6 +46,7 @@ export default function ProductGovernorateSelect({
       <Select
         value={value}
         onValueChange={(next) => {
+          setGovernoratePreferenceClient(next);
           router.push(
             buildProductDetailHref(productSlug, { governorate: next }),
           );

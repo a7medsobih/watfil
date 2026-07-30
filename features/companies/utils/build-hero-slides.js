@@ -1,29 +1,54 @@
+import { getProduct } from "@/features/products/api";
+import { buildCatalogProductHref } from "@/features/products/utils/resolve-product-detail-params";
+import { buildProductSlug } from "@/features/products/utils/product-slug";
+
 /**
- * Resolves a frontend product-detail href for a billboard.
- * Prefers supplier_product_id / target.product_id; falls back to target.path.
+ * Resolves the SEO catalog product href for a billboard.
+ * Billboard ads always target Watfil catalog products via `supplier_product_id`.
  *
  * @param {object} billboard
- * @returns {string|null}
+ * @param {{ governorate?: string|number|null, locale?: string }} [options]
+ * @returns {Promise<string|null>}
  */
-function resolveBillboardHref(billboard) {
+async function resolveBillboardHref(
+  billboard,
+  { governorate = null, locale = "ar" } = {},
+) {
   const productId =
-    billboard?.supplierProductId ?? billboard?.target?.productId ?? null;
+    billboard?.supplierProductId ??
+    billboard?.product?.id ??
+    billboard?.target?.productId ??
+    null;
 
-  if (productId != null && productId !== "") {
-    return `/products/${encodeURIComponent(String(productId))}`;
+  if (productId == null || productId === "") return null;
+
+  // Prefer live catalog product (canonical SEO slug).
+  const catalogProduct = await getProduct(productId, locale);
+  if (catalogProduct?.slug) {
+    return buildCatalogProductHref(catalogProduct, { governorate });
   }
 
-  const path = billboard?.target?.path;
-  if (typeof path !== "string" || !path.trim()) return null;
+  // Fallback from embedded billboard product payload (sku + id → slug).
+  const embedded = billboard?.product;
+  if (embedded) {
+    const embeddedSlug =
+      embedded.slug ||
+      buildProductSlug({
+        id: embedded.id ?? productId,
+        sku: embedded.sku,
+      });
 
-  const match = path.match(/\/products\/([^/?#]+)/i);
-  if (!match?.[1]) return null;
+    if (embeddedSlug) {
+      return buildCatalogProductHref(embeddedSlug, { governorate });
+    }
+  }
 
-  return `/products/${encodeURIComponent(match[1])}`;
+  // Last resort: id path — product detail route resolves id → canonical slug.
+  return buildCatalogProductHref(String(productId), { governorate });
 }
 
 /**
- * Normalizes gallery images into hero slides.
+ * Normalizes gallery images into hero slides (non-clickable).
  * @param {Array<{ id?: string|number, url?: string }>} gallery
  */
 function mapGallerySlides(gallery = []) {
@@ -38,40 +63,50 @@ function mapGallerySlides(gallery = []) {
 }
 
 /**
- * Normalizes billboards into hero slides.
+ * Normalizes billboards into hero slides with catalog product hrefs.
  * @param {object[]} billboards
+ * @param {{ governorate?: string|number|null, locale?: string }} [options]
  */
-function mapBillboardSlides(billboards = []) {
-  return (billboards ?? [])
-    .filter((item) => item?.image)
-    .map((item) => ({
+async function mapBillboardSlides(
+  billboards = [],
+  { governorate = null, locale = "ar" } = {},
+) {
+  const rows = (billboards ?? []).filter((item) => item?.image);
+
+  return Promise.all(
+    rows.map(async (item) => ({
       id: `billboard-${item.id}`,
       url: item.image,
       kind: "billboard",
-      href: resolveBillboardHref(item),
-    }));
+      href: await resolveBillboardHref(item, { governorate, locale }),
+      productName: item.product?.name || null,
+    })),
+  );
 }
 
 /**
  * Data adapter: single source of truth for CompanyHeroGallery slides.
  *
- * billboards.length > 0 → billboards only
- * otherwise → company.gallery (current behaviour)
+ * billboards.length > 0 → billboards only (ads → catalog product)
+ * otherwise → company.gallery (cover / identity)
+ *
+ * Campaign callers pass `billboards: []` to keep gallery hero without ads.
  *
  * @param {{
  *   billboards?: object[],
  *   gallery?: Array<{ id?: string|number, url?: string }>,
+ *   governorate?: string|number|null,
+ *   locale?: string,
  * }} [input]
- * @returns {Array<{
- *   id: string|number,
- *   url: string,
- *   kind: 'gallery'|'billboard',
- *   href: string|null,
- * }>}
  */
-export function buildHeroSlides({ billboards = [], gallery = [] } = {}) {
+export async function buildHeroSlides({
+  billboards = [],
+  gallery = [],
+  governorate = null,
+  locale = "ar",
+} = {}) {
   if (Array.isArray(billboards) && billboards.length > 0) {
-    return mapBillboardSlides(billboards);
+    return mapBillboardSlides(billboards, { governorate, locale });
   }
 
   return mapGallerySlides(gallery);

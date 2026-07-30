@@ -5,6 +5,7 @@ import ProductCard from "@/components/common/ProductCard";
 import LazySectionCarousel from "@/components/common/LazySectionCarousel";
 import SectionHeader from "@/components/common/SectionHeader";
 import { Button } from "@/components/ui/button";
+import { getGovernorates } from "@/features/companies/api";
 import { getFeaturedProducts } from "@/features/products/api";
 import { Link } from "@/i18n/navigation";
 
@@ -13,11 +14,16 @@ const HOME_PRODUCTS_LIMIT = 8;
 export default async function ProductsSection() {
   const t = await getTranslations();
   const locale = await getLocale();
-  const { products } = await getFeaturedProducts({
-    limit: HOME_PRODUCTS_LIMIT,
-  });
+  const [{ products }, governorates] = await Promise.all([
+    getFeaturedProducts({
+      limit: HOME_PRODUCTS_LIMIT,
+    }),
+    getGovernorates({ locale }),
+  ]);
 
   if (!products.length) return null;
+
+  const catalogGovernorateId = governorates[0]?.id ?? null;
 
   return (
     <section className="container py-10">
@@ -42,6 +48,7 @@ export default async function ProductsSection() {
             product={product}
             locale={locale}
             variant="catalog"
+            governorate={catalogGovernorateId}
             className="h-full"
           />
         ))}

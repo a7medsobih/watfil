@@ -6,15 +6,25 @@ import { useTranslations } from "next-intl";
 import logo from "@/assets/watfil-logo.png";
 import { Link } from "@/i18n/navigation";
 import { useCompanyBrand } from "@/features/companies/context/company-brand-context";
+import { useExperience } from "@/features/experience";
+import { buildCompanyExperienceHref } from "@/features/experience/utils";
+import { EXPERIENCE } from "@/features/experience/constants";
 
-export default function NavbarBrand() {
+export default function NavbarBrand({ hideWatfilFallback = false }) {
   const t = useTranslations();
   const brand = useCompanyBrand();
+  const { experience, isCampaign } = useExperience();
+  const campaignMode = isCampaign || hideWatfilFallback;
 
   if (brand?.name) {
+    const href = buildCompanyExperienceHref(
+      brand.slug,
+      campaignMode ? EXPERIENCE.CAMPAIGN : experience,
+    );
+
     return (
       <Link
-        href={`/companies/${brand.slug}`}
+        href={href}
         className="group flex min-w-0 shrink-0 items-center gap-2"
       >
         {brand.hasLogo && brand.logo ? (
@@ -31,6 +41,11 @@ export default function NavbarBrand() {
         </span>
       </Link>
     );
+  }
+
+  // Campaign chrome never falls back to Watfil branding.
+  if (campaignMode) {
+    return <div className="min-w-0 shrink-0" aria-hidden />;
   }
 
   return (

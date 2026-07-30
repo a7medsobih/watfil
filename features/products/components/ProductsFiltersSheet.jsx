@@ -23,6 +23,9 @@ export default function ProductsFiltersSheet({
   stageOptions,
   labels,
   locale,
+  showStagesFilter = true,
+  showGovernorateFilter = true,
+  showSourceFilter = false,
 }) {
   return (
     <Sheet>
@@ -51,6 +54,9 @@ export default function ProductsFiltersSheet({
             labels={labels}
             locale={locale}
             showHeader={false}
+            showStagesFilter={showStagesFilter}
+            showGovernorateFilter={showGovernorateFilter}
+            showSourceFilter={showSourceFilter}
             className="border-0 p-0 shadow-none lg:static"
           />
         </div>

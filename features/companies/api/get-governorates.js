@@ -1,7 +1,7 @@
 import { fetchFromAPI } from "@/lib/api/fetcher";
 import { endpoints } from "@/lib/api/endpoints";
 import { cacheTags, revalidate } from "@/lib/cache";
-import { mapGovernorates } from "@/features/companies/services/company.mapper";
+import { mapGovernorates } from "@/features/companies/services/governorate.mapper";
 
 /**
  * Fetches public governorates (deduped) for companies tabs.

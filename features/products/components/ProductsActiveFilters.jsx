@@ -112,6 +112,19 @@ export default function ProductsActiveFilters({
       });
     }
 
+    if (params.source) {
+      const sourceLabel =
+        params.source === "catalog"
+          ? (labels.sourceCatalog ?? params.source)
+          : (labels.sourceCompany ?? params.source);
+      next.push({
+        id: "source",
+        label: `${labels.source ?? "Source"}: ${sourceLabel}`,
+        removeLabel,
+        onRemove: () => update({ source: null }),
+      });
+    }
+
     if (params.sort && params.sort !== "newest") {
       const sortLabels = {
         price_asc: labels.sortPriceAsc,

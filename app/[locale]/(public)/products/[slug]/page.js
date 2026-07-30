@@ -1,7 +1,12 @@
 import { getLocale, getTranslations } from "next-intl/server";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 import { getGovernorates } from "@/features/companies/api";
+import {
+  getGovernoratePreferenceFromCookies,
+  needsGovernorateUrlSeed,
+  pickGovernorateId,
+} from "@/features/governorate";
 import {
   getProduct,
   getProductCompanies,
@@ -9,7 +14,7 @@ import {
 } from "@/features/products/api";
 import ProductDetailsPage from "@/features/products/components/details/ProductDetailsPage";
 import {
-  buildProductDetailHref,
+  buildCatalogProductHref,
   resolveProductDetailParams,
 } from "@/features/products/utils/resolve-product-detail-params";
 import { redirect as i18nRedirect } from "@/i18n/navigation";
@@ -64,53 +69,36 @@ export default async function ProductDetailRoute({ params, searchParams }) {
   const product = await getProduct(slug, locale);
   if (!product) notFound();
 
-  const incoming = decodeURIComponent(String(slug));
-  if (incoming !== product.slug) {
-    const qs = new URLSearchParams();
-    const gov = Array.isArray(resolvedSearchParams?.governorate)
-      ? resolvedSearchParams.governorate[0]
-      : resolvedSearchParams?.governorate;
-    if (gov) qs.set("governorate", String(gov));
-    const suffix = qs.toString() ? `?${qs.toString()}` : "";
-    redirect(`/${locale}/products/${encodeURIComponent(product.slug)}${suffix}`);
-  }
+  const [governorates, preferredId] = await Promise.all([
+    getGovernorates({ locale }),
+    getGovernoratePreferenceFromCookies(),
+  ]);
 
-  const governorates = await getGovernorates({ locale });
-  const defaultGovernorateId = governorates[0]?.id ?? null;
-
-  const hasGovernorateParam = (() => {
+  const rawGovernorate = (() => {
     const value = resolvedSearchParams?.governorate;
-    const raw = Array.isArray(value) ? value[0] : value;
-    return raw != null && raw !== "";
+    return Array.isArray(value) ? value[0] : value;
   })();
 
-  if (!hasGovernorateParam && defaultGovernorateId != null) {
-    i18nRedirect({
-      href: buildProductDetailHref(product.slug, {
-        governorate: defaultGovernorateId,
-      }),
-      locale,
-    });
-  }
-
-  const detailParams = resolveProductDetailParams(resolvedSearchParams, {
-    defaultGovernorateId,
+  const detailParams = resolveProductDetailParams(resolvedSearchParams);
+  const selectedGovernorateId = pickGovernorateId({
+    rawId: detailParams.governorate_id ?? rawGovernorate,
+    governorates,
+    preferredId,
+    allowAll: false,
   });
 
-  const isKnownGovernorate = governorates.some(
-    (item) => String(item.id) === String(detailParams.governorate_id),
-  );
+  const incoming = decodeURIComponent(String(slug));
+  const needsSlugFix = incoming !== product.slug;
+  const needsGovernorateFix = needsGovernorateUrlSeed({
+    rawId: rawGovernorate,
+    selectedId: selectedGovernorateId,
+    allowAll: false,
+  });
 
-  const selectedGovernorateId = isKnownGovernorate
-    ? detailParams.governorate_id
-    : defaultGovernorateId;
-
-  if (
-    selectedGovernorateId != null &&
-    String(detailParams.governorate_id) !== String(selectedGovernorateId)
-  ) {
+  // Safety net — happy path is seeded by proxy.ts (no flash / second skeleton).
+  if (needsSlugFix || needsGovernorateFix) {
     i18nRedirect({
-      href: buildProductDetailHref(product.slug, {
+      href: buildCatalogProductHref(product.slug, {
         governorate: selectedGovernorateId,
       }),
       locale,

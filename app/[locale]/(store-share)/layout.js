@@ -1,16 +1,34 @@
-import { Navbar } from "@/components/layout/navbar";
-import StoreShareFooter from "@/features/companies/components/share/StoreShareFooter";
+import { Suspense } from "react";
+
+import CampaignFooter from "@/components/layout/CampaignFooter";
+import CampaignNavbar from "@/components/layout/CampaignNavbar";
+import { CompanyBrandProvider } from "@/features/companies/context/company-brand-context";
+import { ExperienceProvider } from "@/features/experience";
+import { EXPERIENCE } from "@/features/experience/constants";
 
 /**
- * Isolated shell for /store/{tax} — no site nav or full footer.
- * Keeps Watfil identity (logo, language, theme) without distraction.
+ * Campaign shell for /store/{tax}.
+ * Same chrome as ?experience=campaign on company routes — no Watfil nav.
  */
 export default function StoreShareLayout({ children }) {
   return (
-    <div className="flex min-h-dvh flex-col">
-      <Navbar variant="minimal" />
-      <main className="flex-1">{children}</main>
-      <StoreShareFooter />
-    </div>
+    <CompanyBrandProvider>
+      <Suspense
+        fallback={
+          <div className="flex min-h-dvh flex-col">
+            <CampaignNavbar />
+            <main className="flex-1">{children}</main>
+          </div>
+        }
+      >
+        <ExperienceProvider forceExperience={EXPERIENCE.CAMPAIGN}>
+          <div className="flex min-h-dvh flex-col">
+            <CampaignNavbar />
+            <main className="flex-1">{children}</main>
+            <CampaignFooter />
+          </div>
+        </ExperienceProvider>
+      </Suspense>
+    </CompanyBrandProvider>
   );
 }

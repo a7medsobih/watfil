@@ -49,8 +49,8 @@
     },
     "home": {
         "categories": {
-            "title": "Explore by category",
-            "subtitle": "From household filters to industrial purification systems."
+            "title": "Solutions for every need",
+            "subtitle": "From home filters to facility systems — choose what fits, from certified companies."
         },
         "featured": {
             "title": "Featured products",
@@ -114,6 +114,9 @@
         "all": "All",
         "allGovernorates": "All governorates",
         "governorateHint": "Shows products available from companies serving this governorate.",
+        "source": "Source",
+        "sourceCatalog": "Approved product",
+        "sourceCompany": "Company product",
         "resetFilters": "Reset filters",
         "clearAll": "Clear all",
         "removeFilter": "Remove filter",
@@ -160,7 +163,8 @@
             "installment": "Installment",
             "perks": "Perks included",
             "watfilProduct": "Watfil product",
-            "companyProduct": "Company product"
+            "companyProduct": "Company product",
+            "approvedProduct": "Approved product"
         },
         "availability": {
             "available": "Available",
@@ -245,6 +249,7 @@
         "servicesSubtitle": "Premium service advantages that make this company stand out.",
         "servicesEmpty": "No services added yet.",
         "productsSubtitle": "{count} products available",
+        "teamSubtitle": "Meet the team behind this company.",
         "teamEmpty": "No team members were added yet.",
         "like": "Like company",
         "unlike": "Unlike company",

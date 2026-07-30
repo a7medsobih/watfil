@@ -28,7 +28,7 @@ import { cn } from "@/lib/utils";
 const ALL_OPTION = "all";
 
 /**
- * Catalog products filters — taxonomy cascade + price + governorate.
+ * Catalog / company-store products filters — taxonomy cascade + price (+ optional source / governorate).
  */
 export default function ProductsFilters({
   productTypes = [],
@@ -40,16 +40,21 @@ export default function ProductsFilters({
   locale = "ar",
   className,
   showHeader = true,
+  showStagesFilter = true,
+  showGovernorateFilter = true,
+  showSourceFilter = false,
 }) {
   const { params, update, reset } = useProductsQuery({ productTypes });
   const typeGroupName = `product-type-${useId()}`;
   const parentGroupName = `parent-category-${useId()}`;
   const categoryGroupName = `category-${useId()}`;
+  const sourceGroupName = `product-source-${useId()}`;
 
   const selectedType = productTypes.find(
     (type) => String(type.id) === String(params.product_type_id),
   );
-  const showStages = isFiltersProductType(selectedType);
+  const showStages =
+    showStagesFilter && isFiltersProductType(selectedType);
 
   const stages = useMemo(() => {
     if (Array.isArray(stageOptions) && stageOptions.length > 0) {
@@ -175,7 +180,32 @@ export default function ProductsFilters({
           />
         </FilterGroup>
 
-        {governorates.length > 0 && (
+        {showSourceFilter && labels.source ? (
+          <FilterGroup label={labels.source}>
+            <div>
+              <FilterRadioOption
+                name={sourceGroupName}
+                checked={!params.source}
+                onChange={() => update({ source: null })}
+                label={labels.all}
+              />
+              <FilterRadioOption
+                name={sourceGroupName}
+                checked={params.source === "catalog"}
+                onChange={() => update({ source: "catalog" })}
+                label={labels.sourceCatalog ?? labels.all}
+              />
+              <FilterRadioOption
+                name={sourceGroupName}
+                checked={params.source === "company"}
+                onChange={() => update({ source: "company" })}
+                label={labels.sourceCompany ?? labels.all}
+              />
+            </div>
+          </FilterGroup>
+        ) : null}
+
+        {showGovernorateFilter && governorates.length > 0 && (
           <FilterGroup label={labels.governorate}>
             <Select
               value={

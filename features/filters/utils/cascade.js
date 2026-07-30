@@ -72,6 +72,7 @@ export function hasActiveProductFilters(params = {}) {
       params.category_id ||
       params.number_of_stages ||
       params.governorate_id ||
+      params.source ||
       (params.min_price != null && params.min_price !== "") ||
       (params.max_price != null && params.max_price !== "") ||
       (params.sort && params.sort !== "newest"),

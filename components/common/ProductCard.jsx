@@ -10,34 +10,37 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { COMPARE_UI_ENABLED } from "@/features/compare";
 import { buildCompanyProductHref } from "@/features/companies/utils/resolve-company-product-params";
-import { resolveLucideIcon } from "@/features/companies/utils/resolve-lucide-icon";
+import { useExperience } from "@/features/experience";
+import { EXPERIENCE } from "@/features/experience/constants";
+import { buildCatalogProductHref } from "@/features/products/utils/resolve-product-detail-params";
 import ProductLikeButton from "@/features/wishlist/components/ProductLikeButton";
 import { LIKE_SOURCE } from "@/features/wishlist/types";
 import { cn } from "@/lib/utils";
 
-function PerkIcons({ perks = [] }) {
-  const visible = perks.slice(0, 4);
+function PerkBadges({ perks = [] }) {
+  const visible = perks.slice(0, 3);
   if (!visible.length) return null;
+
+  const overflow = perks.length - visible.length;
 
   return (
     <div className="mt-3 flex flex-wrap items-center gap-1.5">
-      {visible.map((perk) => {
-        const Icon = resolveLucideIcon(perk.icon);
-        return (
-          <span
-            key={perk.id ?? `${perk.title}-${perk.icon}`}
-            title={perk.title}
-            className="inline-flex size-7 items-center justify-center rounded-full bg-primary/10 text-primary"
-          >
-            <Icon className="size-3.5" aria-hidden />
-            <span className="sr-only">{perk.title}</span>
-          </span>
-        );
-      })}
-      {perks.length > visible.length && (
-        <span className="text-xs text-muted-foreground">
-          +{perks.length - visible.length}
-        </span>
+      {visible.map((perk) => (
+        <Badge
+          key={perk.id ?? `${perk.title}-${perk.icon}`}
+          variant="secondary"
+          className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary"
+        >
+          {perk.title}
+        </Badge>
+      ))}
+      {overflow > 0 && (
+        <Badge
+          variant="outline"
+          className="rounded-full px-2 py-0.5 text-[11px] text-muted-foreground"
+        >
+          +{overflow}
+        </Badge>
       )}
     </div>
   );
@@ -56,8 +59,10 @@ export default function ProductCard({
   variant,
   companySlug = null,
   href: hrefOverride = null,
+  governorate = null,
 }) {
   const t = useTranslations("product");
+  const { isCampaign } = useExperience();
   const likeSource =
     product.likeSource ??
     product.source ??
@@ -82,8 +87,6 @@ export default function ProductCard({
 
   const isCatalogSource =
     (product.source ?? likeSource) === LIKE_SOURCE.CATALOG;
-  const isCompanyProduct =
-    (product.source ?? likeSource) === LIKE_SOURCE.COMPANY;
   const isOutOfStock =
     product.isAvailable === false || product.stockStatus === "out_of_stock";
   const perks = product.hasPerks ? (product.perks ?? []) : [];
@@ -98,9 +101,10 @@ export default function ProductCard({
     hrefOverride ??
     ((companySlug || product.companySlug) && product.id
       ? buildCompanyProductHref(companySlug || product.companySlug, product.id, {
-        source: product.source ?? likeSource ?? "catalog",
-      })
-      : `/products/${product.slug}`);
+          source: product.source ?? likeSource ?? "catalog",
+          experience: isCampaign ? EXPERIENCE.CAMPAIGN : undefined,
+        })
+      : buildCatalogProductHref(product, { governorate }));
 
   return (
     <article
@@ -132,17 +136,9 @@ export default function ProductCard({
           {!isCatalogVariant && isCatalogSource && (
             <Badge
               variant="secondary"
-              className="rounded-full bg-card/90 text-foreground backdrop-blur-sm"
+              className="rounded-full border border-primary/15 bg-card/90 text-foreground backdrop-blur-sm"
             >
-              {t("badges.watfilProduct")}
-            </Badge>
-          )}
-          {!isCatalogVariant && isCompanyProduct && (
-            <Badge
-              variant="secondary"
-              className="rounded-full bg-primary/15 text-primary backdrop-blur-sm"
-            >
-              {t("badges.companyProduct")}
+              {t("badges.approvedProduct")}
             </Badge>
           )}
           {isOutOfStock && (
@@ -252,9 +248,7 @@ export default function ProductCard({
           )}
         </div>
 
-        {!isCatalogVariant && perks.length > 0 && (
-          <PerkIcons perks={perks} />
-        )}
+        {perks.length > 0 && <PerkBadges perks={perks} />}
 
         {isCatalogVariant && product.offeringCompaniesCount > 0 && (
           <p className="mt-2 text-xs text-muted-foreground">
@@ -300,9 +294,12 @@ export default function ProductCard({
       </div>
 
       <Link
-        href={href}
+        href={href || "#"}
         className="absolute inset-0 z-[1]"
         aria-label={product.name}
+        aria-disabled={!href || undefined}
+        tabIndex={!href ? -1 : undefined}
+        onClick={!href ? (event) => event.preventDefault() : undefined}
       />
     </article>
   );

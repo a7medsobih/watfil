@@ -3,6 +3,10 @@
 import { useCallback, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 
+import {
+  GOVERNORATE_ALL,
+  setGovernoratePreferenceClient,
+} from "@/features/governorate";
 import { useRouter } from "@/i18n/navigation";
 import {
   buildCompaniesHref,
@@ -36,6 +40,9 @@ export function useCompaniesQuery() {
         next.governorate_id === "all"
       ) {
         next.governorate_id = null;
+        setGovernoratePreferenceClient(GOVERNORATE_ALL);
+      } else if (next.governorate_id != null) {
+        setGovernoratePreferenceClient(next.governorate_id);
       }
 
       router.push(buildCompaniesHref(next));

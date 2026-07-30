@@ -10,8 +10,10 @@ import NavbarBrand from "./NavbarBrand";
 import NavbarLinks from "./NavbarLinks";
 
 /**
+ * Website navbar (Server Component).
+ * Campaign chrome lives in `CampaignNavbar` — do not import this into client modules.
+ *
  * @param {{ variant?: "default" | "minimal" }} props
- * `minimal` — logo + language + theme only (store share landing).
  */
 export default function Navbar({ variant = "default" }) {
   if (variant === "minimal") {

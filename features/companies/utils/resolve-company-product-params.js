@@ -4,12 +4,12 @@
  *
  * @param {string} companySlug
  * @param {string|number} productId
- * @param {{ source?: string }} [options]
+ * @param {{ source?: string, governorate?: string|number|null, experience?: string|null }} [options]
  */
 export function buildCompanyProductHref(
   companySlug,
   productId,
-  { source = "catalog", governorate } = {},
+  { source = "catalog", governorate, experience } = {},
 ) {
   const base = `/companies/${encodeURIComponent(String(companySlug))}/products/${encodeURIComponent(String(productId))}`;
   const query = new URLSearchParams();
@@ -17,6 +17,9 @@ export function buildCompanyProductHref(
   if (source) query.set("source", String(source));
   if (governorate != null && governorate !== "") {
     query.set("governorate", String(governorate));
+  }
+  if (experience === "campaign") {
+    query.set("experience", "campaign");
   }
 
   const qs = query.toString();

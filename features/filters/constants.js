@@ -4,7 +4,7 @@ export const PRICE_MAX = 8000;
 export const PRICE_STEP = 100;
 
 /** Default page size for public products list. */
-export const PRODUCTS_PER_PAGE = 15;
+export const PRODUCTS_PER_PAGE = 12;
 
 /**
  * Sort options wired to GET /public/products?sort=

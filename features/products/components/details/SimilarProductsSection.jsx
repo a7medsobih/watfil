@@ -103,6 +103,7 @@ export default async function SimilarProductsSection({
               locale={locale}
               variant={cardVariant}
               companySlug={isCompanyMode ? companySlug : null}
+              governorate={isCompanyMode ? null : governorateId}
               className="h-full"
             />
           ))}

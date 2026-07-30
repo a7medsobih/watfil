@@ -17,6 +17,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getTopRatedCompanies } from "@/features/companies/api/get-top-rated-companies";
+import {
+  GOVERNORATE_ALL,
+  setGovernoratePreferenceClient,
+} from "@/features/governorate";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -45,6 +49,9 @@ export default function HomeCompaniesClient({
     const requestId = ++requestIdRef.current;
     setGovernorateId(value);
     setLoading(true);
+    setGovernoratePreferenceClient(
+      value === ALL_OPTION ? GOVERNORATE_ALL : value,
+    );
 
     try {
       const result = await getTopRatedCompanies({

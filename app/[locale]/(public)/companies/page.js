@@ -1,6 +1,6 @@
+// src/app/[locale]/(public)/companies/page.js
 import { Suspense } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
-import { redirect } from "next/navigation";
 import { Building2 } from "lucide-react";
 
 import AppPagination from "@/components/common/AppPagination";
@@ -19,42 +19,54 @@ import {
   buildCompaniesHref,
   resolveCompaniesParams,
 } from "@/features/companies/utils/resolve-companies-params";
+import {
+  getGovernoratePreferenceFromCookies,
+  needsGovernorateUrlSeed,
+  pickGovernorateId,
+} from "@/features/governorate";
+import { redirect as i18nRedirect } from "@/i18n/navigation";
 
 /**
  * Companies directory using public companies listing endpoint
  * with governorate + search + pagination filters.
+ *
+ * Missing governorate_id is seeded in proxy.ts before this page runs.
+ * This redirect is only a safety net for unknown/invalid ids.
  */
 export default async function Page({ searchParams }) {
   const locale = await getLocale();
   const t = await getTranslations();
   const resolvedSearchParams = await searchParams;
 
-  const governorates = await getGovernorates({ locale });
+  const [governorates, preferredId] = await Promise.all([
+    getGovernorates({ locale }),
+    getGovernoratePreferenceFromCookies(),
+  ]);
   const params = resolveCompaniesParams(resolvedSearchParams);
 
-  const isKnownGovernorate =
-    params.governorate_id != null &&
-    governorates.some(
-      (item) => String(item.id) === String(params.governorate_id),
-    );
-
-  const fallbackGovernorateId = governorates[0]?.id ?? null;
-  const selectedGovernorateId = isKnownGovernorate
-    ? params.governorate_id
-    : fallbackGovernorateId;
+  const selectedGovernorateId = pickGovernorateId({
+    rawId: params.governorate_id,
+    governorates,
+    preferredId,
+    allowAll: false,
+  });
 
   if (
-    selectedGovernorateId != null &&
-    String(params.governorate_id ?? "") !== String(selectedGovernorateId)
+    needsGovernorateUrlSeed({
+      rawId: params.governorate_id,
+      selectedId: selectedGovernorateId,
+      allowAll: false,
+    })
   ) {
-    redirect(
-      buildCompaniesHref({
+    i18nRedirect({
+      href: buildCompaniesHref({
         governorate_id: selectedGovernorateId,
         page: params.page,
         per_page: params.per_page,
         search: params.search,
       }),
-    );
+      locale,
+    });
   }
 
   const { companies, meta } =
@@ -132,7 +144,7 @@ export default async function Page({ searchParams }) {
               }}
               hrefBuilder={(page) =>
                 buildCompaniesHref({
-                  governorate: selectedGovernorateId,
+                  governorate_id: selectedGovernorateId,
                   page,
                   per_page: params.per_page,
                   search: params.search,

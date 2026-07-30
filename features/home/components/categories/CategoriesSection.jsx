@@ -29,7 +29,7 @@ export default async function CategoriesSection() {
   return (
     <section className="container py-10">
       <SectionHeader
-        eyebrow={locale === "ar" ? "الفئات" : "Categories"}
+        eyebrow={locale === "ar" ? "حلول المياه" : "Water solutions"}
         title={t("home.categories.title")}
         subtitle={t("home.categories.subtitle")}
       />
@@ -42,7 +42,6 @@ export default async function CategoriesSection() {
             <CategoryCard
               key={cat.id}
               name={cat.name[locale] ?? cat.name.en}
-              count={cat.count}
               Icon={Icon}
             />
           );

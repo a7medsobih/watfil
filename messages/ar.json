@@ -49,8 +49,8 @@
     },
     "home": {
         "categories": {
-            "title": "تصفح حسب الفئة",
-            "subtitle": "من فلاتر المنزل إلى أنظمة التنقية الصناعية."
+            "title": "حلول لكل احتياج",
+            "subtitle": "من فلاتر المنزل إلى أنظمة المنشآت — اختر ما يناسبك من شركات معتمدة."
         },
         "featured": {
             "title": "المنتجات المميزة",
@@ -114,6 +114,9 @@
         "all": "الكل",
         "allGovernorates": "كل المحافظات",
         "governorateHint": "يعرض المنتجات المتاحة لدى الشركات التي تخدم هذه المحافظة.",
+        "source": "المصدر",
+        "sourceCatalog": "منتج معتمد",
+        "sourceCompany": "منتج الشركة",
         "resetFilters": "إعادة ضبط الفلاتر",
         "clearAll": "مسح الكل",
         "removeFilter": "إزالة الفلتر",
@@ -160,7 +163,8 @@
             "installment": "تقسيط",
             "perks": "مزايا إضافية",
             "watfilProduct": "منتج Watfil",
-            "companyProduct": "منتج خاص بالشركة"
+            "companyProduct": "منتج خاص بالشركة",
+            "approvedProduct": "منتج معتمد"
         },
         "availability": {
             "available": "متوفر",
@@ -245,6 +249,7 @@
         "servicesSubtitle": "مميزات الخدمة التي تجعل هذه الشركة أكثر تنافسية.",
         "servicesEmpty": "لم تتم إضافة خدمات بعد.",
         "productsSubtitle": "{count} منتج متاح",
+        "teamSubtitle": "تعرف على فريق العمل خلف هذه الشركة.",
         "teamEmpty": "لم تتم إضافة أعضاء الفريق بعد.",
         "like": "أعجب بالشركة",
         "unlike": "إزالة الإعجاب",

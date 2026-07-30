@@ -83,6 +83,7 @@ export default function ProductDetailsPage({
           mode="catalog"
           productId={product.id}
           companyId={offerings[0]?.company?.id ?? null}
+          governorateId={selectedGovernorateId}
           locale={locale}
         />
       </Suspense>

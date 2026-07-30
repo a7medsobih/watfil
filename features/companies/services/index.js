@@ -4,6 +4,8 @@ export {
   mapCompanies,
   mapCompaniesMeta,
   mapCompanyProducts,
+} from "./company.mapper";
+export {
   mapGovernorates,
   sortGovernoratesByRating,
-} from "./company.mapper";
+} from "./governorate.mapper";
