@@ -17,7 +17,7 @@ import { buildProductDetailHref } from "@/features/products/utils/resolve-produc
  * Selection updates the URL (same as previous tabs) — no client fetch.
  */
 export default function ProductGovernorateSelect({
-  productSlug,
+  productId,
   governorates = [],
   selectedId,
   ariaLabel,
@@ -48,7 +48,7 @@ export default function ProductGovernorateSelect({
         onValueChange={(next) => {
           setGovernoratePreferenceClient(next);
           router.push(
-            buildProductDetailHref(productSlug, { governorate: next }),
+            buildProductDetailHref(productId, { governorate: next }),
           );
         }}
       >

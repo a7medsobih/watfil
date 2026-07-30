@@ -23,7 +23,7 @@ import { hasActiveCompanyStoreFilters } from "@/features/companies/utils/resolve
  * Filters/search/pagination are URL-driven and resolved on the server.
  */
 export default function CompanyStoreProductsSection({
-  companySlug,
+  companyId,
   products = [],
   meta = { total: 0, currentPage: 1, lastPage: 1, perPage: 15 },
   storeParams = {},
@@ -33,7 +33,7 @@ export default function CompanyStoreProductsSection({
 }) {
   const t = useTranslations();
   const locale = useLocale();
-  const query = useCompanyStoreQuery({ companySlug, productTypes });
+  const query = useCompanyStoreQuery({ companyId, productTypes });
   const { isPending } = query;
 
   const hasFilters = hasActiveCompanyStoreFilters(storeParams);
@@ -145,7 +145,7 @@ export default function CompanyStoreProductsSection({
                       product={product}
                       locale={locale}
                       variant="company"
-                      companySlug={companySlug}
+                      companyId={companyId}
                     />
                   ))}
                 </div>

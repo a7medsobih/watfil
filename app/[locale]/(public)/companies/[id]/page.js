@@ -1,4 +1,4 @@
-// src/app/[locale]/(public)/companies/[slug]/page.js
+// src/app/[locale]/(public)/companies/[id]/page.js
 import { Suspense } from "react";
 import { getLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -42,21 +42,21 @@ export async function generateStaticParams() {
     return (companies || [])
       .map((company) => company.id)
       .filter((id) => id != null && id !== "")
-      .map((id) => ({ slug: String(id) }));
+      .map((id) => ({ id: String(id) }));
   } catch {
     return [];
   }
 }
 
 export async function generateMetadata({ params }) {
-  const { slug } = await params;
+  const { id } = await params;
   const locale = await getLocale();
-  const company = await getCompany(slug, locale);
+  const company = await getCompany(id, locale);
 
   if (!company) {
     return buildMetadata({
       title: "Company",
-      path: `/companies/${slug}`,
+      path: `/companies/${id}`,
       locale,
     });
   }
@@ -83,11 +83,7 @@ function StoreProductsSkeleton() {
   );
 }
 
-async function CompanyStoreProducts({
-  companyId,
-  searchParams,
-  locale,
-}) {
+async function CompanyStoreProducts({ companyId, searchParams, locale }) {
   const storeParams = resolveCompanyStoreParams(searchParams);
 
   const [productTypes, { products: rawProducts, meta }] = await Promise.all([
@@ -135,7 +131,7 @@ async function CompanyStoreProducts({
 
   return (
     <CompanyStoreProductsSection
-      companySlug={String(companyId)}
+      companyId={String(companyId)}
       products={products}
       meta={meta}
       storeParams={storeParams}
@@ -147,12 +143,12 @@ async function CompanyStoreProducts({
 }
 
 export default async function CompanyStoreRoute({ params, searchParams }) {
-  const { slug } = await params;
+  const { id } = await params;
   const locale = await getLocale();
   const resolvedSearchParams = await searchParams;
   const storeParams = resolveCompanyStoreParams(resolvedSearchParams);
 
-  const company = await getCompany(slug, locale);
+  const company = await getCompany(id, locale);
 
   if (!company) notFound();
 
@@ -191,7 +187,7 @@ export default async function CompanyStoreRoute({ params, searchParams }) {
     <>
       <CompanyBrandSetter
         brand={{
-          slug: String(company.id),
+          id: String(company.id),
           name: company.name,
           logo: company.logo,
           hasLogo: company.hasLogo,
@@ -203,7 +199,7 @@ export default async function CompanyStoreRoute({ params, searchParams }) {
         likeSlot={
           <Suspense fallback={<CompanyLikeFallback />}>
             <PersonalizedCompanyActions
-              slugOrId={company.id}
+              companyId={company.id}
               company={company}
             />
           </Suspense>

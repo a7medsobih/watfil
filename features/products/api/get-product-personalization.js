@@ -1,7 +1,6 @@
 import { fetchFromAPI } from "@/lib/api/fetcher";
 import { endpoints } from "@/lib/api/endpoints";
 import { getCustomerTokenFromCookies } from "@/lib/auth/customer-token";
-import { toProductRouteId } from "@/features/products/utils/product-slug";
 
 /**
  * Personalized product fields (`is_liked`) for Suspense islands.
@@ -12,8 +11,8 @@ import { toProductRouteId } from "@/features/products/utils/product-slug";
  */
 export async function getProductPersonalization(id) {
   const empty = { isLiked: false };
-  const productId = toProductRouteId(id);
-  if (!productId) return empty;
+  if (id == null || id === "") return empty;
+  const productId = String(id);
 
   const token = await getCustomerTokenFromCookies();
   if (!token) return empty;

@@ -17,8 +17,8 @@ export default function CampaignFooter() {
   const { experience } = useExperience();
   const year = new Date().getFullYear();
 
-  const href = brand?.slug
-    ? buildCompanyExperienceHref(brand.slug, experience)
+  const href = brand?.id
+    ? buildCompanyExperienceHref(brand.id, experience)
     : null;
 
   return (

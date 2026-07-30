@@ -39,7 +39,7 @@ export function buildProductDetailHref(productId, { governorate } = {}) {
 }
 
 /**
- * Catalog product URLs — temporary: path uses numeric id (API contract).
+ * Catalog product URLs — path uses numeric product id.
  *
  * @param {object|string|number|null|undefined} productOrId
  * @param {{ governorate?: string|number|null }} [params]

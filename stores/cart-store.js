@@ -24,7 +24,6 @@ function normalizeCompany(company) {
   return {
     id,
     name: company.name ?? "",
-    slug: String(id),
     logo: company.logo ?? null,
     hasLogo: Boolean(company.hasLogo ?? company.logo),
   };
@@ -49,7 +48,6 @@ function normalizeItem(item, quantity = 1) {
       ? item.installmentPlans
       : [],
     source: item.source ?? "company",
-    slug: item.slug ?? null,
   };
 }
 

@@ -15,13 +15,13 @@ import { useRouter } from "@/i18n/navigation";
  * Soft-navigates via router.replace({ scroll: false }) so the store section
  * keeps its scroll position while filters / pagination update.
  *
- * @param {{ companySlug: string, productTypes?: object[] }} options
+ * @param {{ companyId: string|number, productTypes?: object[] }} options
  */
 export function useCompanyStoreQuery(options) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
-  const { companySlug, productTypes = [] } = options;
+  const { companyId, productTypes = [] } = options;
 
   const params = useMemo(() => {
     return resolveCompanyStoreParams(
@@ -36,21 +36,21 @@ export function useCompanyStoreQuery(options) {
       if (resetPage) next.page = 1;
 
       startTransition(() => {
-        router.replace(buildCompanyStoreHref(companySlug, next), {
+        router.replace(buildCompanyStoreHref(companyId, next), {
           scroll: false,
         });
       });
     },
-    [params, productTypes, router, companySlug],
+    [params, productTypes, router, companyId],
   );
 
   const reset = useCallback(() => {
     startTransition(() => {
-      router.replace(buildCompanyStoreHref(companySlug, {}), {
+      router.replace(buildCompanyStoreHref(companyId, {}), {
         scroll: false,
       });
     });
-  }, [router, companySlug]);
+  }, [router, companyId]);
 
   return { params, update, reset, isPending };
 }

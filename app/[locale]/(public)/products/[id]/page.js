@@ -32,21 +32,21 @@ export async function generateStaticParams() {
     return (products || [])
       .map((product) => product.id)
       .filter((id) => id != null && id !== "")
-      .map((id) => ({ slug: String(id) }));
+      .map((id) => ({ id: String(id) }));
   } catch {
     return [];
   }
 }
 
 export async function generateMetadata({ params }) {
-  const { slug } = await params;
+  const { id } = await params;
   const locale = await getLocale();
-  const product = await getProduct(slug, locale);
+  const product = await getProduct(id, locale);
 
   if (!product) {
     return buildMetadata({
       title: "Product",
-      path: `/products/${slug}`,
+      path: `/products/${id}`,
       locale,
     });
   }
@@ -61,12 +61,12 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function ProductDetailRoute({ params, searchParams }) {
-  const { slug } = await params;
+  const { id } = await params;
   const locale = await getLocale();
   const t = await getTranslations();
   const resolvedSearchParams = await searchParams;
 
-  const product = await getProduct(slug, locale);
+  const product = await getProduct(id, locale);
   if (!product) notFound();
 
   const [governorates, preferredId] = await Promise.all([

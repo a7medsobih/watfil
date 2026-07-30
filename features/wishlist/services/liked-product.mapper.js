@@ -26,8 +26,8 @@ export function mapLikedProduct(item) {
     nested.company?.id ??
     null;
 
-  // Temporary: company route key is numeric id (same value used as companySlug prop).
-  const companySlug = companyId != null ? String(companyId) : null;
+  // Company id drives ProductCard links for company-liked products.
+  const routeCompanyId = companyId != null ? companyId : null;
 
   return {
     ...product,
@@ -36,8 +36,7 @@ export function mapLikedProduct(item) {
       nested.likes_count ?? item.likes_count ?? product.likesCount ?? 0,
     ),
     likeSource: source === LIKE_SOURCE.COMPANY ? LIKE_SOURCE.COMPANY : LIKE_SOURCE.CATALOG,
-    companyId: companyId != null ? companyId : null,
-    companySlug,
+    companyId: routeCompanyId,
   };
 }
 

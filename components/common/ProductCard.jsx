@@ -57,7 +57,7 @@ export default function ProductCard({
   className = "",
   onLikeChange,
   variant,
-  companySlug = null,
+  companyId = null,
   href: hrefOverride = null,
   governorate = null,
 }) {
@@ -68,9 +68,14 @@ export default function ProductCard({
     product.source ??
     (product.companyId != null ? LIKE_SOURCE.COMPANY : LIKE_SOURCE.CATALOG);
 
+  // Prefer explicit store context; otherwise only company-sourced products.
+  const routeCompanyId =
+    companyId ??
+    (likeSource === LIKE_SOURCE.COMPANY ? product.companyId : null);
+
   const resolvedVariant =
     variant ??
-    (likeSource === LIKE_SOURCE.COMPANY || companySlug
+    (likeSource === LIKE_SOURCE.COMPANY || routeCompanyId
       ? "company"
       : "catalog");
   const isCatalogVariant = resolvedVariant === "catalog";
@@ -99,8 +104,8 @@ export default function ProductCard({
 
   const href =
     hrefOverride ??
-    ((companySlug || product.companySlug) && product.id
-      ? buildCompanyProductHref(companySlug || product.companySlug, product.id, {
+    (routeCompanyId && product.id
+      ? buildCompanyProductHref(routeCompanyId, product.id, {
           source: product.source ?? likeSource ?? "catalog",
           experience: isCampaign ? EXPERIENCE.CAMPAIGN : undefined,
         })

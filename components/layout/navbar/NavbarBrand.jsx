@@ -18,7 +18,7 @@ export default function NavbarBrand({ hideWatfilFallback = false }) {
 
   if (brand?.name) {
     const href = buildCompanyExperienceHref(
-      brand.slug,
+      brand.id,
       campaignMode ? EXPERIENCE.CAMPAIGN : experience,
     );
 

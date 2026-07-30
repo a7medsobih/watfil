@@ -7,7 +7,7 @@ import { buildProductDetailHref } from "@/features/products/utils/resolve-produc
  * Client wrapper so hrefBuilder stays on the client boundary.
  */
 export default function ProductGovernorateTabs({
-  productSlug,
+  productId,
   governorates = [],
   selectedId,
   ariaLabel,
@@ -22,7 +22,7 @@ export default function ProductGovernorateTabs({
       ariaLabel={ariaLabel}
       labels={labels}
       hrefBuilder={(governorateId) =>
-        buildProductDetailHref(productSlug, { governorate: governorateId })
+        buildProductDetailHref(productId, { governorate: governorateId })
       }
     />
   );

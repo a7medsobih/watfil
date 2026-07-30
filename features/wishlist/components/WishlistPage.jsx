@@ -352,7 +352,7 @@ export default function WishlistPage({
                       ? "company"
                       : "catalog"
                   }
-                  companySlug={product.companySlug ?? null}
+                  companyId={product.companyId ?? null}
                   onLikeChange={handleProductLikeChange(product)}
                 />
               ))}

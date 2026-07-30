@@ -37,8 +37,7 @@ export function SimilarProductsSkeleton({ locale = "ar" }) {
  * @param {"catalog"|"company"} props.mode
  * @param {string|number} props.productId Supplier product id (catalog) or company product id (company)
  * @param {string|number|null} [props.governorateId] Company similar API only
- * @param {string|number|null} [props.companyId] Optional boost for catalog similar API
- * @param {string|null} [props.companySlug] For company ProductCard links
+ * @param {string|number|null} [props.companyId] Company id for company ProductCard links / similar API
  * @param {"catalog"|"company"} [props.source] Company similar API source param
  * @param {string} [props.locale]
  */
@@ -47,7 +46,6 @@ export default async function SimilarProductsSection({
   productId,
   governorateId = null,
   companyId = null,
-  companySlug = null,
   source = "company",
   locale = "ar",
 }) {
@@ -102,7 +100,7 @@ export default async function SimilarProductsSection({
               product={product}
               locale={locale}
               variant={cardVariant}
-              companySlug={isCompanyMode ? companySlug : null}
+              companyId={isCompanyMode ? companyId : null}
               governorate={isCompanyMode ? null : governorateId}
               className="h-full"
             />

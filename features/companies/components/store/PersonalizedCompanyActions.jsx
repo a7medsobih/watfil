@@ -6,10 +6,10 @@ import { CompanyPersonalizationHydrator } from "@/features/companies/context/com
  * Suspense island: company like + my_rating without blocking the ISR shell.
  */
 export default async function PersonalizedCompanyActions({
-  slugOrId,
+  companyId,
   company,
 }) {
-  const { isLiked, myRating } = await getCompanyPersonalization(slugOrId);
+  const { isLiked, myRating } = await getCompanyPersonalization(companyId);
 
   return (
     <>

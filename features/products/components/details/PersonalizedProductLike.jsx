@@ -6,14 +6,13 @@ import { LIKE_SOURCE } from "@/features/wishlist/types";
  * Suspense island: resolves `is_liked` without blocking the cacheable page shell.
  */
 export default async function PersonalizedProductLike({
-  slugOrId,
   productId,
   source = LIKE_SOURCE.CATALOG,
   companyId = null,
   likesCount = 0,
   className,
 }) {
-  const { isLiked } = await getProductPersonalization(slugOrId);
+  const { isLiked } = await getProductPersonalization(productId);
 
   return (
     <ProductLikeCluster

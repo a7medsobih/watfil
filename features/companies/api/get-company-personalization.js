@@ -1,7 +1,6 @@
 import { fetchFromAPI } from "@/lib/api/fetcher";
 import { endpoints } from "@/lib/api/endpoints";
 import { getCustomerTokenFromCookies } from "@/lib/auth/customer-token";
-import { toCompanyRouteId } from "@/features/companies/utils/company-slug";
 
 /**
  * Personalized company fields for Suspense islands.
@@ -12,8 +11,8 @@ import { toCompanyRouteId } from "@/features/companies/utils/company-slug";
  */
 export async function getCompanyPersonalization(id) {
   const empty = { isLiked: false, myRating: null };
-  const companyId = toCompanyRouteId(id);
-  if (!companyId) return empty;
+  if (id == null || id === "") return empty;
+  const companyId = String(id);
 
   const token = await getCustomerTokenFromCookies();
   if (!token) return empty;

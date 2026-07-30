@@ -26,7 +26,6 @@ export function mapPublicStore(payload) {
 
   return {
     companyId: payload.company_id ?? null,
-    companySlug: payload.company_slug ?? payload.slug ?? null,
     taxNumber: payload.tax_number ?? "",
     name: payload.name ?? "",
     logo: logo || IMAGE_PLACEHOLDERS.company,

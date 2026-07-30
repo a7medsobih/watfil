@@ -17,5 +17,4 @@ export {
   buildProductDetailHref,
   buildCatalogProductHref,
 } from "./utils/resolve-product-detail-params";
-export { toProductRouteId } from "./utils/product-slug";
 export { ProductDetailsPage } from "./components/details";

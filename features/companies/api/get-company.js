@@ -4,7 +4,6 @@ import { fetchFromAPI } from "@/lib/api/fetcher";
 import { endpoints } from "@/lib/api/endpoints";
 import { cacheTags, companyTag, revalidate } from "@/lib/cache";
 import { mapCompanyDetail } from "@/features/companies/services/company.mapper";
-import { toCompanyRouteId } from "@/features/companies/utils/company-slug";
 
 /**
  * Fetches a public company store by id.
@@ -15,8 +14,8 @@ import { toCompanyRouteId } from "@/features/companies/utils/company-slug";
  * @param {string} [locale]
  */
 export const getCompany = cache(async function getCompany(id, locale = "ar") {
-  const companyId = toCompanyRouteId(id);
-  if (!companyId) return null;
+  if (id == null || id === "") return null;
+  const companyId = String(id);
 
   try {
     const response = await fetchFromAPI(endpoints.companies.detail(companyId), {

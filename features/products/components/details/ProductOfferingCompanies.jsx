@@ -9,7 +9,7 @@ import ProductOfferingCompanyCard from "@/features/products/components/details/P
  * Companies selling this catalog product, filtered by governorate.
  */
 export default function ProductOfferingCompanies({
-  productSlug,
+  productId,
   offerings = [],
   governorates = [],
   selectedGovernorateId,
@@ -25,7 +25,7 @@ export default function ProductOfferingCompanies({
       />
 
       <ProductGovernorateSelect
-        productSlug={productSlug}
+        productId={productId}
         governorates={governorates}
         selectedId={selectedGovernorateId}
         ariaLabel={labels.filterByGov}

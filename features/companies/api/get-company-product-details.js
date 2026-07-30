@@ -4,7 +4,6 @@ import { fetchFromAPI } from "@/lib/api/fetcher";
 import { endpoints } from "@/lib/api/endpoints";
 import { cacheTags, companyTag, productTag, revalidate } from "@/lib/cache";
 import { mapProduct } from "@/features/products/services/product.mapper";
-import { toCompanyRouteId } from "@/features/companies/utils/company-slug";
 
 /**
  * Fetches a company's product offering details.
@@ -17,8 +16,8 @@ export const getCompanyProductDetails = cache(
     source = "catalog",
     locale = "ar",
   }) {
-    const companyId = toCompanyRouteId(companyIdParam);
-    if (!companyId) return null;
+    if (companyIdParam == null || companyIdParam === "") return null;
+    const companyId = String(companyIdParam);
     if (productId == null || productId === "") return null;
 
     const resolvedSource = source === "company" ? "company" : "catalog";

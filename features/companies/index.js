@@ -29,9 +29,6 @@ export {
   useCompanyBrand,
 } from "./context/company-brand-context";
 export {
-  toCompanyRouteId,
-} from "./utils/company-slug";
-export {
   buildCompanyProductHref,
   resolveCompanyProductGovernorate,
   resolveCompanyProductSource,

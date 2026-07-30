@@ -4,7 +4,6 @@ import { fetchFromAPI } from "@/lib/api/fetcher";
 import { endpoints } from "@/lib/api/endpoints";
 import { cacheTags, productTag, revalidate } from "@/lib/cache";
 import { mapProduct } from "@/features/products/services/product.mapper";
-import { toProductRouteId } from "@/features/products/utils/product-slug";
 
 /**
  * Fetches a single public product by id.
@@ -15,8 +14,8 @@ import { toProductRouteId } from "@/features/products/utils/product-slug";
  * @param {string} [locale]
  */
 export const getProduct = cache(async function getProduct(id, locale = "ar") {
-  const productId = toProductRouteId(id);
-  if (!productId) return null;
+  if (id == null || id === "") return null;
+  const productId = String(id);
 
   try {
     const response = await fetchFromAPI(endpoints.products.detail(productId), {

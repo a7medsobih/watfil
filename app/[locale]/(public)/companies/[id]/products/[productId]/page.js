@@ -31,15 +31,15 @@ import { redirect as i18nRedirect } from "@/i18n/navigation";
 import { buildMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata({ params, searchParams }) {
-  const { slug, productId } = await params;
+  const { id, productId } = await params;
   const resolvedSearchParams = await searchParams;
   const locale = await getLocale();
   const source = resolveCompanyProductSource(resolvedSearchParams);
 
   const [company, product] = await Promise.all([
-    getCompany(slug, locale),
+    getCompany(id, locale),
     getCompanyProductDetails({
-      companyId: slug,
+      companyId: id,
       productId,
       source,
       locale,
@@ -49,7 +49,7 @@ export async function generateMetadata({ params, searchParams }) {
   if (!product) {
     return buildMetadata({
       title: "Product",
-      path: `/companies/${slug}/products/${productId}`,
+      path: `/companies/${id}/products/${productId}`,
       locale,
     });
   }
@@ -57,7 +57,7 @@ export async function generateMetadata({ params, searchParams }) {
   return buildMetadata({
     title: company ? `${product.name} · ${company.name}` : product.name,
     description: product.description || undefined,
-    path: buildCompanyProductHref(company?.id ?? slug, product.id, {
+    path: buildCompanyProductHref(company?.id ?? id, product.id, {
       source,
     }),
     locale,
@@ -69,7 +69,7 @@ export default async function CompanyProductDetailsRoute({
   params,
   searchParams,
 }) {
-  const { slug, productId } = await params;
+  const { id, productId } = await params;
   const resolvedSearchParams = await searchParams;
   const locale = await getLocale();
   const t = await getTranslations();
@@ -77,7 +77,7 @@ export default async function CompanyProductDetailsRoute({
   const experience = resolveExperience(resolvedSearchParams);
   const isCampaign = experience === EXPERIENCE.CAMPAIGN;
 
-  const company = await getCompany(slug, locale);
+  const company = await getCompany(id, locale);
   if (!company) notFound();
 
   const product = await getCompanyProductDetails({
@@ -129,7 +129,7 @@ export default async function CompanyProductDetailsRoute({
     <>
       <CompanyBrandSetter
         brand={{
-          slug: String(company.id),
+          id: String(company.id),
           name: company.name,
           logo: company.logo,
           hasLogo: company.hasLogo,
@@ -164,7 +164,6 @@ export default async function CompanyProductDetailsRoute({
             mode="company"
             productId={productId}
             companyId={company.id}
-            companySlug={String(company.id)}
             governorateId={governorateId}
             source={source}
             locale={locale}

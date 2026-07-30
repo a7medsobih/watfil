@@ -24,7 +24,6 @@ function mapBillboard(item) {
       ? {
           id: item.product.id,
           sku: item.product.sku ?? null,
-          slug: item.product.slug ?? null,
           name: item.product.name ?? "",
           image: item.product.image ?? null,
           cashPrice: item.product.cash_price ?? null,

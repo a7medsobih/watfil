@@ -60,7 +60,6 @@ export function useAddToCart() {
         hasInstallment: product.hasInstallment,
         installmentPlans: product.installmentPlans,
         source: product.source ?? product.likeSource ?? "company",
-        slug: product.slug,
       },
       quantity,
       openCart,
