@@ -1,6 +1,6 @@
 
 
-export default function WhyCard({ icon: Icon, title, description, index = 0 }) {
+export default function WhyCard({ icon: Icon, title, description }) {
   return (
     <div
       className="rounded-3xl border border-border/60 bg-card p-6 hover-lift"

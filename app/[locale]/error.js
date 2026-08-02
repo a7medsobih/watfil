@@ -1,13 +1,7 @@
 "use client";
 
-export default function Error({ error, reset }) {
-  return (
-    <div>
-      <h2>Something went wrong</h2>
-      <p>{error?.message}</p>
-      <button type="button" onClick={() => reset()}>
-        Try again
-      </button>
-    </div>
-  );
+import RouteError from "@/components/common/RouteError";
+
+export default function Error(props) {
+  return <RouteError {...props} scope="locale" />;
 }

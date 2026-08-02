@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 export default function BlogCard({
     article,
-    locale = "en",
+    locale = "ar",
     readMoreLabel,
     readTimeLabel,
     className = "",

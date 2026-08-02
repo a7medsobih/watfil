@@ -9,6 +9,7 @@ export { useRequireAuth } from "./hooks/use-require-auth";
 export {
   checkPhone,
   loginCustomer,
+  registerCustomer,
   requestRegisterOtp,
   verifyRegister,
   logoutCustomer,
@@ -17,3 +18,4 @@ export {
   normalizePhone,
   isValidEgyptianPhone,
 } from "./api/customer-auth";
+export { resolveRegisterCompany } from "./utils/resolve-register-company";

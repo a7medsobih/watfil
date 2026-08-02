@@ -162,7 +162,7 @@ export default function NavbarAuth() {
           className="gap-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
         >
           {t("auth.actions.logout")}
-          <LogOutIcon className="size-3.5" />
+          <LogOutIcon className="size-3.5 rtl:rotate-180" />
         </Button>
       </div>
     );

@@ -125,20 +125,6 @@ export default function ProductsActiveFilters({
       });
     }
 
-    if (params.sort && params.sort !== "newest") {
-      const sortLabels = {
-        price_asc: labels.sortPriceAsc,
-        price_desc: labels.sortPriceDesc,
-        popular: labels.sortPopular,
-      };
-      next.push({
-        id: "sort",
-        label: `${labels.sort}: ${sortLabels[params.sort] ?? params.sort}`,
-        removeLabel,
-        onRemove: () => update({ sort: "newest" }),
-      });
-    }
-
     return next;
   }, [
     params,

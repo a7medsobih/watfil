@@ -7,7 +7,6 @@ import {
   Check,
   Droplets,
   Package,
-  QrCode,
   Shield,
   Smartphone,
   Wrench,

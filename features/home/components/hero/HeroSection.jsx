@@ -1,10 +1,9 @@
 "use client";
 
-import { Search, ShieldCheck, Sparkles, Truck } from "lucide-react";
+import { ShieldCheck, Sparkles, Truck } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
 import HeroCarousel from "@/components/common/HeroCarousel";
-import { Button } from "@/components/ui/button";
 
 import HeroFloatingBadge from "./HeroFloatingBadge";
 import { WaterBackdrop } from "./WaterBackdrop";
@@ -36,7 +35,7 @@ export default function HeroSection() {
               {t("hero.subtitle")}
             </p>
 
-            <form
+            {/* <form
               onSubmit={(event) => event.preventDefault()}
               className="mt-8 flex max-w-xl items-center gap-2 rounded-full border border-border/60 bg-card p-1.5 shadow-elegant"
             >
@@ -52,7 +51,7 @@ export default function HeroSection() {
               <Button variant="hero" size="lg" type="submit">
                 {t("nav.search")}
               </Button>
-            </form>
+            </form> */}
 
             <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">

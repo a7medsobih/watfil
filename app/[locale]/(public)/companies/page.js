@@ -4,7 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Building2 } from "lucide-react";
 
 import AppPagination from "@/components/common/AppPagination";
-import CampanyCard from "@/components/common/CampanyCard";
+import CompanyCard from "@/components/common/CompanyCard";
 import EmptyState from "@/components/common/EmptyState";
 import PageHeader from "@/components/common/PageHeader";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -125,7 +125,7 @@ export default async function Page({ searchParams }) {
           <>
             <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {companies.map((company) => (
-                <CampanyCard
+                <CompanyCard
                   key={company.id}
                   company={company}
                   locale={locale}

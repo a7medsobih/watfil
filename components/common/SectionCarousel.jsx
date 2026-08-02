@@ -125,7 +125,7 @@ export default function SectionCarousel({
       <CarouselContent
         viewportClassName={keepCarousel ? undefined : "md:overflow-visible"}
         className={cn(
-          "ml-0 -ms-4",
+          "-ms-4",
           keepCarousel ? null : "md:ms-0 md:grid md:gap-5",
           keepCarousel ? null : gridClassName,
         )}
@@ -134,7 +134,7 @@ export default function SectionCarousel({
           <CarouselItem
             key={slide.key ?? index}
             className={cn(
-              "pl-0 ps-4",
+              "ps-4",
               resolvedItemClassName,
               keepCarousel ? null : "md:ps-0 md:basis-auto",
             )}

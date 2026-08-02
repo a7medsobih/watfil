@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import { resolveLucideIcon } from "@/features/companies/utils/resolve-lucide-icon";
+import { ViewsCount } from "@/features/browsing";
 import { cn } from "@/lib/utils";
 
 function formatDate(value, locale) {
@@ -95,7 +96,12 @@ function SpecificationsPanel({ product, locale, t }) {
     {
       icon: Eye,
       label: t("views"),
-      value: String(product.viewsCount ?? 0),
+      value: (
+        <ViewsCount
+          value={product.viewsCount ?? 0}
+          numberClassName="font-semibold text-foreground"
+        />
+      ),
     },
     {
       icon: Heart,

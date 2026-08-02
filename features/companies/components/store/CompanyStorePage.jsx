@@ -1,30 +1,23 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import dynamic from "next/dynamic";
 import { useLocale } from "next-intl";
 
+import CompanyHeroGallery from "@/features/companies/components/store/CompanyHeroGallery";
 import CompanyInfoCard from "@/features/companies/components/store/CompanyInfoCard";
 import CompanyRatingsSection from "@/features/companies/components/store/CompanyRatingsSection";
 import CompanyServicesSection from "@/features/companies/components/store/CompanyServicesSection";
 import CompanyTeamSection from "@/features/companies/components/store/CompanyTeamSection";
 import { CompanyPersonalizationProvider } from "@/features/companies/context/company-personalization-context";
+import { StoreVisitTracker } from "@/features/browsing";
 import { cn } from "@/lib/utils";
-
-const CompanyHeroGallery = dynamic(
-  () => import("@/features/companies/components/store/CompanyHeroGallery"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="h-[240px] w-full animate-pulse bg-muted sm:h-[340px] md:h-[440px] lg:h-[500px]" />
-    ),
-  },
-);
 
 /**
  * Composes the public company storefront.
  * Order: Hero → Info → Services → Store → Ratings → Team.
  * Campaign experience hides billboard ads only — gallery hero still shows when present.
+ *
+ * Hero gallery is SSR'd (no next/dynamic `ssr: false`) so imagery is in initial HTML.
  */
 export default function CompanyStorePage({
   company,
@@ -40,6 +33,15 @@ export default function CompanyStorePage({
     rating: undefined,
     reviews: undefined,
   });
+  const [viewsCount, setViewsCount] = useState(company?.viewsCount ?? 0);
+  const [viewsSyncKey, setViewsSyncKey] = useState(
+    `${company?.id}-${company?.viewsCount ?? 0}`,
+  );
+  const nextViewsSyncKey = `${company?.id}-${company?.viewsCount ?? 0}`;
+  if (nextViewsSyncKey !== viewsSyncKey) {
+    setViewsSyncKey(nextViewsSyncKey);
+    setViewsCount(company?.viewsCount ?? 0);
+  }
 
   // Keep personalized fields across ISR shell refreshes until hydrator runs.
   if (company?.id !== personalization.companyId) {
@@ -61,10 +63,16 @@ export default function CompanyStorePage({
     }));
   }, []);
 
+  const handleVisitRecorded = useCallback((result) => {
+    if (result?.viewsCount == null) return;
+    setViewsCount(result.viewsCount);
+  }, []);
+
   if (!company) return null;
 
   const view = {
     ...company,
+    viewsCount,
     myRating:
       personalization.myRating !== undefined
         ? personalization.myRating
@@ -89,6 +97,10 @@ export default function CompanyStorePage({
 
   return (
     <CompanyPersonalizationProvider onUpdate={applyPersonalization}>
+      <StoreVisitTracker
+        companyId={view.id}
+        onRecorded={handleVisitRecorded}
+      />
       <div className="pb-16">
         <div className={cn(showHero && "relative")}>
           {showHero && (

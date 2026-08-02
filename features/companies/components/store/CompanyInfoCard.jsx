@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   BarChart3,
@@ -16,6 +16,7 @@ import {
 
 import MediaImage from "@/components/common/MediaImage";
 import { Badge } from "@/components/ui/badge";
+import { ViewsCount } from "@/features/browsing";
 import CompanyLikeButton from "@/features/companies/components/store/CompanyLikeButton";
 import { cn } from "@/lib/utils";
 
@@ -42,10 +43,14 @@ function RatingStars({ value = 0 }) {
 export default function CompanyInfoCard({ company, className, likeSlot = null }) {
   const t = useTranslations("company");
   const [likesCount, setLikesCount] = useState(company?.likes ?? 0);
-
-  useEffect(() => {
+  const [likesSyncKey, setLikesSyncKey] = useState(
+    `${company?.id}-${company?.likes ?? 0}`,
+  );
+  const nextLikesSyncKey = `${company?.id}-${company?.likes ?? 0}`;
+  if (nextLikesSyncKey !== likesSyncKey) {
+    setLikesSyncKey(nextLikesSyncKey);
     setLikesCount(company?.likes ?? 0);
-  }, [company?.id, company?.likes]);
+  }
 
   const coverageNames = useMemo(
     () => (company.coverageAreas ?? []).map((item) => item.name).filter(Boolean),
@@ -161,6 +166,23 @@ export default function CompanyInfoCard({ company, className, likeSlot = null })
                 </span>
               </div>
 
+              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                <Eye className="size-4 shrink-0" aria-hidden />
+                <ViewsCount
+                  value={company.viewsCount ?? 0}
+                  numberClassName="font-semibold text-foreground"
+                />
+                <span>{t("views")}</span>
+              </div>
+
+              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                <Heart className="size-4 shrink-0" aria-hidden />
+                <span className="font-semibold tabular-nums text-foreground">
+                  {likesCount}
+                </span>
+                <span>{t("likes")}</span>
+              </div>
+
               {company.myRating != null ? (
                 <Badge
                   variant="secondary"
@@ -209,7 +231,13 @@ export default function CompanyInfoCard({ company, className, likeSlot = null })
               </p>
               <Icon className="size-4 text-primary" aria-hidden />
             </div>
-            <p className="text-2xl font-bold tabular-nums">{value}</p>
+            <p className="text-2xl font-bold tabular-nums">
+              {key === "views" ? (
+                <ViewsCount value={value} />
+              ) : (
+                value
+              )}
+            </p>
           </article>
         ))}
       </div>

@@ -41,8 +41,16 @@ export const getCompanyProductDetails = cache(
       );
 
       const payload = response?.data ?? response;
+      if (!payload || typeof payload !== "object") {
+        console.error(
+          `[getCompanyProductDetails] unexpected payload company=${companyId} product=${productId}`,
+          { type: typeof payload },
+        );
+        return null;
+      }
+
       const product = mapProduct(payload, locale);
-      if (!product) return null;
+      if (!product?.id) return null;
 
       const sellingCompanyId = Number(companyId);
 
@@ -52,6 +60,10 @@ export const getCompanyProductDetails = cache(
           product.companyProductId ??
           payload?.id ??
           product.id,
+      );
+
+      console.info(
+        `[getCompanyProductDetails] ok company=${companyId} product=${productId}`,
       );
 
       return {
@@ -64,7 +76,20 @@ export const getCompanyProductDetails = cache(
           : null,
       };
     } catch (error) {
-      if (error?.status === 404) return null;
+      if (error?.status === 404) {
+        console.info(
+          `[getCompanyProductDetails] not found company=${companyId} product=${productId}`,
+        );
+        return null;
+      }
+      console.error(
+        `[getCompanyProductDetails] failed company=${companyId} product=${productId}`,
+        {
+          status: error?.status,
+          code: error?.code,
+          message: error?.message,
+        },
+      );
       throw error;
     }
   },

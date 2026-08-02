@@ -11,9 +11,18 @@ export function useRequireAuth(intent = "login") {
   const isOpen = useAuthDialogStore((state) => state.isOpen);
 
   return {
-    openAuth: () => openAuthDialog(intent),
-    openLogin: () => openAuthDialog("login"),
-    openRegister: () => openAuthDialog("register"),
+    /**
+     * @param {{ companyId?: string|number|null }} [options]
+     */
+    openAuth: (options) => openAuthDialog(intent, options),
+    /**
+     * @param {{ companyId?: string|number|null }} [options]
+     */
+    openLogin: (options) => openAuthDialog("login", options),
+    /**
+     * @param {{ companyId?: string|number|null }} [options]
+     */
+    openRegister: (options) => openAuthDialog("register", options),
     isAuthDialogOpen: isOpen,
   };
 }

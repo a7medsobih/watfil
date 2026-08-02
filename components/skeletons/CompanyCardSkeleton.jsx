@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 /**
- * Matches `CampanyCard` layout: fixed h-44 media + padded body.
+ * Matches `CompanyCard` layout: fixed h-44 media + padded body.
  */
 export default function CompanyCardSkeleton({ className }) {
   return (

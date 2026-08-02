@@ -1,13 +1,15 @@
 export { default as WishlistPage } from "./components/WishlistPage";
 export { default as ProductLikeButton } from "./components/ProductLikeButton";
-export { useProductLike, useLikeToggle } from "./hooks";
+export { default as LikeButton } from "./components/LikeButton";
+export { useLike, executePendingLikeIntent } from "./hooks";
 export {
-  likeProduct,
-  unlikeProduct,
-  getLikedProducts,
+  setLike,
+  like,
+  unlike,
   getCustomerLikes,
-  getLikedCompanies,
   fetchAllLikedIds,
+  parseLikeResponse,
+  buildLikeBody,
 } from "./api";
 export {
   mapLikedProduct,
@@ -15,4 +17,9 @@ export {
   mapLikedCompany,
   mapLikedCompanies,
 } from "./services";
-export { LIKE_SOURCE } from "./types";
+export {
+  LIKE_TYPE,
+  LIKE_SOURCE,
+  resolveLikeType,
+  isProductLikeType,
+} from "./types";

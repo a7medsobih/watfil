@@ -5,20 +5,23 @@ import {
   mapProducts,
   mapProductsMeta,
 } from "@/features/products/services/product.mapper";
-import { DEFAULT_PRODUCT_SORT } from "@/features/filters/constants";
+import { PRODUCTS_PER_PAGE } from "@/features/filters/constants";
 
 /**
- * Builds API query params from Search Params / callers.
+ * Builds API query params for GET /public/products.
+ * Only forwards backend-documented snake_case keys (no local aliases).
+ *
  * @param {object} [params]
  */
 function buildQueryParams(params = {}) {
   const query = {
     page: params.page ?? 1,
-    per_page: params.per_page ?? 15,
+    per_page: params.per_page ?? PRODUCTS_PER_PAGE,
   };
 
   if (params.search) query.search = params.search;
   if (params.product_type_id) query.product_type_id = params.product_type_id;
+  if (params.product_type) query.product_type = params.product_type;
   if (params.parent_category_id) {
     query.parent_category_id = params.parent_category_id;
   }
@@ -27,6 +30,7 @@ function buildQueryParams(params = {}) {
     query.number_of_stages = params.number_of_stages;
   }
   if (params.governorate_id) query.governorate_id = params.governorate_id;
+  if (params.city_id) query.city_id = params.city_id;
 
   if (params.min_price != null && params.min_price !== "") {
     query.min_price = params.min_price;
@@ -34,10 +38,6 @@ function buildQueryParams(params = {}) {
 
   if (params.max_price != null && params.max_price !== "") {
     query.max_price = params.max_price;
-  }
-
-  if (params.sort && params.sort !== DEFAULT_PRODUCT_SORT) {
-    query.sort = params.sort;
   }
 
   return query;
@@ -58,7 +58,7 @@ export async function getProducts(params = {}) {
     ...(isSearch
       ? { cache: "no-store" }
       : {
-          revalidate: revalidate.medium,
+          revalidate: revalidate.short,
           tags: [cacheTags.products],
         }),
   });

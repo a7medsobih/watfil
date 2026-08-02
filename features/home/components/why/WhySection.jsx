@@ -27,13 +27,12 @@ export default async function WhySection() {
       />
 
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-        {whyItems.map((item, index) => {
+        {whyItems.map((item) => {
           const Icon = iconMap[item.icon] ?? ShieldCheck;
 
           return (
             <WhyCard
               key={item.id}
-              index={index}
               icon={Icon}
               title={item.title[locale] ?? item.title.en}
               description={item.description[locale] ?? item.description.en}

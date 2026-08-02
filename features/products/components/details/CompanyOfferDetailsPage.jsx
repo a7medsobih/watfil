@@ -6,6 +6,8 @@ import AppBreadcrumb from "@/components/common/AppBreadcrumb";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
+import { useProductViews } from "@/features/browsing/hooks/use-product-views";
+import { normalizeProductSource } from "@/features/browsing/types";
 import { useAddToCart } from "@/features/cart";
 import ProductDetailsTabs from "@/features/products/components/details/ProductDetailsTabs";
 import ProductHero from "@/features/products/components/details/ProductHero";
@@ -49,6 +51,17 @@ export default function CompanyOfferDetailsPage({
   const { addToCart } = useAddToCart();
   const currency = locale === "ar" ? "ج.م" : "EGP";
 
+  const productSource = normalizeProductSource(
+    product?.source ?? product?.likeSource ?? "catalog",
+  );
+
+  const { viewsCount } = useProductViews({
+    companyId: company?.id,
+    productId: product?.id,
+    productSource,
+    initialViewsCount: product?.viewsCount ?? 0,
+  });
+
   const grouped = groupPerks(product?.hasPerks ? product.perks ?? [] : []);
 
   if (!product || !company) return null;
@@ -56,6 +69,8 @@ export default function CompanyOfferDetailsPage({
   const handleAddToCart = () => {
     addToCart({ company, product, quantity: 1, openCart: true });
   };
+
+  const viewProduct = { ...product, viewsCount };
 
   return (
     <div className="container pb-16 pt-4 md:pt-8">
@@ -66,14 +81,18 @@ export default function CompanyOfferDetailsPage({
       )}
 
       <ProductHero
-        product={product}
+        product={viewProduct}
         locale={locale}
         company={company}
         showOfferingCompanies={false}
         mode="company"
       />
 
-      <ProductDetailsTabs product={product} locale={locale} mode="company" />
+      <ProductDetailsTabs
+        product={viewProduct}
+        locale={locale}
+        mode="company"
+      />
 
       <section className="mt-12 space-y-8 sm:mt-16">
         <div

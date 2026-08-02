@@ -4,7 +4,7 @@ watfil-website/
 │   │   ├── layout.js                       # Inter + Cairo fonts, lang/dir
 │   │   ├── error.js
 │   │   ├── (public)/
-│   │   │   ├── layout.js                   # Navbar + Footer
+│   │   │   ├── layout.js                   # ExperienceChrome (Navbar/Footer)
 │   │   │   ├── loading.js
 │   │   │   ├── not-found.js
 │   │   │   ├── page.js                     # Home
@@ -12,14 +12,14 @@ watfil-website/
 │   │   │   │   ├── page.js
 │   │   │   │   ├── loading.js
 │   │   │   │   ├── error.js
-│   │   │   │   └── [slug]/
+│   │   │   │   └── [id]/
 │   │   │   │       ├── page.js
 │   │   │   │       └── loading.js
 │   │   │   ├── companies/
 │   │   │   │   ├── page.js
 │   │   │   │   ├── loading.js
 │   │   │   │   ├── error.js
-│   │   │   │   └── [slug]/
+│   │   │   │   └── [id]/
 │   │   │   │       ├── page.js
 │   │   │   │       ├── loading.js
 │   │   │   │       └── products/
@@ -28,24 +28,47 @@ watfil-website/
 │   │   │   │               └── loading.js
 │   │   │   ├── categories/
 │   │   │   │   ├── page.js
+│   │   │   │   ├── loading.js
 │   │   │   │   └── [slug]/
-│   │   │   │       └── page.js
+│   │   │   │       ├── page.js
+│   │   │   │       └── loading.js
 │   │   │   ├── search/
-│   │   │   │   └── page.js
+│   │   │   │   ├── page.js
+│   │   │   │   └── loading.js
 │   │   │   ├── wishlist/
-│   │   │   │   └── page.js
+│   │   │   │   ├── page.js
+│   │   │   │   └── loading.js
 │   │   │   ├── compare/
-│   │   │   │   └── page.js
+│   │   │   │   ├── page.js
+│   │   │   │   └── loading.js
+│   │   │   ├── checkout/
+│   │   │   │   ├── page.js
+│   │   │   │   ├── loading.js
+│   │   │   │   └── success/
+│   │   │   │       ├── page.js
+│   │   │   │       └── loading.js
 │   │   │   ├── blog/
 │   │   │   │   ├── page.js
+│   │   │   │   ├── loading.js
 │   │   │   │   └── [slug]/
-│   │   │   │       └── page.js
+│   │   │   │       ├── page.js
+│   │   │   │       └── loading.js
 │   │   │   ├── join-us/
-│   │   │   │   └── page.js                 # Company join request
+│   │   │   │   ├── page.js                 # Company join request
+│   │   │   │   └── loading.js
 │   │   │   └── about/
-│   │   │       └── page.js
+│   │   │       ├── page.js
+│   │   │       └── loading.js
+│   │   ├── (store-share)/                  # Campaign chrome (no main site nav)
+│   │   │   ├── layout.js
+│   │   │   └── store/
+│   │   │       └── [taxNumber]/
+│   │   │           ├── page.js             # Public store share link
+│   │   │           ├── loading.js
+│   │   │           └── error.js
 │   │   └── (auth)/
 │   │       ├── layout.js
+│   │       ├── loading.js
 │   │       ├── login/
 │   │       │   └── page.js
 │   │       ├── register/
@@ -60,8 +83,9 @@ watfil-website/
 │   │   └── backend/
 │   │       └── [...path]/
 │   │           └── route.js                # BFF proxy to backend
+│   ├── sitemap.xml/
+│   │   └── route.js
 │   ├── providers.jsx
-│   ├── sitemap.js
 │   ├── robots.js
 │   └── manifest.js
 ├── features/
@@ -86,12 +110,16 @@ watfil-website/
 │   │   │   ├── ProductsFilters.jsx
 │   │   │   ├── ProductsFiltersSheet.jsx
 │   │   │   ├── ProductsSearch.jsx
-│   │   │   └── details/                   # ProductHero, tabs, similar, …
-│   │   ├── api/                            # get-products, get-product, …
+│   │   │   ├── ProductsSort.jsx
+│   │   │   ├── ProductsActiveFilters.jsx
+│   │   │   └── details/                   # ProductHero, tabs, similar, offer, …
+│   │   ├── api/                            # get-products, get-product, personalization, …
+│   │   ├── context/
+│   │   │   └── list-query-context.jsx
 │   │   ├── hooks/
 │   │   ├── schemas/
 │   │   ├── services/
-│   │   ├── utils/                          # slug + params resolvers
+│   │   ├── utils/                          # params resolvers
 │   │   └── index.js
 │   ├── companies/
 │   │   ├── components/
@@ -100,10 +128,12 @@ watfil-website/
 │   │   │   ├── GovernorateTabs.jsx
 │   │   │   ├── JoinCompanyCTA.jsx
 │   │   │   ├── join/                       # JoinUsPage, JoinUsForm
-│   │   │   └── store/                      # CompanyStorePage, ratings, …
-│   │   ├── api/                            # companies, join, like, rate, …
+│   │   │   ├── store/                      # CompanyStorePage, ratings, team, …
+│   │   │   └── share/                      # StoreSharePage, hero, footer
+│   │   ├── api/                            # companies, billboards, store, like, rate, …
 │   │   ├── context/
-│   │   │   └── company-brand-context.jsx
+│   │   │   ├── company-brand-context.jsx
+│   │   │   └── company-personalization-context.jsx
 │   │   ├── hooks/
 │   │   ├── schemas/
 │   │   ├── services/
@@ -111,7 +141,8 @@ watfil-website/
 │   │   ├── types.js
 │   │   └── index.js
 │   ├── blog/
-│   │   ├── api/                            # get-articles, get-featured-articles
+│   │   ├── components/                     # BlogArticlePage, search, TOC, …
+│   │   ├── api/                            # get-articles, get-featured, analytics, …
 │   │   ├── hooks/
 │   │   ├── services/
 │   │   └── utils/
@@ -122,9 +153,35 @@ watfil-website/
 │   │   ├── api/
 │   │   ├── services/
 │   │   └── index.js
+│   ├── taxonomy/
+│   │   ├── api/                            # get-categories, get-product-types
+│   │   ├── services/
+│   │   ├── utils/
+│   │   └── index.js
+│   ├── filters/
+│   │   ├── components/                     # FilterGroup, PriceRange, chips, …
+│   │   ├── hooks/
+│   │   ├── utils/
+│   │   ├── constants.js
+│   │   └── index.js
+│   ├── governorate/
+│   │   ├── constants.js
+│   │   ├── preference.js
+│   │   ├── resolve.js
+│   │   ├── ensure.js
+│   │   ├── routes.js
+│   │   └── index.js
+│   ├── experience/
+│   │   ├── context/
+│   │   │   └── experience-context.jsx      # marketplace vs campaign chrome
+│   │   ├── constants.js
+│   │   ├── utils.js
+│   │   └── index.js
 │   ├── search/
 │   │   ├── components/
 │   │   │   └── SearchPage.jsx
+│   │   ├── api/
+│   │   │   └── search-catalog.js
 │   │   └── index.js
 │   ├── wishlist/
 │   │   ├── components/
@@ -135,18 +192,30 @@ watfil-website/
 │   │   ├── services/
 │   │   ├── types.js
 │   │   └── index.js
+│   ├── browsing/
+│   │   ├── api/                            # store visit, product view, recent-*
+│   │   ├── components/                     # trackers, RecentlyViewed, ViewsCount
+│   │   ├── hooks/
+│   │   ├── services/
+│   │   ├── utils/                          # session-key (watfil_browse_session)
+│   │   ├── constants.js
+│   │   ├── types.js
+│   │   └── index.js
 │   ├── compare/
 │   │   ├── components/
 │   │   │   └── ComparePage.jsx
 │   │   ├── flags.js
 │   │   └── index.js
 │   ├── cart/
-│   │   ├── components/                     # MiniCart, CartHost, …
+│   │   ├── components/                     # MiniCart, CartHost, conflict dialog, …
 │   │   ├── hooks/
 │   │   │   └── use-add-to-cart.js
 │   │   └── index.js
 │   ├── checkout/
-│   │   └── utils/                          # build-order-payload, idempotency
+│   │   ├── components/                     # CheckoutPage, summary, success
+│   │   ├── api/                            # create order, company link
+│   │   ├── utils/                          # build-order-payload, idempotency
+│   │   └── index.js
 │   ├── auth/
 │   │   ├── components/
 │   │   │   ├── AuthDialog.jsx
@@ -169,6 +238,9 @@ watfil-website/
 │   ├── ui/                                 # button, badge, sheet, dialog, …
 │   ├── layout/
 │   │   ├── Footer.jsx
+│   │   ├── CampaignNavbar.jsx
+│   │   ├── CampaignFooter.jsx
+│   │   ├── ExperienceChrome.jsx            # switches marketplace/campaign chrome
 │   │   └── navbar/
 │   │       ├── index.js
 │   │       ├── nav-items.js
@@ -179,10 +251,8 @@ watfil-website/
 │   │       ├── NavbarAuth.jsx
 │   │       ├── MobileMenu.jsx
 │   │       └── MobileDrawer.jsx
-│   ├── common/                             # ProductCard, PageHeader, …
-│   ├── skeletons/
-│   │   ├── index.js
-│   │   └── PageSkeleton.jsx
+│   ├── common/                             # ProductCard, PageHeader, SectionCarousel, …
+│   ├── skeletons/                          # Home, Product, Checkout, Store, …
 │   ├── seo/
 │   │   ├── index.js
 │   │   └── JsonLd.jsx
@@ -203,11 +273,13 @@ watfil-website/
 │   ├── seo/
 │   │   ├── metadata.js
 │   │   ├── openGraph.js
+│   │   ├── resolve-redirect.js
 │   │   └── schema.js
 │   ├── cache/
 │   │   └── index.js
 │   ├── constants/
-│   │   └── constantData.js
+│   │   ├── constantData.js
+│   │   └── app-store.js
 │   ├── media/
 │   │   └── placeholders.js
 │   ├── validations/
@@ -222,8 +294,7 @@ watfil-website/
 │   ├── auth-dialog-store.js
 │   ├── cart-store.js
 │   ├── compare-store.js
-│   ├── liked-companies-store.js
-│   ├── wishlist-count-store.js
+│   ├── likes-store.js
 │   └── ui-store.js
 ├── hooks/
 │   ├── index.js
@@ -247,8 +318,11 @@ watfil-website/
 │   ├── folder-structure.txt
 │   ├── WATAFL_COMPANY_JOIN_REQUESTS.md
 │   ├── WATAFL_CUSTOMER_RATINGS.md
+│   ├── WATAFL_BILLBOARDS.md
+│   ├── WATAFL_COMPANY_STORE_LINKS_WEB.md
+│   ├── WATAFL_PRODUCTS_TAXONOMY_FRONTEND.md
 │   ├── FRONTEND_ENDPOINTS_BUSINESS_GUIDE_AR 8.md
-│   └── Watafl_Company_Join_Requests.postman_collection 1.json
+│   └── *.postman_collection*.json
 ├── proxy.ts                                # Next.js 16 (replaces middleware.js)
 ├── next.config.mjs
 ├── postcss.config.mjs

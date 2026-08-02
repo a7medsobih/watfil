@@ -1,6 +1,5 @@
 export {
   getProducts,
-  getFeaturedProducts,
   getProduct,
   getProductCompanies,
 } from "./api";

@@ -2,11 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { toast } from "sonner";
 import { Building2, Heart, Package } from "lucide-react";
 
 import AppPagination from "@/components/common/AppPagination";
-import CampanyCard from "@/components/common/CampanyCard";
+import CompanyCard from "@/components/common/CompanyCard";
 import EmptyState from "@/components/common/EmptyState";
 import ProductCard from "@/components/common/ProductCard";
 import {
@@ -17,7 +16,6 @@ import {
 } from "@/components/skeletons/ProductCardSkeleton";
 import { Button } from "@/components/ui/button";
 import { useRequireAuth } from "@/features/auth";
-import { unlikeCompany } from "@/features/companies/api";
 import { getCustomerLikes } from "@/features/wishlist/api";
 import { Link } from "@/i18n/navigation";
 import { useAuthStore, useIsAuthenticated } from "@/stores/auth-store";
@@ -44,8 +42,8 @@ function normalizeInitial(initialData, productsPerPage, companiesPerPage) {
 }
 
 /**
- * Wishlist with Products | Companies tabs and independent pagination.
- * First page is provided by the Server Component; further pages fetch client-side.
+ * Wishlist rebuilt on GET /customer/likes.
+ * Tabs: Products | Companies — independent pagination.
  */
 export default function WishlistPage({
   initialData = null,
@@ -103,12 +101,16 @@ export default function WishlistPage({
       setError(null);
 
       try {
-        const result = await getCustomerLikes(token, {
-          products_page: nextProductsPage,
-          products_per_page: productsPerPage,
-          companies_page: nextCompaniesPage,
-          companies_per_page: companiesPerPage,
-        });
+        const result = await getCustomerLikes(
+          token,
+          {
+            products_page: nextProductsPage,
+            products_per_page: productsPerPage,
+            companies_page: nextCompaniesPage,
+            companies_per_page: companiesPerPage,
+          },
+          locale,
+        );
 
         removedProductsRef.current.clear();
         removedCompaniesRef.current.clear();
@@ -119,7 +121,6 @@ export default function WishlistPage({
         setProductsPage(result.meta.products.currentPage || nextProductsPage);
         setCompaniesPage(result.meta.companies.currentPage || nextCompaniesPage);
 
-        // Keep the unified store in sync for visible items.
         for (const product of result.products) {
           if (product?.id != null) setProductLiked(product.id, true);
         }
@@ -134,6 +135,7 @@ export default function WishlistPage({
     },
     [
       token,
+      locale,
       productsPage,
       companiesPage,
       productsPerPage,
@@ -156,7 +158,6 @@ export default function WishlistPage({
 
     if (skipInitialFetchRef.current) {
       skipInitialFetchRef.current = false;
-      // Seed store from SSR payload.
       for (const product of seeded.products) {
         if (product?.id != null) setProductLiked(product.id, true);
       }
@@ -208,42 +209,32 @@ export default function WishlistPage({
     }));
   };
 
-  const handleUnlikeCompany = async (company) => {
-    if (!company?.id || !token) return;
-
-    const previous = company;
-    removedCompaniesRef.current.set(company.id, previous);
-    setCompanies((current) =>
-      current.filter((entry) => String(entry.id) !== String(company.id)),
-    );
-    setCompaniesMeta((meta) => ({
-      ...meta,
-      total: Math.max(0, (meta.total || 0) - 1),
-    }));
-    setCompanyLiked(company.id, false);
-
-    try {
-      await unlikeCompany(company.id, token);
-      toast(t("toast.unliked"), {
-        className: "!border-primary/30 !bg-primary !text-primary-foreground",
-      });
-    } catch {
-      removedCompaniesRef.current.delete(company.id);
+  const handleCompanyLikeChange = (company) => (next) => {
+    if (!next.liked) {
+      removedCompaniesRef.current.set(company.id, company);
       setCompanies((current) =>
-        current.some((entry) => String(entry.id) === String(company.id))
-          ? current
-          : [previous, ...current],
+        current.filter((entry) => String(entry.id) !== String(company.id)),
       );
       setCompaniesMeta((meta) => ({
         ...meta,
-        total: (meta.total || 0) + 1,
+        total: Math.max(0, (meta.total || 0) - 1),
       }));
-      setCompanyLiked(company.id, true);
-      toast.error(t("toast.error"), {
-        className:
-          "!border-destructive/30 !bg-destructive !text-destructive-foreground",
-      });
+      return;
     }
+
+    const stashed = removedCompaniesRef.current.get(company.id);
+    if (!stashed) return;
+
+    removedCompaniesRef.current.delete(company.id);
+    setCompanies((current) =>
+      current.some((entry) => String(entry.id) === String(company.id))
+        ? current
+        : [...current, stashed],
+    );
+    setCompaniesMeta((meta) => ({
+      ...meta,
+      total: (meta.total || 0) + 1,
+    }));
   };
 
   const showAuthGate =
@@ -289,80 +280,116 @@ export default function WishlistPage({
   }
 
   return (
-    <div className="space-y-6">
-      <div
-        role="tablist"
-        aria-label={t("title")}
-        className="flex h-auto flex-wrap gap-1.5 rounded-full bg-muted p-1.5"
-      >
-        {[
-          {
-            key: "products",
-            label: t("tabs.products"),
-            count: productsMeta.total ?? products.length,
-          },
-          {
-            key: "companies",
-            label: t("tabs.companies"),
-            count: companiesMeta.total ?? companies.length,
-          },
-        ].map((item) => {
-          const isActive = tab === item.key;
-          return (
-            <button
-              key={item.key}
-              type="button"
-              role="tab"
-              aria-selected={isActive}
-              onClick={() => setTab(item.key)}
-              className={cn(
-                "rounded-full px-5 py-2 text-sm font-medium transition-colors",
-                isActive
-                  ? "bg-card text-foreground shadow-soft"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {item.label}
-              <span className="ms-2 tabular-nums text-muted-foreground">
-                ({item.count})
-              </span>
-            </button>
-          );
-        })}
-      </div>
+    <>
+      <div className="space-y-6">
+        <div
+          role="tablist"
+          aria-label={t("title")}
+          className="flex h-auto flex-wrap gap-1.5 rounded-full bg-muted p-1.5"
+        >
+          {[
+            {
+              key: "products",
+              label: t("tabs.products"),
+              count: productsMeta.total ?? products.length,
+            },
+            {
+              key: "companies",
+              label: t("tabs.companies"),
+              count: companiesMeta.total ?? companies.length,
+            },
+          ].map((item) => {
+            const isActive = tab === item.key;
+            return (
+              <button
+                key={item.key}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setTab(item.key)}
+                className={cn(
+                  "rounded-full px-5 py-2 text-sm font-medium transition-colors",
+                  isActive
+                    ? "bg-card text-foreground shadow-soft"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {item.label}
+                <span className="ms-2 tabular-nums text-muted-foreground">
+                  ({item.count})
+                </span>
+              </button>
+            );
+          })}
+        </div>
 
-      {loading ? (
-        tab === "companies" ? (
-          <CompanyCardSkeletonGrid count={6} />
-        ) : (
-          <ProductCardSkeletonGrid count={8} />
-        )
-      ) : tab === "products" ? (
-        products.length > 0 ? (
+        {loading ? (
+          tab === "companies" ? (
+            <CompanyCardSkeletonGrid count={6} />
+          ) : (
+            <ProductCardSkeletonGrid count={8} />
+          )
+        ) : tab === "products" ? (
+          products.length > 0 ? (
+            <>
+              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                {products.map((product) => (
+                  <ProductCard
+                    key={`${product.likeSource}-${product.companyId ?? "catalog"}-${product.id}`}
+                    product={product}
+                    locale={locale}
+                    variant={
+                      product.likeSource === "company" ||
+                      product.source === "company"
+                        ? "company"
+                        : "catalog"
+                    }
+                    companyId={product.companyId ?? null}
+                    onLikeChange={handleProductLikeChange(product)}
+                  />
+                ))}
+              </div>
+              <AppPagination
+                currentPage={productsMeta.currentPage || productsPage}
+                lastPage={productsMeta.lastPage || 1}
+                total={productsMeta.total}
+                perPage={productsMeta.perPage || productsPerPage}
+                onPageChange={handleProductsPageChange}
+                labels={{
+                  previous: tPagination("previous"),
+                  next: tPagination("next"),
+                }}
+              />
+            </>
+          ) : (
+            <EmptyState
+              icon={<Heart className="size-7 sm:size-8" aria-hidden />}
+              title={t("emptyTitle")}
+              description={t("empty")}
+              action={
+                <Button type="button" asChild>
+                  <Link href="/products">{t("emptyProductsCta")}</Link>
+                </Button>
+              }
+            />
+          )
+        ) : companies.length > 0 ? (
           <>
-            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {products.map((product) => (
-                <ProductCard
-                  key={`${product.likeSource}-${product.companyId ?? "catalog"}-${product.id}`}
-                  product={product}
-                  locale={locale}
-                  variant={
-                    product.likeSource === "company" ||
-                    product.source === "company"
-                      ? "company"
-                      : "catalog"
-                  }
-                  companyId={product.companyId ?? null}
-                  onLikeChange={handleProductLikeChange(product)}
+            <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              {companies.map((company) => (
+                <CompanyCard
+                  key={company.id}
+                  company={company}
+                  onLikeChange={handleCompanyLikeChange(company)}
                 />
               ))}
             </div>
             <AppPagination
-              currentPage={productsMeta.currentPage || productsPage}
-              lastPage={productsMeta.lastPage || 1}
-              total={productsMeta.total}
-              perPage={productsMeta.perPage || productsPerPage}
-              onPageChange={handleProductsPageChange}
+              currentPage={companiesMeta.currentPage || companiesPage}
+              lastPage={companiesMeta.lastPage || 1}
+              total={companiesMeta.total}
+              perPage={companiesMeta.perPage || companiesPerPage}
+              onPageChange={handleCompaniesPageChange}
               labels={{
                 previous: tPagination("previous"),
                 next: tPagination("next"),
@@ -371,58 +398,17 @@ export default function WishlistPage({
           </>
         ) : (
           <EmptyState
-            icon={<Heart className="size-7 sm:size-8" aria-hidden />}
-            title={t("emptyTitle")}
-            description={t("empty")}
+            icon={<Building2 className="size-7 sm:size-8" aria-hidden />}
+            title={t("emptyCompaniesTitle")}
+            description={t("emptyCompanies")}
             action={
               <Button type="button" asChild>
-                <Link href="/products">{t("emptyProductsCta")}</Link>
+                <Link href="/companies">{t("emptyCompaniesCta")}</Link>
               </Button>
             }
           />
-        )
-      ) : companies.length > 0 ? (
-        <>
-          <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {companies.map((company) => (
-              <div key={company.id} className="relative">
-                <CampanyCard company={company} />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="absolute end-3 top-3 z-[2] bg-card/90 backdrop-blur-sm"
-                  onClick={() => handleUnlikeCompany(company)}
-                >
-                  {t("unlike")}
-                </Button>
-              </div>
-            ))}
-          </div>
-          <AppPagination
-            currentPage={companiesMeta.currentPage || companiesPage}
-            lastPage={companiesMeta.lastPage || 1}
-            total={companiesMeta.total}
-            perPage={companiesMeta.perPage || companiesPerPage}
-            onPageChange={handleCompaniesPageChange}
-            labels={{
-              previous: tPagination("previous"),
-              next: tPagination("next"),
-            }}
-          />
-        </>
-      ) : (
-        <EmptyState
-          icon={<Building2 className="size-7 sm:size-8" aria-hidden />}
-          title={t("emptyCompaniesTitle")}
-          description={t("emptyCompanies")}
-          action={
-            <Button type="button" asChild>
-              <Link href="/companies">{t("emptyCompaniesCta")}</Link>
-            </Button>
-          }
-        />
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 }

@@ -6,7 +6,7 @@ import { mapProductsMeta } from "@/features/products/services/product.mapper";
 import { mapCompaniesMeta } from "@/features/companies/services/company.mapper";
 
 /**
- * Builds query params for the unified likes endpoint.
+ * Builds query params for GET /customer/likes.
  * @param {object} [params]
  */
 function buildQueryParams(params = {}) {
@@ -27,13 +27,11 @@ function buildQueryParams(params = {}) {
   return query;
 }
 
-function emptyMeta() {
-  return { total: 0, currentPage: 1, lastPage: 1, perPage: 15 };
-}
-
 /**
  * Fetches unified customer likes (products + companies).
  * Always uncached (personalized).
+ *
+ * Response shape: `{ data: { products, companies }, meta: { products, companies } }`
  *
  * @param {string} token
  * @param {{
@@ -44,11 +42,6 @@ function emptyMeta() {
  *   companies_per_page?: number,
  * }} [params]
  * @param {string} [locale]
- * @returns {Promise<{
- *   products: object[],
- *   companies: object[],
- *   meta: { products: object, companies: object },
- * }>}
  */
 export async function getCustomerLikes(token, params = {}, locale = "ar") {
   const response = await fetchFromAPI(endpoints.likes.all, {
@@ -77,40 +70,13 @@ export async function getCustomerLikes(token, params = {}, locale = "ar") {
 }
 
 /**
- * Fetches liked companies only (when products are not needed).
- * @param {string} token
- * @param {{ page?: number, per_page?: number }} [params]
- * @param {string} [locale]
- */
-export async function getLikedCompanies(token, params = {}, locale = "ar") {
-  const query = {};
-  if (params.page != null) query.page = params.page;
-  if (params.per_page != null) query.per_page = params.per_page;
-
-  const response = await fetchFromAPI(endpoints.likes.companies, {
-    method: "GET",
-    token,
-    params: query,
-    cache: "no-store",
-  });
-
-  const rows = response?.data ?? response?.companies ?? [];
-
-  return {
-    companies: mapLikedCompanies(Array.isArray(rows) ? rows : [], locale),
-    meta: mapCompaniesMeta(response?.meta) ?? emptyMeta(),
-  };
-}
-
-/**
- * Hydrate helper: walk all pages of the unified likes endpoint and collect IDs.
- * Uses a large per_page to minimize round-trips.
+ * Hydrate helper: walk all pages of GET /customer/likes and collect IDs.
  *
  * @param {string} token
  * @returns {Promise<{ productIds: string[], companyIds: string[] }>}
  */
 export async function fetchAllLikedIds(token) {
-  const perPage = 100;
+  const perPage = 50;
   const productIds = new Set();
   const companyIds = new Set();
 

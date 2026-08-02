@@ -25,7 +25,6 @@ import ProductsActiveFilters from "@/features/products/components/ProductsActive
 import ProductsFilters from "@/features/products/components/ProductsFilters";
 import ProductsFiltersSheet from "@/features/products/components/ProductsFiltersSheet";
 import ProductsSearch from "@/features/products/components/ProductsSearch";
-import ProductsSort from "@/features/products/components/ProductsSort";
 import { getProducts } from "@/features/products/api";
 import {
   buildProductsHref,
@@ -164,18 +163,6 @@ export default async function Page({ searchParams }) {
     search: t("products.search"),
     clearAll: t("products.clearAll"),
     removeFilter: t("products.removeFilter"),
-    sort: t("products.sortLabel"),
-    sortPriceAsc: t("products.sort.priceAsc"),
-    sortPriceDesc: t("products.sort.priceDesc"),
-    sortPopular: t("products.sort.popular"),
-  };
-
-  const sortLabels = {
-    sortLabel: t("products.sortLabel"),
-    newest: t("products.sort.newest"),
-    priceAsc: t("products.sort.priceAsc"),
-    priceDesc: t("products.sort.priceDesc"),
-    popular: t("products.sort.popular"),
   };
 
   return (
@@ -236,9 +223,6 @@ export default async function Page({ searchParams }) {
               <p className="hidden text-sm text-muted-foreground lg:block">
                 {t("products.count", { count: meta.total })}
               </p>
-              <Suspense fallback={<Skeleton className="h-9 w-40 rounded-full" />}>
-                <ProductsSort labels={sortLabels} className="ms-auto" />
-              </Suspense>
             </div>
 
             <Suspense fallback={null}>

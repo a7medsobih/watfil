@@ -6,8 +6,6 @@ export {
   getGovernorates,
   getTopRatedCompanies,
   createCompanyJoinRequest,
-  likeCompany,
-  unlikeCompany,
   rateCompany,
   deleteCompanyRating,
 } from "./api";

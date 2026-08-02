@@ -1,6 +1,5 @@
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import ThemeToggle from "@/components/ThemeToggle";
-import { MiniCartTrigger } from "@/features/cart";
 
 import MobileDrawer from "./MobileDrawer";
 import MobileMenu from "./MobileMenu";
@@ -40,7 +39,6 @@ export default function Navbar({ variant = "default" }) {
           <div className="flex-1" />
           <NavbarActions />
           <NavbarAuth />
-          <MiniCartTrigger className="md:hidden" />
           <MobileMenu />
         </div>
         <MobileDrawer />

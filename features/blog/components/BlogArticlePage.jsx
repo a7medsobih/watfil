@@ -5,30 +5,34 @@ import MediaImage from "@/components/common/MediaImage";
 import JsonLd from "@/components/seo/JsonLd";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDate } from "@/lib/utils/format-date";
+import { getSiteUrl } from "@/lib/env";
 import { articleSchema, breadcrumbSchema } from "@/lib/seo/schema";
+import { routing } from "@/i18n/routing";
 
 import BlogArticleContent from "./BlogArticleContent";
 import BlogArticleSidebar, { BlogTags } from "./BlogArticleSidebar";
 import BlogTableOfContents from "./BlogTableOfContents";
 import BlogViewTracker from "./BlogViewTracker";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-
 export default function BlogArticlePage({
   article,
   relatedArticles = [],
-  locale = "en",
+  locale = "ar",
   breadcrumbs = [],
   labels = {},
 }) {
   const bodyHtml = article.body;
   const canonicalPath = `/blog/${article.slug}`;
-  const fullUrl = `${SITE_URL}/${locale}${canonicalPath}`;
+  const siteUrl = getSiteUrl();
+  const fullUrl =
+    locale === routing.defaultLocale
+      ? `${siteUrl}${canonicalPath}`
+      : `${siteUrl}/${locale}${canonicalPath}`;
 
-  const schemaBreadcrumbs = breadcrumbs.map((item, index) => ({
+  const schemaBreadcrumbs = breadcrumbs.map((item) => ({
     name: item.label,
     url: item.href
-      ? `${SITE_URL}/${locale}${item.href === "/" ? "" : item.href}`
+      ? `${siteUrl}${locale === routing.defaultLocale ? "" : `/${locale}`}${item.href === "/" ? "" : item.href}`
       : fullUrl,
   }));
 
@@ -153,8 +157,6 @@ export default function BlogArticlePage({
               <BlogArticleSidebar
                 articles={relatedArticles}
                 title={labels.relatedArticles}
-                locale={locale}
-                readMoreLabel={labels.readMore}
                 readTimeLabel={labels.readTime}
               />
             </div>

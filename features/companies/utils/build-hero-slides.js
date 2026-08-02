@@ -1,17 +1,14 @@
-import { getProduct } from "@/features/products/api";
 import { buildCatalogProductHref } from "@/features/products/utils/resolve-product-detail-params";
 
 /**
- * Resolves the catalog product href for a billboard (id-based path).
+ * Resolves the catalog product href for a billboard from API product ids.
+ * No extra fetch — uses ids already present on the billboard payload.
  *
  * @param {object} billboard
- * @param {{ governorate?: string|number|null, locale?: string }} [options]
- * @returns {Promise<string|null>}
+ * @param {{ governorate?: string|number|null }} [options]
+ * @returns {string|null}
  */
-async function resolveBillboardHref(
-  billboard,
-  { governorate = null, locale = "ar" } = {},
-) {
+function resolveBillboardHref(billboard, { governorate = null } = {}) {
   const productId =
     billboard?.supplierProductId ??
     billboard?.product?.id ??
@@ -20,12 +17,7 @@ async function resolveBillboardHref(
 
   if (productId == null || productId === "") return null;
 
-  const catalogProduct = await getProduct(productId, locale);
-  if (catalogProduct?.id != null) {
-    return buildCatalogProductHref(catalogProduct, { governorate });
-  }
-
-  return buildCatalogProductHref(String(productId), { governorate });
+  return buildCatalogProductHref(productId, { governorate });
 }
 
 /**
@@ -46,23 +38,18 @@ function mapGallerySlides(gallery = []) {
 /**
  * Normalizes billboards into hero slides with catalog product hrefs.
  * @param {object[]} billboards
- * @param {{ governorate?: string|number|null, locale?: string }} [options]
+ * @param {{ governorate?: string|number|null }} [options]
  */
-async function mapBillboardSlides(
-  billboards = [],
-  { governorate = null, locale = "ar" } = {},
-) {
-  const rows = (billboards ?? []).filter((item) => item?.image);
-
-  return Promise.all(
-    rows.map(async (item) => ({
+function mapBillboardSlides(billboards = [], { governorate = null } = {}) {
+  return (billboards ?? [])
+    .filter((item) => item?.image)
+    .map((item) => ({
       id: `billboard-${item.id}`,
       url: item.image,
       kind: "billboard",
-      href: await resolveBillboardHref(item, { governorate, locale }),
+      href: resolveBillboardHref(item, { governorate }),
       productName: item.product?.name || null,
-    })),
-  );
+    }));
 }
 
 /**
@@ -84,10 +71,9 @@ export async function buildHeroSlides({
   billboards = [],
   gallery = [],
   governorate = null,
-  locale = "ar",
 } = {}) {
   if (Array.isArray(billboards) && billboards.length > 0) {
-    return mapBillboardSlides(billboards, { governorate, locale });
+    return mapBillboardSlides(billboards, { governorate });
   }
 
   return mapGallerySlides(gallery);

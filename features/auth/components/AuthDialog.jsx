@@ -12,23 +12,22 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { executePendingLikeIntent } from "@/features/wishlist/hooks";
+import { resolveRegisterCompany } from "@/features/auth/utils/resolve-register-company";
 import { useAuthDialogStore } from "@/stores/auth-dialog-store";
 import { useAuthStore } from "@/stores/auth-store";
 
 import PhoneStep from "./steps/PhoneStep";
 import PasswordStep from "./steps/PasswordStep";
 import RegisterStep from "./steps/RegisterStep";
-import OtpStep from "./steps/OtpStep";
-
-const OTP_COUNTDOWN_SECONDS = 60;
 
 /**
- * Global authentication Dialog — phone → login or register+OTP.
+ * Global authentication Dialog — phone → login or direct register (+ company_id).
  */
 export default function AuthDialog() {
   const t = useTranslations("auth");
   const isOpen = useAuthDialogStore((state) => state.isOpen);
   const intent = useAuthDialogStore((state) => state.intent);
+  const dialogCompanyId = useAuthDialogStore((state) => state.companyId);
   const setAuthDialogOpen = useAuthDialogStore((state) => state.setAuthDialogOpen);
   const closeAuthDialog = useAuthDialogStore((state) => state.closeAuthDialog);
   const clearPendingLikeIntent = useAuthDialogStore(
@@ -38,17 +37,14 @@ export default function AuthDialog() {
 
   const [step, setStep] = useState("phone");
   const [phone, setPhone] = useState("");
-  const [registerDraft, setRegisterDraft] = useState(null);
-  const [debugOtp, setDebugOtp] = useState(null);
-  const [otpExpiresAt, setOtpExpiresAt] = useState(null);
   const [formError, setFormError] = useState("");
+  const [registerCompany, setRegisterCompany] = useState(() =>
+    resolveRegisterCompany(dialogCompanyId),
+  );
 
   const resetState = () => {
     setStep("phone");
     setPhone("");
-    setRegisterDraft(null);
-    setDebugOtp(null);
-    setOtpExpiresAt(null);
     setFormError("");
   };
 
@@ -57,8 +53,9 @@ export default function AuthDialog() {
       const timer = setTimeout(resetState, 200);
       return () => clearTimeout(timer);
     }
+    setRegisterCompany(resolveRegisterCompany(dialogCompanyId));
     return undefined;
-  }, [isOpen]);
+  }, [isOpen, dialogCompanyId]);
 
   const copy = useMemo(() => {
     switch (step) {
@@ -72,11 +69,6 @@ export default function AuthDialog() {
           title: t("register.title"),
           description: t("register.subtitle"),
         };
-      case "otp":
-        return {
-          title: t("otp.title"),
-          description: t("otp.subtitle", { phone }),
-        };
       default:
         return {
           title: intent === "register" ? t("register.title") : t("welcome.title"),
@@ -86,12 +78,11 @@ export default function AuthDialog() {
               : t("welcome.subtitle"),
         };
     }
-  }, [step, intent, phone, t]);
+  }, [step, intent, t]);
 
   const handleOpenChange = (open) => {
     setAuthDialogOpen(open);
     if (!open) {
-      // Dismissed without auth — drop pending like intent.
       if (!useAuthStore.getState().token) {
         clearPendingLikeIntent();
       }
@@ -112,10 +103,6 @@ export default function AuthDialog() {
         toast.error(t("errors.generic"));
       }
     }
-  };
-
-  const startOtpCountdown = () => {
-    setOtpExpiresAt(Date.now() + OTP_COUNTDOWN_SECONDS * 1000);
   };
 
   return (
@@ -168,37 +155,15 @@ export default function AuthDialog() {
         {step === "register" ? (
           <RegisterStep
             phone={phone}
+            companyId={registerCompany.companyId}
+            companyName={registerCompany.companyName}
+            companyLocked={registerCompany.locked}
             onBack={() => {
               setFormError("");
               setStep("phone");
             }}
-            onOtpSent={({ draft, debugOtp: nextDebugOtp }) => {
-              setFormError("");
-              setRegisterDraft(draft);
-              setDebugOtp(nextDebugOtp ?? null);
-              startOtpCountdown();
-              setStep("otp");
-            }}
-            onError={setFormError}
-          />
-        ) : null}
-
-        {step === "otp" ? (
-          <OtpStep
-            phone={phone}
-            draft={registerDraft}
-            debugOtp={debugOtp}
-            expiresAt={otpExpiresAt}
-            onResent={({ debugOtp: nextDebugOtp }) => {
-              setDebugOtp(nextDebugOtp ?? null);
-              startOtpCountdown();
-            }}
             onSuccess={handleAuthenticated}
             onError={setFormError}
-            onBack={() => {
-              setFormError("");
-              setStep("register");
-            }}
           />
         ) : null}
       </DialogContent>

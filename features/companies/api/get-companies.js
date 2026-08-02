@@ -5,6 +5,7 @@ import {
   mapCompanies,
   mapCompaniesMeta,
 } from "@/features/companies/services/company.mapper";
+import { PRODUCTS_PER_PAGE } from "@/features/filters/constants";
 
 /**
  * Builds API query params for companies list.
@@ -14,11 +15,15 @@ import {
 function buildQueryParams(params = {}) {
   const query = {
     page: params.page ?? 1,
-    per_page: params.per_page ?? 15,
+    per_page: params.per_page ?? PRODUCTS_PER_PAGE,
   };
 
   if (params.governorate_id != null && params.governorate_id !== "") {
     query.governorate_id = params.governorate_id;
+  }
+
+  if (params.city_id != null && params.city_id !== "") {
+    query.city_id = params.city_id;
   }
 
   if (params.search != null && params.search !== "") {
@@ -46,7 +51,7 @@ export async function getCompanies(params = {}) {
     ...(isSearch
       ? { cache: "no-store" }
       : {
-          revalidate: revalidate.medium,
+          revalidate: revalidate.short,
           tags: [cacheTags.companies],
         }),
   });

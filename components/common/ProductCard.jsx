@@ -8,6 +8,7 @@ import MediaImage from "@/components/common/MediaImage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
+import { ViewsCount } from "@/features/browsing";
 import { COMPARE_UI_ENABLED } from "@/features/compare";
 import { buildCompanyProductHref } from "@/features/companies/utils/resolve-company-product-params";
 import { useExperience } from "@/features/experience";
@@ -53,7 +54,7 @@ function PerkBadges({ perks = [] }) {
  */
 export default function ProductCard({
   product,
-  locale = "en",
+  locale = "ar",
   className = "",
   onLikeChange,
   variant,
@@ -106,9 +107,9 @@ export default function ProductCard({
     hrefOverride ??
     (routeCompanyId && product.id
       ? buildCompanyProductHref(routeCompanyId, product.id, {
-          source: product.source ?? likeSource ?? "catalog",
-          experience: isCampaign ? EXPERIENCE.CAMPAIGN : undefined,
-        })
+        source: product.source ?? likeSource ?? "catalog",
+        experience: isCampaign ? EXPERIENCE.CAMPAIGN : undefined,
+      })
       : buildCatalogProductHref(product, { governorate }));
 
   return (
@@ -157,7 +158,7 @@ export default function ProductCard({
           <ProductLikeButton
             productId={product.id}
             source={likeSource}
-            companyId={product.companyId}
+            companyId={routeCompanyId}
             initialLiked={product.isLiked ?? product.isWishlisted}
             initialLikesCount={product.likesCount ?? 0}
             onChange={(next) => {
@@ -189,7 +190,7 @@ export default function ProductCard({
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col p-5">
+      <div className="flex flex-1 flex-col py-2 px-4">
         {(product.productType?.label ||
           product.category?.name ||
           product.parentCategoryName) && (
@@ -225,7 +226,7 @@ export default function ProductCard({
           </p>
         )}
 
-        <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs">
+        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
           {(product.rating != null || product.reviews > 0) && (
             <div className="flex items-center gap-1.5">
               <Star className="h-3.5 w-3.5 text-warning" />
@@ -243,14 +244,13 @@ export default function ProductCard({
             </span>
           </div>
 
-          {product.viewsCount != null && (
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <Eye className="h-3.5 w-3.5" aria-hidden />
-              <span className="font-semibold tabular-nums text-foreground">
-                {product.viewsCount}
-              </span>
-            </div>
-          )}
+          <div className="flex items-center gap-1 text-muted-foreground">
+            <Eye className="h-3.5 w-3.5" aria-hidden />
+            <ViewsCount
+              value={product.viewsCount ?? 0}
+              numberClassName="font-semibold text-foreground"
+            />
+          </div>
         </div>
 
         {perks.length > 0 && <PerkBadges perks={perks} />}

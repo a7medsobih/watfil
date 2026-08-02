@@ -18,6 +18,7 @@
         "contact": "Contact",
         "joinUs": "Join us",
         "wishlist": "Wishlist",
+        "recent": "Recently viewed",
         "compare": "Compare",
         "search": "Search",
         "login": "Sign in",
@@ -42,7 +43,7 @@
         "wishlist": "Save"
     },
     "hero": {
-        "eyebrow": "Trusted by 480+ certified companies",
+        "eyebrow": "Trusted purification from certified companies",
         "title": "Cleaner water,\nsmarter choices.",
         "subtitle": "Discover premium water filters, purifiers, and certified companies across every governorate — all in one place.",
         "searchPlaceholder": "Search filters, brands, categories…"
@@ -83,6 +84,28 @@
             "title": "Stay in the flow",
             "subtitle": "Get product releases, buying guides and exclusive offers.",
             "button": "Subscribe"
+        }
+    },
+    "browsing": {
+        "eyebrow": "Continue browsing",
+        "pageTitle": "Recently viewed",
+        "pageSubtitle": "Products and stores you checked recently — pick up where you left off.",
+        "title": "Recently viewed products",
+        "subtitle": "Pick up where you left off — products you checked recently.",
+        "accountSubtitle": "Your latest product views across Watfil.",
+        "storesTitle": "Recently viewed companies",
+        "storesSubtitle": "Companies you opened recently.",
+        "views": "views",
+        "viewProduct": "View details",
+        "lastViewed": "Viewed {time}",
+        "lastVisited": "Visited {time}",
+        "empty": {
+            "productsTitle": "No recent products yet",
+            "productsDescription": "Browse the catalog or a company store — your history will show up here.",
+            "storesTitle": "No recent stores yet",
+            "storesDescription": "Visit a company page to start building your browsing history.",
+            "browseProducts": "Browse products",
+            "browseCompanies": "Browse companies"
         }
     },
     "products": {
@@ -349,7 +372,7 @@
         },
         "register": {
             "title": "Create your account",
-            "subtitle": "A few details and you’re in",
+            "subtitle": "Link your account to a company when you register so you can place orders",
             "phoneHint": "Enter your phone number to get started"
         },
         "otp": {
@@ -369,6 +392,9 @@
         "name": "Full name",
         "governorate": "Governorate",
         "governoratePlaceholder": "Select governorate",
+        "company": "Company",
+        "companyPlaceholder": "Select company",
+        "companyHint": "Your account will be linked to this company so you can place orders.",
         "referralCode": "Referral code",
         "optional": "optional",
         "forgot": "Forgot password?",
@@ -380,6 +406,8 @@
             "checking": "Checking…",
             "signIn": "Sign in",
             "signingIn": "Signing in…",
+            "createAccount": "Create account",
+            "creatingAccount": "Creating account…",
             "sendOtp": "Send verification code",
             "sendingOtp": "Sending…",
             "confirmOtp": "Confirm",
@@ -403,6 +431,7 @@
             "passwordMin": "Password must be at least 8 characters",
             "passwordMismatch": "Passwords do not match",
             "governorateRequired": "Please select a governorate",
+            "companyRequired": "Please select a company to link your account",
             "otpInvalid": "Invalid or expired verification code"
         }
     },
@@ -583,7 +612,9 @@
             "empty": "Your cart is empty.",
             "auth": "Sign in to place your order.",
             "invalidCompany": "Couldn’t identify the selling company. Clear the cart and add the product again from the company page.",
-            "notLinked": "Your account is not linked to {company}. Confirm company_id matches Postman, or link the customer to the company from the company/admin panel, then try again.",
+            "notLinked": "Your account isn’t linked to {company}. Register a new account with this company, or contact them to get linked.",
+            "companyInactive": "This company isn’t available right now. Please choose another company or try again later.",
+            "productUnavailable": "One of the products in your order isn’t available. Review your cart and try again.",
             "installmentSingle": "Installment supports one product only.",
             "installmentPlan": "Choose an installment plan to continue.",
             "generic": "Couldn’t create the order. Please try again."

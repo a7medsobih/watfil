@@ -23,6 +23,9 @@ import { buildMetadata } from "@/lib/seo/metadata";
 /** ISR: product details refresh every 5 minutes. */
 export const revalidate = 300;
 
+/** Uncached ids still render on-demand (Vercel ISR). */
+export const dynamicParams = true;
+
 /**
  * Pre-render top products by id; remaining via on-demand ISR.
  */
@@ -33,7 +36,10 @@ export async function generateStaticParams() {
       .map((product) => product.id)
       .filter((id) => id != null && id !== "")
       .map((id) => ({ id: String(id) }));
-  } catch {
+  } catch (error) {
+    console.warn("[products/[id] generateStaticParams] backend unavailable", {
+      message: error?.message,
+    });
     return [];
   }
 }
@@ -41,23 +47,33 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }) {
   const { id } = await params;
   const locale = await getLocale();
-  const product = await getProduct(id, locale);
 
-  if (!product) {
+  try {
+    const product = await getProduct(id, locale);
+
+    if (!product) {
+      return buildMetadata({
+        title: "Product",
+        path: `/products/${id}`,
+        locale,
+      });
+    }
+
+    return buildMetadata({
+      title: product.name,
+      description: product.description || undefined,
+      path: `/products/${product.id}`,
+      locale,
+      images: product.image ? [{ url: product.image }] : undefined,
+    });
+  } catch (error) {
+    console.error(`[products/[id] generateMetadata] id=${id}`, error);
     return buildMetadata({
       title: "Product",
       path: `/products/${id}`,
       locale,
     });
   }
-
-  return buildMetadata({
-    title: product.name,
-    description: product.description || undefined,
-    path: `/products/${product.id}`,
-    locale,
-    images: product.image ? [{ url: product.image }] : undefined,
-  });
 }
 
 export default async function ProductDetailRoute({ params, searchParams }) {
@@ -66,13 +82,34 @@ export default async function ProductDetailRoute({ params, searchParams }) {
   const t = await getTranslations();
   const resolvedSearchParams = await searchParams;
 
-  const product = await getProduct(id, locale);
+  let product;
+  try {
+    product = await getProduct(id, locale);
+  } catch (error) {
+    console.error(`[products/[id] page] getProduct failed id=${id}`, {
+      status: error?.status,
+      code: error?.code,
+      message: error?.message,
+    });
+    throw error;
+  }
+
   if (!product) notFound();
 
-  const [governorates, preferredId] = await Promise.all([
-    getGovernorates({ locale }),
-    getGovernoratePreferenceFromCookies(),
-  ]);
+  let governorates = [];
+  let preferredId = null;
+  try {
+    [governorates, preferredId] = await Promise.all([
+      getGovernorates({ locale }),
+      getGovernoratePreferenceFromCookies(),
+    ]);
+  } catch (error) {
+    console.error(`[products/[id] page] governorates failed id=${id}`, {
+      status: error?.status,
+      message: error?.message,
+    });
+    throw error;
+  }
 
   const rawGovernorate = (() => {
     const value = resolvedSearchParams?.governorate;
@@ -102,12 +139,22 @@ export default async function ProductDetailRoute({ params, searchParams }) {
     });
   }
 
-  const offerings = selectedGovernorateId
-    ? await getProductCompanies(product.id, {
-        governorateId: selectedGovernorateId,
-        locale,
-      })
-    : [];
+  let offerings = [];
+  try {
+    offerings = selectedGovernorateId
+      ? await getProductCompanies(product.id, {
+          governorateId: selectedGovernorateId,
+          locale,
+        })
+      : [];
+  } catch (error) {
+    // Offerings are secondary — keep the product page up if this endpoint fails.
+    console.error(`[products/[id] page] offerings failed id=${id}`, {
+      status: error?.status,
+      message: error?.message,
+    });
+    offerings = [];
+  }
 
   return (
     <ProductDetailsPage

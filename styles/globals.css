@@ -238,18 +238,19 @@
     scroll-behavior: smooth;
   }
 
-  /* English / LTR → Inter */
+  /* Default / Arabic / RTL → Cairo */
   html,
-  html[lang="en"],
-  html[dir="ltr"] {
-    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  }
-
-  /* Arabic / RTL → Cairo */
   html[lang="ar"],
   html[dir="rtl"] {
     --font-sans: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
     font-family: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  /* English / LTR → Inter */
+  html[lang="en"],
+  html[dir="ltr"] {
+    --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   }
 
   body {
@@ -270,13 +271,13 @@
   h4,
   h5,
   h6 {
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
     font-weight: 700;
   }
 
-  html[lang="ar"] :is(h1, h2, h3, h4, h5, h6),
-  html[dir="rtl"] :is(h1, h2, h3, h4, h5, h6) {
-    letter-spacing: 0;
+  html[lang="en"] :is(h1, h2, h3, h4, h5, h6),
+  html[dir="ltr"] :is(h1, h2, h3, h4, h5, h6) {
+    letter-spacing: -0.02em;
   }
 
   ::selection {

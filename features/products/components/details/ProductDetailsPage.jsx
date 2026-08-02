@@ -1,8 +1,7 @@
 import { Suspense } from "react";
 
 import AppBreadcrumb from "@/components/common/AppBreadcrumb";
-import ProductDetailsTabs from "@/features/products/components/details/ProductDetailsTabs";
-import ProductHero from "@/features/products/components/details/ProductHero";
+import ProductDetailsViewClient from "@/features/products/components/details/ProductDetailsViewClient";
 import ProductOfferingCompanies from "@/features/products/components/details/ProductOfferingCompanies";
 import PersonalizedProductLike, {
   ProductLikeFallback,
@@ -14,6 +13,8 @@ import { LIKE_SOURCE } from "@/features/wishlist/types";
 
 /**
  * Composes the public catalog product detail page.
+ * Primary content (name / price / description) is rendered via ProductHero,
+ * which is a client component with SSR enabled (present in initial HTML).
  */
 export default function ProductDetailsPage({
   product,
@@ -46,12 +47,13 @@ export default function ProductDetailsPage({
         </div>
       )}
 
-      <ProductHero
+      <ProductDetailsViewClient
         product={product}
-        locale={locale}
         company={company}
-        showOfferingCompanies={showOfferingCompanies}
+        offerings={offerings}
+        locale={locale}
         mode={mode}
+        showOfferingCompanies={showOfferingCompanies}
         likeSlot={
           <Suspense fallback={<ProductLikeFallback className="size-10" />}>
             <PersonalizedProductLike
@@ -64,7 +66,6 @@ export default function ProductDetailsPage({
           </Suspense>
         }
       />
-      <ProductDetailsTabs product={product} locale={locale} mode={mode} />
 
       {showOfferingCompanies && (
         <ProductOfferingCompanies

@@ -24,9 +24,32 @@ export const getCompany = cache(async function getCompany(id, locale = "ar") {
     });
 
     const payload = response?.data ?? response;
-    return mapCompanyDetail(payload, locale);
+    if (!payload || typeof payload !== "object") {
+      console.error(`[getCompany] unexpected payload for id=${companyId}`, {
+        type: typeof payload,
+      });
+      return null;
+    }
+
+    const mapped = mapCompanyDetail(payload, locale);
+    if (!mapped?.id) {
+      console.error(`[getCompany] mapper returned empty model for id=${companyId}`);
+      return null;
+    }
+
+    console.info(`[getCompany] ok id=${companyId}`);
+    return mapped;
   } catch (error) {
-    if (error?.status === 404) return null;
+    if (error?.status === 404) {
+      console.info(`[getCompany] not found id=${companyId}`);
+      return null;
+    }
+
+    console.error(`[getCompany] failed id=${companyId}`, {
+      status: error?.status,
+      code: error?.code,
+      message: error?.message,
+    });
     throw error;
   }
 });

@@ -3,21 +3,11 @@ export const PRICE_MIN = 0;
 export const PRICE_MAX = 8000;
 export const PRICE_STEP = 100;
 
-/** Default page size for public products list. */
-export const PRODUCTS_PER_PAGE = 12;
-
 /**
- * Sort options wired to GET /public/products?sort=
- * @type {readonly string[]}
+ * Default page size for public products list.
+ * Matches backend pagination default (`per_page` = 15).
  */
-export const PRODUCT_SORT_VALUES = Object.freeze([
-  "newest",
-  "price_asc",
-  "price_desc",
-  "popular",
-]);
-
-export const DEFAULT_PRODUCT_SORT = "newest";
+export const PRODUCTS_PER_PAGE = 15;
 
 /**
  * Common stage counts when taxonomy does not expose stage options yet.

@@ -1,6 +1,6 @@
 "use client";
 
-import { GitCompare, Heart, Search } from "lucide-react";
+import { GitCompare, Heart, History } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -18,18 +18,13 @@ export default function NavbarActions() {
   const wishlistCount = useWishlistCount();
 
   return (
-    <div className="hidden items-center gap-1 md:flex">
-      <Button variant="ghost" size="icon" asChild aria-label={t("nav.search")}>
-        <Link href="/search">
-          <Search className="h-4.5 w-4.5" />
-        </Link>
-      </Button>
-
+    <div className="flex items-center gap-1">
       {COMPARE_UI_ENABLED ? (
         <Button
           variant="ghost"
           size="icon"
           asChild
+          className="hidden md:inline-flex"
           aria-label={t("nav.compare")}
         >
           <Link href="/compare" className="relative">
@@ -42,6 +37,17 @@ export default function NavbarActions() {
           </Link>
         </Button>
       ) : null}
+
+      <Button
+        variant="ghost"
+        size="icon"
+        asChild
+        aria-label={t("nav.recent")}
+      >
+        <Link href="/recent">
+          <History className="h-4.5 w-4.5" />
+        </Link>
+      </Button>
 
       <Button variant="ghost" size="icon" asChild aria-label={t("nav.wishlist")}>
         <Link href="/wishlist" className="relative">
@@ -56,8 +62,10 @@ export default function NavbarActions() {
 
       <MiniCartTrigger />
 
-      <LanguageSwitcher />
-      <ThemeToggle />
+      <div className="hidden items-center gap-1 md:flex">
+        <LanguageSwitcher />
+        <ThemeToggle />
+      </div>
     </div>
   );
 }

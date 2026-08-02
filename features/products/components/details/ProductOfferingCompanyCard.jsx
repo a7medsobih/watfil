@@ -1,12 +1,13 @@
 "use client";
 
-import { Gift, MapPin, Star } from "lucide-react";
+import { Eye, Gift, MapPin, Star } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import MediaImage from "@/components/common/MediaImage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
+import { ViewsCount } from "@/features/browsing";
 import { buildCompanyProductHref } from "@/features/companies/utils/resolve-company-product-params";
 import { cn } from "@/lib/utils";
 
@@ -48,9 +49,9 @@ export default function ProductOfferingCompanyCard({
 
   const buyHref = product?.id
     ? buildCompanyProductHref(company.id, product.id, {
-      source: product.source ?? product.likeSource ?? "catalog",
-      governorate: selectedGovernorateId,
-    })
+        source: product.source ?? product.likeSource ?? "catalog",
+        governorate: selectedGovernorateId,
+      })
     : `/companies/${company.id}`;
 
   const companyHref = `/companies/${company.id}`;
@@ -78,7 +79,10 @@ export default function ProductOfferingCompanyCard({
     benefitChips.push({
       key: perk.id ?? `${perk.type}-${perk.title}`,
       label: perk.title,
-      highlight: isOfferPerk(perk) || perk.type === "warranty" || perk.type === "installation",
+      highlight:
+        isOfferPerk(perk) ||
+        perk.type === "warranty" ||
+        perk.type === "installation",
     });
   }
 
@@ -173,6 +177,15 @@ export default function ProductOfferingCompanyCard({
                 </span>
               )}
             </div>
+
+            <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
+              <Eye className="size-3.5 shrink-0" aria-hidden />
+              <ViewsCount
+                value={product.viewsCount ?? 0}
+                numberClassName="font-semibold text-foreground"
+              />
+              <span>{t("views")}</span>
+            </div>
           </div>
         )}
 
@@ -229,9 +242,7 @@ export default function ProductOfferingCompanyCard({
 
         <div className="mt-auto flex flex-col gap-2 pt-1 sm:flex-row">
           <Button asChild className="flex-1">
-            <Link href={buyHref}>
-              {labels.buyNow ?? t("buyNow")}
-            </Link>
+            <Link href={buyHref}>{labels.buyNow ?? t("buyNow")}</Link>
           </Button>
           <Button asChild variant="outline" className="flex-1">
             <Link href={companyHref}>

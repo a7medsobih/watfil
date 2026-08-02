@@ -159,7 +159,7 @@ export default function MobileDrawer() {
                 onClick={handleLogout}
                 className="w-full gap-1.5 hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive"
               >
-                <LogOutIcon className="size-3.5" />
+                <LogOutIcon className="size-3.5 rtl:rotate-180" />
                 {t("auth.actions.logout")}
               </Button>
             </>

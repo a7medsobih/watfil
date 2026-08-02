@@ -215,7 +215,7 @@ export function mapProduct(product, locale = "ar") {
     stockStatus: product.stock_status ?? null,
     isAvailable:
       product.is_available != null ? Boolean(product.is_available) : true,
-    viewsCount: Number(product.views_count ?? 0),
+    viewsCount: Number(product.views_count ?? product.viewsCount ?? 0),
     offeringCompaniesCount: Number(product.offering_companies_count ?? 0),
     likesCount: Number(product.likes_count ?? 0),
     isLiked: Boolean(product.is_liked ?? product.is_wishlisted),

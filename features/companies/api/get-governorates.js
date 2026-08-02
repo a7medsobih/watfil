@@ -11,10 +11,19 @@ import { mapGovernorates } from "@/features/companies/services/governorate.mappe
  * @returns {Promise<object[]>}
  */
 export async function getGovernorates(options = {}) {
-  const response = await fetchFromAPI(endpoints.governorates.list, {
-    revalidate: revalidate.long,
-    tags: [cacheTags.governorates],
-  });
+  try {
+    const response = await fetchFromAPI(endpoints.governorates.list, {
+      revalidate: revalidate.long,
+      tags: [cacheTags.governorates],
+    });
 
-  return mapGovernorates(response?.data ?? [], options.locale);
+    return mapGovernorates(response?.data ?? [], options.locale);
+  } catch (error) {
+    console.error("[getGovernorates] failed", {
+      status: error?.status,
+      code: error?.code,
+      message: error?.message,
+    });
+    throw error;
+  }
 }

@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useRequireAuth } from "@/features/auth";
+import { ViewsCount } from "@/features/browsing";
 import {
   deleteCompanyRating,
   rateCompany,
@@ -311,7 +312,7 @@ export default function CompanyRatingsSection({
       </div>
 
       {ratingsCount > 0 ? (
-        <div className="w-fit rounded-3xl border border-border/60 bg-card p-5 sm:p-6">
+        <div>
           <div className="flex flex-wrap items-center gap-4">
             <div>
               <p className="text-3xl font-bold tabular-nums text-primary">
@@ -323,8 +324,12 @@ export default function CompanyRatingsSection({
               <p className="font-medium text-foreground">
                 {t("ratings.summary", { count: ratingsCount })}
               </p>
-              <p className="mt-1">
-                {viewsCount} {t("views")} · {likesCount} {t("likes")}
+              <p className="mt-1 inline-flex flex-wrap items-center gap-x-1">
+                <ViewsCount
+                  value={viewsCount}
+                  numberClassName="font-medium text-foreground"
+                />{" "}
+                {t("views")} · {likesCount} {t("likes")}
               </p>
               {myRating != null && (
                 <p className="mt-1">{t("myRating", { rating: myRating })}</p>

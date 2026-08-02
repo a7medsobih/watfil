@@ -103,9 +103,9 @@ export default function HeroCarousel({
             onMouseEnter={plugin.current.stop}
             onMouseLeave={plugin.current.reset}
           >
-            <CarouselContent className="-ml-0">
+            <CarouselContent className="-ms-0">
               {images.map((image, index) => (
-                <CarouselItem key={index} className="basis-full pl-0">
+                <CarouselItem key={index} className="basis-full ps-0">
                   <div className="relative aspect-square w-full">
                     <Image
                       src={image.src}

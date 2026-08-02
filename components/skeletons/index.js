@@ -1,4 +1,3 @@
-export { default as PageSkeleton } from "./PageSkeleton";
 export { default as PageContentSkeleton } from "./PageContentSkeleton";
 export { default as HomePageSkeleton } from "./HomePageSkeleton";
 export { default as ProductDetailSkeleton } from "./ProductDetailSkeleton";
@@ -18,4 +17,3 @@ export {
   BlogCardSkeletonGrid,
   BlogFeaturedCardSkeleton,
 } from "./BlogCardSkeleton";
-export { default as SearchResultsSkeleton } from "./SearchResultsSkeleton";

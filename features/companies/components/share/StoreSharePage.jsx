@@ -2,15 +2,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import {
-  Bell,
-  ExternalLink,
-  Package,
-  Shield,
-  Smartphone,
-  Store,
-  Wrench,
-} from "lucide-react";
+import { ExternalLink, Smartphone, Store } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import MediaImage from "@/components/common/MediaImage";
@@ -18,19 +10,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import StoreShareHero from "@/features/companies/components/share/StoreShareHero";
+import StoreShareSourceTracker from "@/features/companies/components/share/StoreShareSourceTracker";
 import { CompanyBrandSetter } from "@/features/companies/context/company-brand-context";
 import { useTryOpenApp } from "@/features/companies/hooks/use-try-open-app";
+import { StoreVisitTracker } from "@/features/browsing";
 import { EXPERIENCE } from "@/features/experience/constants";
 import { buildCompanyExperienceHref } from "@/features/experience/utils";
 import { WATFIL_PLAY_STORE_URL } from "@/lib/constants/app-store";
 import { cn } from "@/lib/utils";
-
-const CTA_BENEFITS = [
-  { key: "track", Icon: Package },
-  { key: "installation", Icon: Wrench },
-  { key: "warranty", Icon: Shield },
-  { key: "notifications", Icon: Bell },
-];
 
 function GooglePlayIcon({ className }) {
   return (
@@ -86,6 +73,13 @@ export default function StoreSharePage({ store }) {
   return (
     <>
       <CompanyBrandSetter brand={brand} />
+      <StoreShareSourceTracker
+        companyId={store.companyId}
+        taxNumber={store.taxNumber}
+      />
+      {store.companyId ? (
+        <StoreVisitTracker companyId={store.companyId} />
+      ) : null}
       <div className="pb-10 md:pb-16">
         <StoreShareHero
           images={store.identityImages}

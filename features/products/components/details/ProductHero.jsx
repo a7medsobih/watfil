@@ -8,6 +8,7 @@ import { Building2, Eye, GitCompare } from "lucide-react";
 import MediaImage from "@/components/common/MediaImage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ViewsCount } from "@/features/browsing";
 import { COMPARE_UI_ENABLED } from "@/features/compare";
 import ProductLikeButton from "@/features/wishlist/components/ProductLikeButton";
 import { LIKE_SOURCE } from "@/features/wishlist/types";
@@ -72,9 +73,7 @@ export default function ProductHero({
     <div className="grid items-start gap-6 md:gap-8 lg:grid-cols-[minmax(0,18rem)_1fr] xl:grid-cols-[minmax(0,20rem)_1fr]">
       <div className="mx-auto w-full max-w-sm lg:mx-0 lg:max-w-none">
         <motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
+          initial={false}
           className="relative aspect-4/3 overflow-hidden rounded-2xl border border-border/60 bg-card gradient-water sm:rounded-3xl"
         >
           <MediaImage
@@ -106,8 +105,8 @@ export default function ProductHero({
               (product.source === "catalog" ||
                 product.likeSource === "catalog") && (
                 <Badge
-                  variant="secondary"
-                  className="rounded-full bg-card/90 px-2.5 py-0.5"
+                  variant="ghost"
+                  className="  px-2.5 py-0.5"
                 >
                   {t("badges.watfilProduct")}
                 </Badge>
@@ -145,6 +144,15 @@ export default function ProductHero({
         <h1 className="mt-1.5 text-2xl font-black leading-tight tracking-tight md:text-3xl">
           {product.name}
         </h1>
+
+        <div className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
+          <Eye className="h-4 w-4 shrink-0" aria-hidden />
+          <ViewsCount
+            value={product.viewsCount ?? 0}
+            numberClassName="font-semibold text-foreground"
+          />
+          <span>{t("views")}</span>
+        </div>
 
         {product.sku && (
           <p className="mt-1.5 text-sm text-muted-foreground">
@@ -276,14 +284,6 @@ export default function ProductHero({
               {t("compare")}
             </Button>
           ) : null}
-
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <Eye className="h-4 w-4" aria-hidden />
-            <span className="font-semibold tabular-nums text-foreground">
-              {product.viewsCount}
-            </span>
-            <span>{t("views")}</span>
-          </div>
         </div>
       </div>
     </div>

@@ -1,15 +1,15 @@
 import {
-  DEFAULT_PRODUCT_SORT,
   PRICE_MAX,
   PRICE_MIN,
   PRODUCTS_PER_PAGE,
-  PRODUCT_SORT_VALUES,
 } from "@/features/filters/constants";
 
 export { PRICE_MIN, PRICE_MAX, PRICE_STEP } from "@/features/filters/constants";
 
 /**
  * Resolves products list query from Next.js searchParams.
+ * Param names match GET /public/products (§2.18) + number_of_stages
+ * (documented for taxonomy / company products; same snake_case key).
  *
  * @param {Record<string, string | string[] | undefined>} [searchParams]
  */
@@ -21,15 +21,13 @@ export function resolveProductsParams(searchParams = {}) {
 
   const minPrice = read("min_price");
   const maxPrice = read("max_price");
-  const sortRaw = read("sort");
-  const sort =
-    sortRaw && PRODUCT_SORT_VALUES.includes(sortRaw)
-      ? sortRaw
-      : DEFAULT_PRODUCT_SORT;
 
   return {
-    page: read("page") ?? 1,
-    per_page: read("per_page") ?? PRODUCTS_PER_PAGE,
+    page: Number(read("page")) > 0 ? Number(read("page")) : 1,
+    per_page:
+      Number(read("per_page")) > 0
+        ? Number(read("per_page"))
+        : PRODUCTS_PER_PAGE,
     search: read("search") || null,
     product_type_id: read("product_type_id") || null,
     parent_category_id: read("parent_category_id") || null,
@@ -38,13 +36,12 @@ export function resolveProductsParams(searchParams = {}) {
     governorate_id: read("governorate_id") || null,
     min_price: minPrice != null && minPrice !== "" ? Number(minPrice) : null,
     max_price: maxPrice != null && maxPrice !== "" ? Number(maxPrice) : null,
-    sort,
   };
 }
 
 /**
  * Builds a /products href from filter state.
- * Omits default bounds, default sort, and empty values.
+ * Omits default bounds and empty values so links stay shareable and clean.
  *
  * @param {object} params
  */
@@ -80,10 +77,6 @@ export function buildProductsHref(params = {}) {
     Number(params.max_price) < PRICE_MAX
   ) {
     query.set("max_price", String(params.max_price));
-  }
-
-  if (params.sort && params.sort !== DEFAULT_PRODUCT_SORT) {
-    query.set("sort", String(params.sort));
   }
 
   if (params.page != null && Number(params.page) > 1) {

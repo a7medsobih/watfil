@@ -11,6 +11,7 @@ import {
   getFieldError,
   loginCustomer,
 } from "@/features/auth/api/customer-auth";
+import { peekSessionKey } from "@/features/browsing/utils/session-key";
 
 export default function PasswordStep({
   phone,
@@ -36,7 +37,11 @@ export default function PasswordStep({
 
     setIsLoading(true);
     try {
-      const response = await loginCustomer({ phone, password });
+      const response = await loginCustomer({
+        phone,
+        password,
+        sessionKey: peekSessionKey() || undefined,
+      });
       await onSuccess(response);
     } catch (error) {
       if (error?.status === 403) {

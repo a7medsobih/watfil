@@ -1,11 +1,12 @@
 import { endpoints } from "@/lib/api/endpoints";
-import { buildUrl } from "@/lib/api/client";
+import { apiClient, buildUrl } from "@/lib/api/client";
 import { mapGovernorates } from "@/features/companies/services/governorate.mapper";
 
 /** Process-local cache so proxy redirects do not hit the API every request. */
 let cachedId = null;
 let cachedAt = 0;
 const TTL_MS = 5 * 60 * 1000;
+const FETCH_TIMEOUT_MS = 8_000;
 
 /**
  * Default browse governorate — same ordering as `getGovernorates`.
@@ -19,15 +20,18 @@ export async function getDefaultGovernorateId(locale = "ar") {
     return cachedId;
   }
 
-  const apiBase = process.env.NEXT_PUBLIC_API_URL;
-  if (!apiBase) return cachedId;
+  if (!apiClient.baseUrl) return cachedId;
 
   try {
     const url = buildUrl(endpoints.governorates.list);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
     const response = await fetch(url, {
       headers: { Accept: "application/json" },
       next: { revalidate: 3600 },
+      signal: controller.signal,
     });
+    clearTimeout(timer);
 
     if (!response.ok) return cachedId;
 

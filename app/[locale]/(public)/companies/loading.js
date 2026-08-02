@@ -1,5 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { CompanyCardSkeletonGrid } from "@/components/skeletons";
+import { PRODUCTS_PER_PAGE } from "@/features/filters/constants";
 
 export default function Loading() {
   return (
@@ -7,6 +8,7 @@ export default function Loading() {
       <div className="mb-8 space-y-3">
         <Skeleton className="h-4 w-40" />
         <Skeleton className="h-8 w-64" />
+        <Skeleton className="h-11 w-full max-w-md rounded-full" />
       </div>
 
       <div className="mb-8 flex gap-2 overflow-hidden">
@@ -15,7 +17,7 @@ export default function Loading() {
         ))}
       </div>
 
-      <CompanyCardSkeletonGrid count={8} />
+      <CompanyCardSkeletonGrid count={PRODUCTS_PER_PAGE} />
     </section>
   );
 }

@@ -24,14 +24,62 @@ export async function checkPhone(phone) {
   });
 }
 
-export async function loginCustomer({ phone, password }) {
+export async function loginCustomer({ phone, password, sessionKey } = {}) {
+  const body = {
+    phone: normalizePhone(phone),
+    password,
+  };
+
+  if (sessionKey) {
+    body.session_key = sessionKey;
+  }
+
   return fetchFromAPI(endpoints.auth.login, {
     method: "POST",
     cache: "no-store",
-    body: JSON.stringify({
-      phone: normalizePhone(phone),
-      password,
-    }),
+    body: JSON.stringify(body),
+  });
+}
+
+/**
+ * Direct customer register (POST /customer/register).
+ * Pass `company_id` to create an active customer_company_links row
+ * (required before POST /customer/orders).
+ *
+ * @param {object} payload
+ * @param {string} payload.phone
+ * @param {string} payload.password
+ * @param {string} payload.password_confirmation
+ * @param {string} payload.full_name
+ * @param {number} payload.governorate_id
+ * @param {number} payload.company_id
+ * @param {string} [payload.referral_code]
+ */
+export async function registerCustomer(payload = {}) {
+  const companyId = Number(payload.company_id);
+  if (!Number.isFinite(companyId) || companyId <= 0) {
+    const error = new Error("company_id_required");
+    error.status = 422;
+    throw error;
+  }
+
+  const body = {
+    phone: normalizePhone(payload.phone),
+    password: payload.password,
+    password_confirmation: payload.password_confirmation,
+    full_name: payload.full_name,
+    governorate_id: Number(payload.governorate_id),
+    company_id: companyId,
+  };
+
+  if (payload.referral_code) {
+    body.referral_code = String(payload.referral_code).trim();
+  }
+
+  return fetchFromAPI(endpoints.auth.register, {
+    method: "POST",
+    cache: "no-store",
+    body: JSON.stringify(body),
   });
 }
 
@@ -44,13 +92,21 @@ export async function requestRegisterOtp(phone) {
 }
 
 export async function verifyRegister(payload) {
+  const { sessionKey, session_key, ...rest } = payload ?? {};
+  const body = {
+    ...rest,
+    phone: normalizePhone(payload?.phone),
+  };
+
+  const mergeKey = session_key || sessionKey;
+  if (mergeKey) {
+    body.session_key = mergeKey;
+  }
+
   return fetchFromAPI(endpoints.auth.verifyRegister, {
     method: "POST",
     cache: "no-store",
-    body: JSON.stringify({
-      ...payload,
-      phone: normalizePhone(payload.phone),
-    }),
+    body: JSON.stringify(body),
   });
 }
 

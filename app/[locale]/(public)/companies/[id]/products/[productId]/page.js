@@ -30,39 +30,57 @@ import {
 import { redirect as i18nRedirect } from "@/i18n/navigation";
 import { buildMetadata } from "@/lib/seo/metadata";
 
+/** ISR: company product offer refresh every 5 minutes. */
+export const revalidate = 300;
+
+/** Uncached product ids still render on-demand (Vercel ISR). */
+export const dynamicParams = true;
+
 export async function generateMetadata({ params, searchParams }) {
   const { id, productId } = await params;
   const resolvedSearchParams = await searchParams;
   const locale = await getLocale();
   const source = resolveCompanyProductSource(resolvedSearchParams);
 
-  const [company, product] = await Promise.all([
-    getCompany(id, locale),
-    getCompanyProductDetails({
-      companyId: id,
-      productId,
-      source,
-      locale,
-    }),
-  ]);
+  try {
+    const [company, product] = await Promise.all([
+      getCompany(id, locale),
+      getCompanyProductDetails({
+        companyId: id,
+        productId,
+        source,
+        locale,
+      }),
+    ]);
 
-  if (!product) {
+    if (!product) {
+      return buildMetadata({
+        title: "Product",
+        path: `/companies/${id}/products/${productId}`,
+        locale,
+      });
+    }
+
+    return buildMetadata({
+      title: company ? `${product.name} · ${company.name}` : product.name,
+      description: product.description || undefined,
+      path: buildCompanyProductHref(company?.id ?? id, product.id, {
+        source,
+      }),
+      locale,
+      images: product.image ? [{ url: product.image }] : undefined,
+    });
+  } catch (error) {
+    console.error(
+      `[companies/.../products generateMetadata] company=${id} product=${productId}`,
+      error,
+    );
     return buildMetadata({
       title: "Product",
       path: `/companies/${id}/products/${productId}`,
       locale,
     });
   }
-
-  return buildMetadata({
-    title: company ? `${product.name} · ${company.name}` : product.name,
-    description: product.description || undefined,
-    path: buildCompanyProductHref(company?.id ?? id, product.id, {
-      source,
-    }),
-    locale,
-    images: product.image ? [{ url: product.image }] : undefined,
-  });
 }
 
 export default async function CompanyProductDetailsRoute({
@@ -77,22 +95,46 @@ export default async function CompanyProductDetailsRoute({
   const experience = resolveExperience(resolvedSearchParams);
   const isCampaign = experience === EXPERIENCE.CAMPAIGN;
 
-  const company = await getCompany(id, locale);
-  if (!company) notFound();
+  let company;
+  let product;
+  try {
+    company = await getCompany(id, locale);
+    if (!company) notFound();
 
-  const product = await getCompanyProductDetails({
-    companyId: company.id,
-    productId,
-    source,
-    locale,
-  });
+    product = await getCompanyProductDetails({
+      companyId: company.id,
+      productId,
+      source,
+      locale,
+    });
+  } catch (error) {
+    console.error(
+      `[companies/.../products page] fetch failed company=${id} product=${productId}`,
+      {
+        status: error?.status,
+        code: error?.code,
+        message: error?.message,
+      },
+    );
+    throw error;
+  }
 
   if (!product) notFound();
 
-  const [governorates, preferredId] = await Promise.all([
-    getGovernorates({ locale }),
-    getGovernoratePreferenceFromCookies(),
-  ]);
+  let governorates = [];
+  let preferredId = null;
+  try {
+    [governorates, preferredId] = await Promise.all([
+      getGovernorates({ locale }),
+      getGovernoratePreferenceFromCookies(),
+    ]);
+  } catch (error) {
+    console.error(
+      `[companies/.../products page] governorates failed company=${id}`,
+      { status: error?.status, message: error?.message },
+    );
+    throw error;
+  }
 
   const rawGovernorate = resolveCompanyProductGovernorate(resolvedSearchParams);
   const selectedGovernorateId = pickGovernorateId({

@@ -10,8 +10,6 @@ import { cn } from "@/lib/utils";
 export default function BlogArticleSidebar({
   articles = [],
   title,
-  locale = "en",
-  readMoreLabel,
   readTimeLabel,
   className,
 }) {

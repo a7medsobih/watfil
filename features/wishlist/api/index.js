@@ -1,7 +1,2 @@
-export { likeProduct, unlikeProduct } from "./like-product";
-export { getLikedProducts } from "./get-liked-products";
-export {
-  getCustomerLikes,
-  getLikedCompanies,
-  fetchAllLikedIds,
-} from "./get-customer-likes";
+export { setLike, like, unlike, buildLikeBody, parseLikeResponse } from "./set-like";
+export { getCustomerLikes, fetchAllLikedIds } from "./get-customer-likes";

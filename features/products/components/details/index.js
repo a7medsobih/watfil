@@ -1,5 +1,6 @@
 export { default as ProductDetailsPage } from "./ProductDetailsPage";
 export { default as CompanyOfferDetailsPage } from "./CompanyOfferDetailsPage";
+export { default as ProductDetailsViewClient } from "./ProductDetailsViewClient";
 export { default as ProductHero } from "./ProductHero";
 export { default as ProductDetailsTabs } from "./ProductDetailsTabs";
 export { default as ProductOfferingCompanies } from "./ProductOfferingCompanies";

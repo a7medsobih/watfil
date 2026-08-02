@@ -3,8 +3,6 @@ export {
   PRICE_MAX,
   PRICE_STEP,
   PRODUCTS_PER_PAGE,
-  PRODUCT_SORT_VALUES,
-  DEFAULT_PRODUCT_SORT,
   DEFAULT_FILTER_STAGES,
 } from "./constants";
 export {

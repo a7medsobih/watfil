@@ -1,3 +1,4 @@
+import { PRICE_MAX, PRICE_MIN } from "@/features/filters/constants";
 import { isFiltersProductType } from "@/features/taxonomy";
 
 /**
@@ -60,7 +61,7 @@ export function collectStageOptions(...categoryLists) {
 }
 
 /**
- * Whether any browse filter (excluding page/sort defaults) is active.
+ * Whether any browse filter (excluding page defaults) is active.
  *
  * @param {object} params
  */
@@ -73,8 +74,11 @@ export function hasActiveProductFilters(params = {}) {
       params.number_of_stages ||
       params.governorate_id ||
       params.source ||
-      (params.min_price != null && params.min_price !== "") ||
-      (params.max_price != null && params.max_price !== "") ||
-      (params.sort && params.sort !== "newest"),
+      (params.min_price != null &&
+        params.min_price !== "" &&
+        Number(params.min_price) > PRICE_MIN) ||
+      (params.max_price != null &&
+        params.max_price !== "" &&
+        Number(params.max_price) < PRICE_MAX),
   );
 }

@@ -15,12 +15,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Link, useRouter } from "@/i18n/navigation";
+import { env } from "@/lib/env";
 import { useRequireAuth } from "@/features/auth";
 import CheckoutSummary from "@/features/checkout/components/CheckoutSummary";
 import { createCustomerOrder } from "@/features/checkout/api/create-customer-order";
-import { ensureCustomerCompanyLink } from "@/features/checkout/api/ensure-customer-company-link";
 import { buildOrderPayload } from "@/features/checkout/utils/build-order-payload";
 import { createOrderIdempotencyKey } from "@/features/checkout/utils/idempotency";
+import {
+  clearOrderSource,
+  resolveOrderSourcePayload,
+} from "@/features/checkout/utils/order-source";
+import { resolveOrderErrorMessage } from "@/features/checkout/utils/resolve-order-error-message";
 import { PAYMENT_TYPE, useCartStore } from "@/stores/cart-store";
 import { useAuthStore, useIsAuthenticated } from "@/stores/auth-store";
 import { cn } from "@/lib/utils";
@@ -29,24 +34,6 @@ const GOV_NONE = "none";
 
 function planKey(plan) {
   return `${plan.months}-${plan.downPayment}-${plan.installmentAmount}`;
-}
-
-function resolveOrderErrorMessage(err, t) {
-  if (err?.status === 401) return t("errors.auth");
-
-  const data = err?.data;
-  if (data && typeof data === "object") {
-    if (typeof data.message === "string" && data.message.trim()) {
-      return data.message;
-    }
-    const fieldErrors = data.errors;
-    if (fieldErrors && typeof fieldErrors === "object") {
-      const first = Object.values(fieldErrors).flat?.()?.[0];
-      if (typeof first === "string") return first;
-    }
-  }
-
-  return err?.message || t("errors.generic");
 }
 
 export default function CheckoutPage({
@@ -119,7 +106,7 @@ export default function CheckoutPage({
     setError(null);
 
     if (!isAuthenticated || !token) {
-      openLogin();
+      openLogin({ companyId: company?.id ?? null });
       return;
     }
 
@@ -147,11 +134,10 @@ export default function CheckoutPage({
 
     startTransition(async () => {
       try {
-        // Backend requires customer ↔ company link before creating the order.
-        await ensureCustomerCompanyLink(sellerCompanyId, token);
-
+        // source = attribution only (store share → link, else direct/ad).
+        // company_id = seller company from cart — never confused with source.
+        const source = resolveOrderSourcePayload(sellerCompanyId);
         const payload = buildOrderPayload({
-          // Seller company the customer is buying from (required by backend).
           companyId: sellerCompanyId,
           items,
           paymentType,
@@ -159,11 +145,10 @@ export default function CheckoutPage({
           governorateId,
           notes,
           idempotencyKey: createOrderIdempotencyKey(),
-          sourceChannel: "link",
+          source,
         });
 
-        if (process.env.NODE_ENV === "development") {
-          // Compare with Postman body when debugging 422 link errors.
+        if (env.isDev) {
           console.info("[checkout] POST /customer/orders", payload);
         }
 
@@ -173,6 +158,7 @@ export default function CheckoutPage({
         const orderId = order?.id ?? order?.order_id ?? null;
 
         clearCart();
+        clearOrderSource();
 
         const qs = new URLSearchParams();
         if (orderId != null) qs.set("orderId", String(orderId));
@@ -190,15 +176,13 @@ export default function CheckoutPage({
           return;
         }
 
-        const raw = resolveOrderErrorMessage(err, t);
-        const message =
-          /غير مرتبط|not linked|not associated/i.test(raw)
-            ? t("errors.notLinked", { company: company.name })
-            : raw;
+        const message = resolveOrderErrorMessage(err, t, {
+          companyName: company.name,
+        });
 
         setError(message);
         toast.error(message);
-        if (err?.status === 401) openLogin();
+        if (err?.status === 401) openLogin({ companyId: company?.id ?? null });
       }
     });
   };

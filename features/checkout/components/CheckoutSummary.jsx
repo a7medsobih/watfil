@@ -36,9 +36,6 @@ export default function CheckoutSummary() {
         <div className="min-w-0">
           <p className="text-xs text-muted-foreground">{t("summary.company")}</p>
           <p className="truncate font-semibold">{company.name}</p>
-          <p className="mt-0.5 text-[11px] text-muted-foreground tabular-nums">
-            company_id: {company.id}
-          </p>
         </div>
       </div>
 
@@ -52,9 +49,6 @@ export default function CheckoutSummary() {
               <p className="line-clamp-2 text-sm font-medium">{item.name}</p>
               <p className="mt-1 text-xs text-muted-foreground">
                 {t("summary.qty", { count: item.quantity })}
-              </p>
-              <p className="text-[11px] text-muted-foreground tabular-nums">
-                company_product_id: {item.companyProductId}
               </p>
               <p className="mt-0.5 text-sm font-semibold tabular-nums text-primary">
                 {(item.price * item.quantity).toLocaleString(

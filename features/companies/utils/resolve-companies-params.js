@@ -1,6 +1,9 @@
+import { PRODUCTS_PER_PAGE } from "@/features/filters/constants";
+
 /**
  * Resolves companies list query from Next.js searchParams.
  * governorate_id is optional — omit / empty / "all" means every governorate.
+ * Matches GET /public/companies (§2.7) + page/per_page/search for list UX.
  *
  * @param {Record<string, string | string[] | undefined>} [searchParams]
  * @param {{ defaultGovernorateId?: string | number | null }} [options]
@@ -31,14 +34,18 @@ export function resolveCompaniesParams(searchParams = {}, options = {}) {
 
   return {
     governorate_id: governorate,
-    page: read("page") ?? 1,
-    per_page: read("per_page") ?? 15,
+    page: Number(read("page")) > 0 ? Number(read("page")) : 1,
+    per_page:
+      Number(read("per_page")) > 0
+        ? Number(read("per_page"))
+        : PRODUCTS_PER_PAGE,
     search: read("search") || null,
   };
 }
 
 /**
  * Builds a /companies href while preserving list query params.
+ * Always writes `governorate_id` (never the legacy `governorate` alias).
  *
  * @param {object} params
  * @param {string|number|null} [params.governorate]
@@ -55,8 +62,7 @@ export function buildCompaniesHref({
   search,
 } = {}) {
   const query = new URLSearchParams();
-  const gov =
-    governorate !== undefined ? governorate : governorate_id;
+  const gov = governorate !== undefined ? governorate : governorate_id;
 
   if (gov != null && gov !== "" && gov !== "all") {
     query.set("governorate_id", String(gov));
@@ -66,7 +72,7 @@ export function buildCompaniesHref({
     query.set("page", String(page));
   }
 
-  if (per_page != null && Number(per_page) !== 15) {
+  if (per_page != null && Number(per_page) !== PRODUCTS_PER_PAGE) {
     query.set("per_page", String(per_page));
   }
 

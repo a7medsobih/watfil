@@ -1,7 +1,7 @@
 import { mapCompany } from "@/features/companies/services/company.mapper";
 
 /**
- * Normalizes a liked-company row from GET /customer/likes (or /likes/companies).
+ * Normalizes a liked-company row from GET /customer/likes.
  * Shape: `{ liked_at, company: { id, name, is_liked, average_rating, … } }`
  */
 export function mapLikedCompany(item, locale = "ar") {

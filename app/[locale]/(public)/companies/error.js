@@ -1,11 +1,7 @@
 "use client";
 
-import ErrorState from "@/components/common/ErrorState";
+import RouteError from "@/components/common/RouteError";
 
-export default function Error({ reset }) {
-  return (
-    <section className="container py-20">
-      <ErrorState onRetry={reset} />
-    </section>
-  );
+export default function Error(props) {
+  return <RouteError {...props} scope="companies" />;
 }

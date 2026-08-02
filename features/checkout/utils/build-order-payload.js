@@ -1,10 +1,15 @@
 import { PAYMENT_TYPE } from "@/stores/cart-store";
+import { ORDER_SOURCE_CHANNEL } from "@/features/checkout/utils/order-source";
 
 /**
  * Build POST /customer/orders body.
  *
- * Matches working Postman + docs §3.10:
- * company_id = seller company the customer buys from.
+ * `source` is attribution only (store share / ad / direct) — not a
+ * customer↔company link mechanism.
+ *
+ * @param {object} options
+ * @param {object} [options.source] Resolved source payload
+ *   e.g. `{ channel: "link", metadata?: {...} }` or `{ channel: "direct" }`
  */
 export function buildOrderPayload({
   companyId,
@@ -15,7 +20,7 @@ export function buildOrderPayload({
   notes = "",
   idempotencyKey,
   discount = 0,
-  sourceChannel = "link",
+  source = null,
 }) {
   const sellerCompanyId = Number(companyId);
   if (!Number.isFinite(sellerCompanyId) || sellerCompanyId <= 0) {
@@ -37,7 +42,28 @@ export function buildOrderPayload({
     throw new Error("empty_items");
   }
 
-  // Keep shape aligned with Postman / docs so backend link rules apply.
+  const channel =
+    typeof source?.channel === "string" && source.channel
+      ? source.channel
+      : ORDER_SOURCE_CHANNEL.DIRECT;
+
+  /** @type {Record<string, unknown>} */
+  const sourcePayload = { channel };
+
+  if (source?.reference_id != null && source.reference_id !== "") {
+    sourcePayload.reference_id = Number(source.reference_id);
+  }
+  if (source?.reference_type != null && source.reference_type !== "") {
+    sourcePayload.reference_type = source.reference_type;
+  }
+  if (
+    source?.metadata &&
+    typeof source.metadata === "object" &&
+    Object.keys(source.metadata).length > 0
+  ) {
+    sourcePayload.metadata = source.metadata;
+  }
+
   const payload = {
     company_id: sellerCompanyId,
     payment_type:
@@ -45,15 +71,14 @@ export function buildOrderPayload({
         ? PAYMENT_TYPE.INSTALLMENT
         : PAYMENT_TYPE.CASH,
     items: orderItems,
-    discount: Number(discount) || 0,
+    source: sourcePayload,
     idempotency_key: idempotencyKey,
-    source: {
-      channel: sourceChannel || "link",
-      reference_type: null,
-      reference_id: null,
-      metadata: {},
-    },
   };
+
+  const discountValue = Number(discount) || 0;
+  if (discountValue > 0) {
+    payload.discount = discountValue;
+  }
 
   if (governorateId != null && governorateId !== "") {
     payload.governorate_id = Number(governorateId);
@@ -71,7 +96,6 @@ export function buildOrderPayload({
     if (payload.items.length !== 1 || payload.items[0].quantity !== 1) {
       throw new Error("installment_single_item");
     }
-    // Never send installment_plan with cash (backend rule).
     payload.installment_plan = {
       months: Number(installmentPlan.months),
       down_payment: Number(

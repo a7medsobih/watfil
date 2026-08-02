@@ -43,6 +43,7 @@ export default function CompanyStoreProductsSection({
     productType: t("products.productType"),
     parentCategory: t("products.parentCategory"),
     category: t("products.category"),
+    stages: t("products.stages"),
     price: t("products.price"),
     source: t("products.source"),
     sourceCatalog: t("products.sourceCatalog"),
@@ -93,7 +94,7 @@ export default function CompanyStoreProductsSection({
               governorates={[]}
               labels={filterLabels}
               locale={locale}
-              showStagesFilter={false}
+              showStagesFilter
               showGovernorateFilter={false}
               showSourceFilter
             />
@@ -112,7 +113,7 @@ export default function CompanyStoreProductsSection({
                 governorates={[]}
                 labels={filterLabels}
                 locale={locale}
-                showStagesFilter={false}
+                showStagesFilter
                 showGovernorateFilter={false}
                 showSourceFilter
               />
@@ -133,7 +134,7 @@ export default function CompanyStoreProductsSection({
 
             {isPending ? (
               <ProductCardSkeletonGrid
-                count={8}
+                count={meta.perPage || 15}
                 className="grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4"
               />
             ) : products.length > 0 ? (

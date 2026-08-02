@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
-import CampanyCard from "@/components/common/CampanyCard";
+import AppPagination from "@/components/common/AppPagination";
+import CompanyCard from "@/components/common/CompanyCard";
 import LazySectionCarousel from "@/components/common/LazySectionCarousel";
 import SectionHeader from "@/components/common/SectionHeader";
 import { CompanyCardSkeletonGrid } from "@/components/skeletons/CompanyCardSkeleton";
@@ -25,48 +26,73 @@ import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 const ALL_OPTION = "all";
-const HOME_COMPANIES_LIMIT = 10;
+const EMPTY_META = { total: 0, currentPage: 1, lastPage: 1, perPage: 8 };
 
 /**
- * Interactive home companies block: top-rated list + governorate Select.
+ * Interactive home companies block: carousel + backend page/per_page pagination.
+ * Governorate filter resets to page 1. Carousel stays active on all breakpoints
+ * so the homepage scroll height does not grow with more results.
  */
 export default function HomeCompaniesClient({
   initialCompanies = [],
+  initialMeta = EMPTY_META,
   governorates = [],
+  perPage = 8,
 }) {
   const t = useTranslations();
   const locale = useLocale();
   const [governorateId, setGovernorateId] = useState(ALL_OPTION);
   const [companies, setCompanies] = useState(initialCompanies);
+  const [meta, setMeta] = useState({ ...EMPTY_META, perPage, ...initialMeta });
+  const [page, setPage] = useState(initialMeta.currentPage || 1);
   const [loading, setLoading] = useState(false);
   const requestIdRef = useRef(0);
 
   useEffect(() => {
     setCompanies(initialCompanies);
-  }, [initialCompanies]);
+    setMeta({ ...EMPTY_META, perPage, ...initialMeta });
+    setPage(initialMeta.currentPage || 1);
+  }, [initialCompanies, initialMeta, perPage]);
 
-  const handleGovernorateChange = async (value) => {
+  const fetchCompanies = async ({
+    nextPage = 1,
+    nextGovernorateId = governorateId,
+  } = {}) => {
     const requestId = ++requestIdRef.current;
-    setGovernorateId(value);
     setLoading(true);
-    setGovernoratePreferenceClient(
-      value === ALL_OPTION ? GOVERNORATE_ALL : value,
-    );
 
     try {
       const result = await getTopRatedCompanies({
-        limit: HOME_COMPANIES_LIMIT,
+        page: nextPage,
+        per_page: perPage,
         min_ratings: 1,
-        governorate_id: value === ALL_OPTION ? null : value,
+        governorate_id:
+          nextGovernorateId === ALL_OPTION ? null : nextGovernorateId,
         locale,
       });
       if (requestId !== requestIdRef.current) return;
+
       setCompanies(result.companies ?? []);
+      setMeta({ ...EMPTY_META, perPage, ...(result.meta ?? {}) });
+      setPage(result.meta?.currentPage || nextPage);
     } finally {
       if (requestId === requestIdRef.current) {
         setLoading(false);
       }
     }
+  };
+
+  const handleGovernorateChange = async (value) => {
+    setGovernorateId(value);
+    setGovernoratePreferenceClient(
+      value === ALL_OPTION ? GOVERNORATE_ALL : value,
+    );
+    await fetchCompanies({ nextPage: 1, nextGovernorateId: value });
+  };
+
+  const handlePageChange = async (nextPage) => {
+    if (nextPage === page || loading) return;
+    await fetchCompanies({ nextPage, nextGovernorateId: governorateId });
   };
 
   return (
@@ -119,7 +145,7 @@ export default function HomeCompaniesClient({
 
       <div className="relative" aria-busy={loading || undefined}>
         {loading && companies.length === 0 ? (
-          <CompanyCardSkeletonGrid count={4} />
+          <CompanyCardSkeletonGrid count={Math.min(perPage, 4)} />
         ) : companies.length > 0 ? (
           <div
             className={cn(
@@ -127,9 +153,13 @@ export default function HomeCompaniesClient({
               loading && "opacity-50",
             )}
           >
-            <LazySectionCarousel ariaLabel={t("home.companies.title")}>
+            <LazySectionCarousel
+              key={`${governorateId}-${page}`}
+              keepCarousel
+              ariaLabel={t("home.companies.title")}
+            >
               {companies.map((company) => (
-                <CampanyCard
+                <CompanyCard
                   key={company.id}
                   company={company}
                   locale={locale}
@@ -143,6 +173,19 @@ export default function HomeCompaniesClient({
             {t("home.companies.empty")}
           </p>
         )}
+
+        <AppPagination
+          currentPage={meta.currentPage || page}
+          lastPage={meta.lastPage || 1}
+          total={meta.total}
+          perPage={meta.perPage || perPage}
+          labels={{
+            previous: t("pagination.previous"),
+            next: t("pagination.next"),
+          }}
+          onPageChange={handlePageChange}
+          className="mt-6"
+        />
       </div>
     </section>
   );

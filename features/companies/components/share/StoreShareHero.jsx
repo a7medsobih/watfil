@@ -98,9 +98,9 @@ export default function StoreShareHero({
         onMouseEnter={multi ? plugin.current.stop : undefined}
         onMouseLeave={multi ? plugin.current.reset : undefined}
       >
-        <CarouselContent className="-ml-0">
+        <CarouselContent className="-ms-0">
           {slides.map((url, index) => (
-            <CarouselItem key={`${url}-${index}`} className="basis-full pl-0">
+            <CarouselItem key={`${url}-${index}`} className="basis-full ps-0">
               <div
                 className={cn(
                   "relative w-full overflow-hidden bg-muted",
