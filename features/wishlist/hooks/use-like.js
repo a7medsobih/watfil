@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { setLike } from "@/features/wishlist/api";
 import {
   LIKE_TYPE,
+  buildLikeKey,
   isProductLikeType,
   resolveLikeType,
 } from "@/features/wishlist/types";
@@ -32,7 +33,7 @@ import {
  * @param {'catalog'|'company'} [options.source] Resolves type for products
  * @param {'product'|'company'} [options.kind] Convenience when type omitted
  * @param {string|number} options.id
- * @param {string|number} [options.companyId] Required for company_product
+ * @param {string|number} [options.companyId] Required for company_product API body
  * @param {boolean} [options.initialLiked]
  * @param {number} [options.initialLikesCount]
  * @param {(next: { liked: boolean, likesCount: number, averageRating?: number|null }) => void} [options.onChange]
@@ -51,6 +52,9 @@ export function useLike({
 } = {}) {
   const type = resolveLikeType({ type: typeProp, source, kind });
   const isProduct = isProductLikeType(type);
+  const productLikeTarget = isProduct
+    ? { type, id, companyId }
+    : null;
 
   const tWishlist = useTranslations("wishlist");
   const tCompany = useTranslations("company");
@@ -64,7 +68,7 @@ export function useLike({
   const setProductLiked = useLikesStore((state) => state.setProductLiked);
   const setCompanyLiked = useLikesStore((state) => state.setCompanyLiked);
 
-  const storeProductLiked = useIsProductLiked(isProduct ? id : null);
+  const storeProductLiked = useIsProductLiked(productLikeTarget);
   const storeCompanyLiked = useIsCompanyLiked(!isProduct ? id : null);
   const storeLiked = isProduct ? storeProductLiked : storeCompanyLiked;
 
@@ -85,7 +89,7 @@ export function useLike({
   const applyOptimistic = useCallback(
     (nextLiked, nextCount, extras) => {
       if (isProduct) {
-        setProductLiked(id, nextLiked);
+        setProductLiked({ type, id, companyId }, nextLiked);
       } else {
         setCompanyLiked(id, nextLiked, extras);
       }
@@ -96,7 +100,7 @@ export function useLike({
         averageRating: extras?.averageRating,
       });
     },
-    [isProduct, id, setCompanyLiked, setProductLiked, onChange],
+    [isProduct, type, id, companyId, setCompanyLiked, setProductLiked, onChange],
   );
 
   const reconcile = useCallback(
@@ -116,7 +120,7 @@ export function useLike({
           : undefined;
 
       if (isProduct) {
-        setProductLiked(id, nextLiked);
+        setProductLiked({ type, id, companyId }, nextLiked);
       } else {
         setCompanyLiked(id, nextLiked, extras);
       }
@@ -128,7 +132,7 @@ export function useLike({
       });
       return { liked: nextLiked, likesCount: nextCount, averageRating: extras?.averageRating };
     },
-    [isProduct, id, setProductLiked, setCompanyLiked, onChange],
+    [isProduct, type, id, companyId, setProductLiked, setCompanyLiked, onChange],
   );
 
   const runToggle = useCallback(
@@ -144,7 +148,7 @@ export function useLike({
       }
 
       const previousLiked = isProduct
-        ? useLikesStore.getState().isProductLiked(id)
+        ? useLikesStore.getState().isProductLiked({ type, id, companyId })
         : useLikesStore.getState().isCompanyLiked(id);
       const previousCount = likesCountRef.current;
       const nextLiked =
@@ -274,6 +278,10 @@ export function useLike({
     loading,
     /** True while likes store is still hydrating for a returning session. */
     isLikesLoading: Boolean(token) && !likesHydrated,
+    /** Namespaced store key for this target (null for incomplete product identity). */
+    likeKey: isProduct
+      ? buildLikeKey({ type, id })
+      : buildLikeKey({ type: LIKE_TYPE.COMPANY, id }),
   };
 }
 
@@ -293,19 +301,20 @@ export async function executePendingLikeIntent(intent, token) {
   const id = intent.id;
   const companyId = intent.companyId;
   const isProduct = isProductLikeType(type);
+  const productTarget = isProduct ? { type, id, companyId } : null;
 
   if (type === LIKE_TYPE.COMPANY_PRODUCT && (companyId == null || companyId === "")) {
     return false;
   }
 
   const already = isProduct
-    ? useLikesStore.getState().isProductLiked(id)
+    ? useLikesStore.getState().isProductLiked(productTarget)
     : useLikesStore.getState().isCompanyLiked(id);
 
   if (already) return true;
 
   if (isProduct) {
-    useLikesStore.getState().setProductLiked(id, true);
+    useLikesStore.getState().setProductLiked(productTarget, true);
   } else {
     useLikesStore.getState().setCompanyLiked(id, true);
   }
@@ -317,7 +326,9 @@ export async function executePendingLikeIntent(intent, token) {
     );
 
     if (isProduct) {
-      useLikesStore.getState().setProductLiked(id, result.isLiked ?? true);
+      useLikesStore
+        .getState()
+        .setProductLiked(productTarget, result.isLiked ?? true);
     } else {
       useLikesStore.getState().setCompanyLiked(id, result.isLiked ?? true, {
         ...(result.averageRating != null
@@ -331,7 +342,7 @@ export async function executePendingLikeIntent(intent, token) {
     if (error?.status === 422) return true;
 
     if (isProduct) {
-      useLikesStore.getState().setProductLiked(id, false);
+      useLikesStore.getState().setProductLiked(productTarget, false);
     } else {
       useLikesStore.getState().setCompanyLiked(id, false);
     }

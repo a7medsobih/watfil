@@ -17,12 +17,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { useRequireAuth } from "@/features/auth";
 import { getCustomerLikes } from "@/features/wishlist/api";
+import { buildProductLikeKeyFromProduct } from "@/features/wishlist/types";
 import { Link } from "@/i18n/navigation";
 import { useAuthStore, useIsAuthenticated } from "@/stores/auth-store";
 import { useLikesStore } from "@/stores/likes-store";
 import { cn } from "@/lib/utils";
 
 const EMPTY_META = { total: 0, currentPage: 1, lastPage: 1, perPage: 12 };
+
+/** Stable identity for a liked product row (prevents catalog/company id collisions). */
+function productRowKey(product) {
+  return (
+    buildProductLikeKeyFromProduct(product) ??
+    `${product?.likeSource ?? product?.source ?? "unknown"}-${product?.companyId ?? "x"}-${product?.id}`
+  );
+}
 
 function normalizeInitial(initialData, productsPerPage, companiesPerPage) {
   return {
@@ -122,7 +131,8 @@ export default function WishlistPage({
         setCompaniesPage(result.meta.companies.currentPage || nextCompaniesPage);
 
         for (const product of result.products) {
-          if (product?.id != null) setProductLiked(product.id, true);
+          const key = buildProductLikeKeyFromProduct(product);
+          if (key) setProductLiked(key, true);
         }
         for (const company of result.companies) {
           if (company?.id != null) setCompanyLiked(company.id, true);
@@ -159,7 +169,8 @@ export default function WishlistPage({
     if (skipInitialFetchRef.current) {
       skipInitialFetchRef.current = false;
       for (const product of seeded.products) {
-        if (product?.id != null) setProductLiked(product.id, true);
+        const key = buildProductLikeKeyFromProduct(product);
+        if (key) setProductLiked(key, true);
       }
       for (const company of seeded.companies) {
         if (company?.id != null) setCompanyLiked(company.id, true);
@@ -182,10 +193,12 @@ export default function WishlistPage({
   };
 
   const handleProductLikeChange = (product) => (next) => {
+    const key = productRowKey(product);
+
     if (!next.liked) {
-      removedProductsRef.current.set(product.id, product);
+      removedProductsRef.current.set(key, product);
       setProducts((current) =>
-        current.filter((entry) => entry.id !== product.id),
+        current.filter((entry) => productRowKey(entry) !== key),
       );
       setProductsMeta((meta) => ({
         ...meta,
@@ -194,12 +207,12 @@ export default function WishlistPage({
       return;
     }
 
-    const stashed = removedProductsRef.current.get(product.id);
+    const stashed = removedProductsRef.current.get(key);
     if (!stashed) return;
 
-    removedProductsRef.current.delete(product.id);
+    removedProductsRef.current.delete(key);
     setProducts((current) =>
-      current.some((entry) => entry.id === product.id)
+      current.some((entry) => productRowKey(entry) === key)
         ? current
         : [...current, stashed],
     );
@@ -332,15 +345,15 @@ export default function WishlistPage({
         ) : tab === "products" ? (
           products.length > 0 ? (
             <>
-              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-5 sm:grid-cols-3 xl:grid-cols-4">
                 {products.map((product) => (
                   <ProductCard
-                    key={`${product.likeSource}-${product.companyId ?? "catalog"}-${product.id}`}
+                    key={productRowKey(product)}
                     product={product}
                     locale={locale}
                     variant={
                       product.likeSource === "company" ||
-                      product.source === "company"
+                        product.source === "company"
                         ? "company"
                         : "catalog"
                     }

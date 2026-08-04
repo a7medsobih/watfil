@@ -463,7 +463,46 @@
         }
     },
     "compare": {
-        "title": "Compare products"
+        "title": "Compare products",
+        "subtitle": "Pick two catalog products and compare price, discounts, and offering companies side by side.",
+        "emptyTitle": "No products to compare",
+        "empty": "Add up to {max} products from the catalog, then open this page to compare them.",
+        "emptySlot": "Add another product",
+        "waitingForSecond": "Add one more product to start comparing.",
+        "needTwo": "{current} of {max} selected — add one more product to compare.",
+        "browseProducts": "Browse products",
+        "viewProduct": "View product",
+        "offeringCompanies": "{count} offering companies",
+        "remove": "Remove from compare",
+        "clear": "Clear all",
+        "retry": "Try again",
+        "countBadge": "{count} / {max}",
+        "fields": {
+            "product": "Product",
+            "price": "Cash price",
+            "originalPrice": "Original price",
+            "discount": "Discount",
+            "productType": "Product type",
+            "category": "Category",
+            "offeringCompanies": "Offering companies",
+            "likes": "Likes",
+            "rating": "Rating",
+            "availability": "Availability",
+            "sku": "SKU",
+            "supplier": "Supplier",
+            "views": "Views"
+        },
+        "errors": {
+            "title": "Could not load comparison",
+            "generic": "Something went wrong. Please try again.",
+            "unavailable": "One of the products is not available for comparison.",
+            "invalid": "Select exactly two different products to compare."
+        },
+        "toast": {
+            "added": "Product added to compare.",
+            "removed": "Product removed from compare.",
+            "full": "You can compare up to {max} products. Remove one first."
+        }
     },
     "joinUs": {
         "title": "Join Watfil",

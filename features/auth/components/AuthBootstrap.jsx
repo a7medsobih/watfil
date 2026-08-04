@@ -42,11 +42,12 @@ export default function AuthBootstrap() {
     setCustomerTokenCookie(token);
     refreshMe().catch(() => {});
 
-    // Avoid flicker after login: keep previous hydrated state while refreshing IDs.
+    // Avoid flicker after login: keep previous hydrated state while refreshing
+    // namespaced product keys + company ids from GET /customer/likes.
     fetchAllLikedIds(token)
-      .then((ids) => {
+      .then((payload) => {
         if (cancelled) return;
-        hydrateLikes(ids);
+        hydrateLikes(payload);
       })
       .catch(() => {
         if (cancelled) return;

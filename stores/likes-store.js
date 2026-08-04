@@ -2,27 +2,55 @@
 
 import { create } from "zustand";
 
+import { buildLikeKey } from "@/features/wishlist/types";
+
 function toId(value) {
   if (value == null || value === "") return null;
   return String(value);
 }
 
-function idsToMap(ids = []) {
+function keysToMap(keys = []) {
   const map = {};
-  for (const id of ids) {
-    const key = toId(id);
-    if (key) map[key] = true;
+  for (const key of keys) {
+    if (typeof key === "string" && key) map[key] = true;
   }
   return map;
 }
 
 /**
+ * Resolve a namespaced product like key from a string key or identity params.
+ * @param {string|{ type?: string, source?: string, id?: string|number, companyId?: string|number }|null|undefined} target
+ * @returns {string|null}
+ */
+export function resolveProductLikeKey(target) {
+  if (target == null || target === "") return null;
+  if (typeof target === "string") return target;
+  if (typeof target === "object") {
+    return buildLikeKey({
+      type: target.type,
+      source: target.source,
+      kind: "product",
+      id: target.id,
+    });
+  }
+  return null;
+}
+
+/**
  * Single source of truth for product + company likes.
- * Count is always derived from the ID maps (never stored separately).
+ *
+ * Product entries are keyed by namespaced like keys (never bare numeric ids):
+ * - `catalog_product:{id}`
+ * - `company_product:{id}`
+ *
+ * Company likes stay in a separate map keyed by company id
+ * (API type `company`).
+ *
+ * Count is always derived from the maps (never stored separately).
  */
 export const useLikesStore = create((set, get) => ({
-  /** @type {Record<string, true>} */
-  likedProductIds: {},
+  /** @type {Record<string, true>} namespaced product like keys */
+  likedProductKeys: {},
   /** @type {Record<string, true>} */
   likedCompanyIds: {},
   /**
@@ -36,34 +64,37 @@ export const useLikesStore = create((set, get) => ({
   setHydrated: (isHydrated = true) => set({ isHydrated: Boolean(isHydrated) }),
 
   /**
-   * Merge liked IDs from GET /customer/likes into the store.
+   * Merge liked keys from GET /customer/likes into the store.
    * Union-merge preserves optimistic likes that may race with hydration.
-   * @param {{ productIds?: Array<string|number>, companyIds?: Array<string|number> }} payload
+   * @param {{ productKeys?: string[], companyIds?: Array<string|number> }} payload
    */
-  hydrate: ({ productIds = [], companyIds = [] } = {}) =>
+  hydrate: ({ productKeys = [], companyIds = [] } = {}) =>
     set((state) => ({
-      likedProductIds: {
-        ...state.likedProductIds,
-        ...idsToMap(productIds),
+      likedProductKeys: {
+        ...state.likedProductKeys,
+        ...keysToMap(productKeys),
       },
       likedCompanyIds: {
         ...state.likedCompanyIds,
-        ...idsToMap(companyIds),
+        ...keysToMap((companyIds || []).map(toId).filter(Boolean)),
       },
       isHydrated: true,
     })),
 
   clear: () =>
     set({
-      likedProductIds: {},
+      likedProductKeys: {},
       likedCompanyIds: {},
       companyExtras: {},
       isHydrated: false,
     }),
 
-  isProductLiked: (productId) => {
-    const key = toId(productId);
-    return Boolean(key && get().likedProductIds[key]);
+  /**
+   * @param {string|{ type?: string, source?: string, id?: string|number, companyId?: string|number }} target
+   */
+  isProductLiked: (target) => {
+    const key = resolveProductLikeKey(target);
+    return Boolean(key && get().likedProductKeys[key]);
   },
 
   isCompanyLiked: (companyId) => {
@@ -71,15 +102,19 @@ export const useLikesStore = create((set, get) => ({
     return Boolean(key && get().likedCompanyIds[key]);
   },
 
-  setProductLiked: (productId, liked) => {
-    const key = toId(productId);
+  /**
+   * @param {string|{ type?: string, source?: string, id?: string|number, companyId?: string|number }} target
+   * @param {boolean} liked
+   */
+  setProductLiked: (target, liked) => {
+    const key = resolveProductLikeKey(target);
     if (!key) return;
 
     set((state) => {
-      const next = { ...state.likedProductIds };
+      const next = { ...state.likedProductKeys };
       if (liked) next[key] = true;
       else delete next[key];
-      return { likedProductIds: next };
+      return { likedProductKeys: next };
     });
   },
 
@@ -114,7 +149,7 @@ export const useLikesStore = create((set, get) => ({
   getCount: () => {
     const state = get();
     return (
-      Object.keys(state.likedProductIds).length +
+      Object.keys(state.likedProductKeys).length +
       Object.keys(state.likedCompanyIds).length
     );
   },
@@ -124,7 +159,7 @@ export const useLikesStore = create((set, get) => ({
 export function useWishlistCount() {
   return useLikesStore(
     (state) =>
-      Object.keys(state.likedProductIds).length +
+      Object.keys(state.likedProductKeys).length +
       Object.keys(state.likedCompanyIds).length,
   );
 }
@@ -134,10 +169,15 @@ export function useLikesHydrated() {
   return useLikesStore((state) => state.isHydrated);
 }
 
-/** Subscribe to whether a product id is liked. */
-export function useIsProductLiked(productId) {
-  const key = toId(productId);
-  return useLikesStore((state) => Boolean(key && state.likedProductIds[key]));
+/**
+ * Subscribe to whether a product like target is liked.
+ * Pass identity params (preferred) or a prebuilt namespaced key string.
+ *
+ * @param {string|{ type?: string, source?: string, id?: string|number|null, companyId?: string|number|null }|null|undefined} target
+ */
+export function useIsProductLiked(target) {
+  const key = resolveProductLikeKey(target);
+  return useLikesStore((state) => Boolean(key && state.likedProductKeys[key]));
 }
 
 /** Subscribe to whether a company id is liked. */

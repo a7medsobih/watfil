@@ -24,7 +24,6 @@ export default function NavbarActions() {
           variant="ghost"
           size="icon"
           asChild
-          className="hidden md:inline-flex"
           aria-label={t("nav.compare")}
         >
           <Link href="/compare" className="relative">

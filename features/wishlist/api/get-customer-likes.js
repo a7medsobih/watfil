@@ -4,6 +4,7 @@ import { mapLikedProducts } from "@/features/wishlist/services/liked-product.map
 import { mapLikedCompanies } from "@/features/wishlist/services/liked-company.mapper";
 import { mapProductsMeta } from "@/features/products/services/product.mapper";
 import { mapCompaniesMeta } from "@/features/companies/services/company.mapper";
+import { buildProductLikeKeyFromProduct } from "@/features/wishlist/types";
 
 /**
  * Builds query params for GET /customer/likes.
@@ -70,14 +71,18 @@ export async function getCustomerLikes(token, params = {}, locale = "ar") {
 }
 
 /**
- * Hydrate helper: walk all pages of GET /customer/likes and collect IDs.
+ * Hydrate helper: walk all pages of GET /customer/likes and collect
+ * namespaced product like keys + company ids.
+ *
+ * Product keys use `catalog_product:{id}` / `company_product:{id}` so catalog
+ * and company products never collide when they share a numeric id.
  *
  * @param {string} token
- * @returns {Promise<{ productIds: string[], companyIds: string[] }>}
+ * @returns {Promise<{ productKeys: string[], companyIds: string[] }>}
  */
 export async function fetchAllLikedIds(token) {
   const perPage = 50;
-  const productIds = new Set();
+  const productKeys = new Set();
   const companyIds = new Set();
 
   let productsPage = 1;
@@ -95,7 +100,8 @@ export async function fetchAllLikedIds(token) {
 
     if (!productsDone) {
       for (const product of result.products) {
-        if (product?.id != null) productIds.add(String(product.id));
+        const key = buildProductLikeKeyFromProduct(product);
+        if (key) productKeys.add(key);
       }
       const last = Number(result.meta.products.lastPage) || 1;
       if (productsPage >= last) productsDone = true;
@@ -113,7 +119,7 @@ export async function fetchAllLikedIds(token) {
   }
 
   return {
-    productIds: [...productIds],
+    productKeys: [...productKeys],
     companyIds: [...companyIds],
   };
 }

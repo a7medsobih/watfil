@@ -9,7 +9,7 @@ import MediaImage from "@/components/common/MediaImage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ViewsCount } from "@/features/browsing";
-import { COMPARE_UI_ENABLED } from "@/features/compare";
+import { COMPARE_UI_ENABLED, useCompareToggle } from "@/features/compare";
 import ProductLikeButton from "@/features/wishlist/components/ProductLikeButton";
 import { LIKE_SOURCE } from "@/features/wishlist/types";
 import { cn } from "@/lib/utils";
@@ -30,6 +30,7 @@ export default function ProductHero({
 }) {
   const t = useTranslations("product");
   const currency = locale === "ar" ? "ج.م" : "EGP";
+  const { toggle: toggleCompare, isInCompare } = useCompareToggle();
   const [likesCount, setLikesCount] = useState(product?.likesCount ?? 0);
   const [likesSyncKey, setLikesSyncKey] = useState(
     `${product?.id}-${product?.likesCount ?? 0}`,
@@ -59,6 +60,11 @@ export default function ProductHero({
     product.likeSource ??
     product.source ??
     (product.companyId != null ? LIKE_SOURCE.COMPANY : LIKE_SOURCE.CATALOG);
+
+  const inCompare = isInCompare(product.id);
+  const canCompare =
+    isCatalog &&
+    (likeSource === LIKE_SOURCE.CATALOG || product.source === "catalog");
 
   const likeCompanyId =
     likeSource === LIKE_SOURCE.COMPANY
@@ -269,18 +275,23 @@ export default function ProductHero({
             </div>
           )}
 
-          {COMPARE_UI_ENABLED ? (
+          {COMPARE_UI_ENABLED && canCompare ? (
             <Button
               type="button"
               variant="outline"
               size="lg"
-              aria-pressed={product.isInCompare}
+              aria-pressed={inCompare}
               className={cn(
                 "gap-2",
-                product.isInCompare && "border-primary/40 text-primary",
+                inCompare &&
+                  "border-primary bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground",
               )}
+              onClick={() => toggleCompare(product)}
             >
-              <GitCompare className="h-4 w-4" aria-hidden />
+              <GitCompare
+                className={cn("h-4 w-4", inCompare && "stroke-[2.25]")}
+                aria-hidden
+              />
               {t("compare")}
             </Button>
           ) : null}

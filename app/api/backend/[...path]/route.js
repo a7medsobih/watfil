@@ -13,7 +13,6 @@ const ALLOWED_PREFIXES = [
   "public/",
   "customer/",
   "cart",
-  "compare",
   "search",
 ];
 
@@ -79,10 +78,11 @@ async function proxyRequest(request, context) {
   const targetPath = `/${segments.join("/")}`;
   const targetUrl = buildUrl(targetPath);
 
-  // Preserve query string from the browser request.
+  // Preserve query string from the browser request (including repeated keys
+  // like product_ids[]=1&product_ids[]=2 — `set` would collapse them).
   const url = new URL(targetUrl);
   incomingUrl.searchParams.forEach((value, key) => {
-    url.searchParams.set(key, value);
+    url.searchParams.append(key, value);
   });
 
   const headers = {

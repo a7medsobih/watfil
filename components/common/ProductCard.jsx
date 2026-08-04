@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { ViewsCount } from "@/features/browsing";
-import { COMPARE_UI_ENABLED } from "@/features/compare";
+import { COMPARE_UI_ENABLED, useCompareToggle } from "@/features/compare";
 import { buildCompanyProductHref } from "@/features/companies/utils/resolve-company-product-params";
 import { useExperience } from "@/features/experience";
 import { EXPERIENCE } from "@/features/experience/constants";
@@ -91,6 +91,9 @@ export default function ProductCard({
     setLikesCount(product.likesCount ?? 0);
   }
 
+  const { toggle: toggleCompare, isInCompare } = useCompareToggle();
+  const inCompare = isInCompare(product.id);
+
   const isCatalogSource =
     (product.source ?? likeSource) === LIKE_SOURCE.CATALOG;
   const isOutOfStock =
@@ -167,24 +170,27 @@ export default function ProductCard({
             }}
           />
 
-          {COMPARE_UI_ENABLED ? (
+          {COMPARE_UI_ENABLED && isCatalogVariant && isCatalogSource ? (
             <Button
               variant="outline"
               size="icon-sm"
               aria-label={t("compare")}
-              aria-pressed={product.isInCompare}
+              aria-pressed={inCompare}
               className={cn(
                 "border-border/60 bg-card/75 shadow-sm backdrop-blur-sm hover:border-primary/30 hover:bg-card",
-                product.isInCompare
-                  ? "border-primary/40 text-primary"
+                inCompare
+                  ? "border-primary bg-primary text-primary-foreground hover:border-primary hover:bg-primary hover:text-primary-foreground"
                   : "text-muted-foreground hover:text-foreground",
               )}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                toggleCompare(product);
               }}
             >
-              <GitCompare className="h-4 w-4" />
+              <GitCompare
+                className={cn("h-4 w-4", inCompare && "stroke-[2.25]")}
+              />
             </Button>
           ) : null}
         </div>

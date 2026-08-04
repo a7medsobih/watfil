@@ -22,4 +22,6 @@ export {
   LIKE_SOURCE,
   resolveLikeType,
   isProductLikeType,
+  buildLikeKey,
+  buildProductLikeKeyFromProduct,
 } from "./types";
